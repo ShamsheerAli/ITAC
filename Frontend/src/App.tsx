@@ -31,13 +31,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/TemporaryDashboard" element={<TemporaryDashboard />} />
+        <Route path="/update-details" element={<UpdateDetails />} />
         {/* DASHBOARD ROUTES (With Sidebar) */}
         {/* We wrap these inside the Layout route */}
         <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
 
         <Route path="/inbox" element={<Inbox />} />
-          <Route path="/update-details" element={<UpdateDetails />} />
+          
           <Route path="/upload-documents" element={<UploadDocuments />} />
           {/* You can add more sidebar pages here later */}
         </Route>

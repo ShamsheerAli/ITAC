@@ -1,136 +1,194 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const TemporaryDashboard = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+
+      const fetchProfile = async () => {
+        try {
+          const res = await api.get(`/profile/${parsedUser.id}`);
+          setProfile(res.data);
+        } catch (err) {
+          console.log("No profile found.");
+        }
+      };
+      fetchProfile();
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  if (!user) return <div className="p-10 text-center">Loading Dashboard...</div>;
+
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-gray-50 p-8 flex justify-center">
+    <div className="min-h-screen bg-white font-sans">
       
-      {/* MAIN CONTAINER */}
-      <div className="w-full max-w-[1600px] space-y-8">
+      {/* 1. HEADER */}
+      <div className="bg-white shadow-sm border-b border-gray-200 w-full px-4 md:px-8 py-4 mb-8 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+            <div className="h-8 w-px bg-gray-300"></div>
+            <span className="text-xl font-bold text-gray-800">Temporary Dashboard</span>
+        </div>
+        <button 
+            onClick={() => {
+                localStorage.removeItem('user');
+                navigate('/login');
+            }}
+            className="text-sm font-bold text-red-500 hover:text-red-700"
+        >
+            Logout
+        </button>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="w-full px-4 md:px-8 space-y-8 pb-12">
         
-        {/* TOP SECTION: GRID OF 2 CARDS */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          
-          {/* LEFT CARD: My Information */}
-          <div className="bg-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col h-full min-h-[400px]">
-            {/* Header - Gray background */}
-            <div className="bg-gray-500 text-white text-center py-4 font-bold text-3xl tracking-wide">
-              My Information
-            </div>
+        {/* 2. TOP CARDS GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* Content */}
-            <div className="p-8 flex flex-col sm:flex-row items-center justify-center gap-8 flex-grow">
-              {/* Profile Image */}
-              <div className="flex-shrink-0">
-                 <img
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                  alt="Profile" 
-                  className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
-                />
-              </div>
-
-              {/* Details */}
-              <div className="text-center w-full space-y-2 text-xl text-gray-800 font-medium leading-relaxed">
-                <p><span className="font-bold text-black">Name:</span> Steven Simpson</p>
-                <p><span className="font-bold text-black">Company:</span> ITW Paslode Power Nailing</p>
-                <p>
-                  <span className="font-bold text-black">Email:</span>{" "}
-                  <a href="mailto:ssimpso@paslode.com" className="underline hover:text-[#FE5C00]">
-                    ssimpso@paslode.com
-                  </a>
-                </p>
-                <p><span className="font-bold text-black">Phone:</span> +1 224-532-8454</p>
-                
-                {/* --- UPDATED ADDRESS SECTION --- */}
-                <p><span className="font-bold text-black">Street Address:</span> 1600 Patrick Dr</p>
-                <p><span className="font-bold text-black">City:</span> Pocahontas</p>
-                <p>
-                  <span className="font-bold text-black">State:</span> AR
-                  <span className="mx-3 text-gray-400">|</span> 
-                  <span className="font-bold text-black">Zip Code:</span> 72455
-                </p>
-                {/* ------------------------------- */}
-                
-                <div className="pt-6 flex justify-center">
-                  <Link to="/update-details">
-                      <button className="bg-[#FE5C00] text-white px-10 py-2 rounded shadow hover:bg-orange-700 transition font-bold uppercase text-xl tracking-wider">
-                      UPDATE
-                      </button>
-                  </Link>
+            {/* LEFT: MY INFORMATION (Redesigned Layout) */}
+            <div className="rounded-lg overflow-hidden shadow-sm flex flex-col h-full border border-gray-100">
+                {/* Header Bar */}
+                <div className="bg-gray-600 text-white text-center py-4 font-bold text-2xl tracking-wide">
+                    My Information
                 </div>
-              </div>
-            </div>
-          </div>
+                
+                {/* Card Body */}
+                <div className="bg-gray-50 p-8 flex-1 flex flex-col">
+                    
+                    {/* Top Section: Photo & Name */}
+                    <div className="flex flex-col items-center mb-10 border-b border-gray-200 pb-6">
+                        <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden mb-4">
+                             <img 
+                                src={profile?.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                            />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-900">{user.name}</h2>
+                        <span className="text-gray-500 font-medium mt-1">Client Account</span>
+                    </div>
 
-          {/* RIGHT CARD: Action Center */}
-          <div className="bg-white p-2 flex flex-col justify-between h-full min-h-[400px]">
-             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-center text-black">Action Center</h2>
-              <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
+                    {/* Middle Section: Info Grid (2 Columns) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10 w-full px-4">
+                        
+                        {/* Column 1 */}
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">Company</label>
+                                <p className="text-xl font-bold text-gray-800">{profile?.companyName || "Not Updated"}</p>
+                            </div>
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">Email</label>
+                                <p className="text-lg font-semibold text-gray-800 break-words">{user.email}</p>
+                            </div>
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">Phone</label>
+                                <p className="text-xl font-bold text-gray-800">{profile?.contactPhone || "Not Updated"}</p>
+                            </div>
+                        </div>
+
+                        {/* Column 2 */}
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">Street Address</label>
+                                <p className="text-xl font-bold text-gray-800">{profile?.streetAddress || "Not Updated"}</p>
+                            </div>
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">City</label>
+                                <p className="text-xl font-bold text-gray-800">{profile?.city || "Not Updated"}</p>
+                            </div>
+                            <div>
+                                <label className="block text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">State & Zip</label>
+                                <p className="text-xl font-bold text-gray-800">
+                                    {profile?.state || "NA"} <span className="text-gray-400 mx-2">|</span> {profile?.zipCode || "NA"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom Section: Button */}
+                    <div className="mt-auto text-center">
+                        <Link to="/update-details">
+                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 px-16 rounded shadow-lg transition transform hover:-translate-y-0.5 uppercase tracking-wider text-lg">
+                                Update Information
+                            </button>
+                        </Link>
+                    </div>
+                </div>
             </div>
 
-            {/* Main Text Area */}
-            <div className="flex-grow flex items-center justify-center px-6">
-              <div className="text-black text-2xl leading-10 text-center font-medium">
-                Go through our services by clicking below “services”
-                button, and Update your details by clicking on “Update
-                Information” button. One of our team members will
-                reach you out.
-              </div>
-            </div>
+            {/* RIGHT: ACTION CENTER */}
+            <div className="rounded-lg overflow-hidden shadow-sm flex flex-col h-full border border-gray-100">
+                 {/* Header Bar */}
+                <div className="bg-[#FE5C00] text-white text-center py-4 font-bold text-2xl tracking-wide">
+                    Action Center
+                </div>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap gap-8 mt-8 justify-center px-12 mb-6">
-              {/* Resources Button */}
-              <button className="flex-1 max-w-[250px] bg-[#FE5C00] text-white px-6 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
-                Resources
-              </button>
-              
-              {/* Update Information Button */}
-              <Link to="/update-details" className="flex-1 max-w-[250px]">
-                  <button className="w-full h-full bg-[#FE5C00] text-white px-6 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center leading-tight">
-                  Update Information
-                  </button>
-              </Link>
-            </div>
-          </div>
+                 {/* Card Body */}
+                <div className="bg-white p-8 flex-1 flex flex-col items-center justify-center text-center">
+                    <div className="max-w-xl space-y-8">
+                        <p className="text-gray-700 font-medium text-xl leading-relaxed">
+                            Welcome to the <span className="font-bold text-[#FE5C00]">ITAC Portal</span>.
+                            <br/><br/>
+                            Get started by exploring our <strong>Resources</strong>, or ensure your profile is up-to-date by clicking <strong>Update Information</strong>.
+                            <br/><br/>
+                            <span className="text-gray-500 italic text-base">One of our team members will review your details and reach out shortly.</span>
+                        </p>
 
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center w-full pt-4">
+                            <button className="flex-1 bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-8 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[200px]">
+                                Resources
+                            </button>
+                            <Link to="/update-details" className="flex-1">
+                                <button className="w-full bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-8 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[200px]">
+                                    Update Info
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {/* BOTTOM SECTION: Tracking System */}
-        <div className="bg-white pt-8 w-full">
-          <div className="mb-10">
-              <h2 className="text-3xl font-bold text-center text-black">Tracking system</h2>
-              <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
-          </div>
+        {/* 3. TRACKING SYSTEM */}
+        <div className="rounded-lg overflow-hidden shadow-sm bg-white border border-gray-100">
+            {/* Header Bar */}
+            <div className="bg-[#FE5C00] text-white text-center py-4 font-bold text-2xl tracking-wide">
+                Tracking System
+            </div>
 
-          {/* PROGRESS BAR */}
-          <div className="bg-gray-50 rounded-xl p-14 border border-gray-100 flex flex-col lg:flex-row items-center justify-center gap-10 w-full">
-              
-              {/* Step 1: Update Information */}
-              <StepItem 
-                icon={<IconDocumentEdit />} 
-                label="Update Information" 
-              />
-
-              {/* Arrow */}
-              <ArrowDivider />
-
-              {/* Step 2: Details Review */}
-              <StepItem 
-                icon={<IconDocumentSearch />} 
-                label="Details Review" 
-              />
-
-              {/* Arrow */}
-              <ArrowDivider />
-
-              {/* Step 3: Ready for next steps */}
-              <StepItem 
-                icon={<IconCheckCircle />} 
-                label="Ready for next steps" 
-              />
-
-          </div>
+            <div className="p-16 flex flex-col md:flex-row items-center justify-center relative max-w-6xl mx-auto">
+                {/* Step 1 */}
+                <Step 
+                    icon={<IconDocument />} 
+                    label="Missing Documents" 
+                    status="active" 
+                />
+                <Connector status="pending" />
+                {/* Step 2 */}
+                <Step 
+                    icon={<IconClock />} 
+                    label="Waiting for approval" 
+                    status="pending" 
+                />
+                <Connector status="pending" />
+                {/* Step 3 */}
+                <Step 
+                    icon={<IconCheck />} 
+                    label="Ready to schedule" 
+                    status="pending" 
+                />
+            </div>
         </div>
 
       </div>
@@ -140,37 +198,48 @@ const TemporaryDashboard = () => {
 
 /* --- SUB-COMPONENTS --- */
 
-const StepItem = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
-  <div className="flex flex-col items-center z-10 text-center w-64">
-    <div className="w-28 h-28 rounded-full bg-slate-600 flex items-center justify-center text-white mb-6 shadow-lg transform hover:scale-105 transition duration-300">
-      {icon}
-    </div>
-    <span className="text-black font-bold text-xl">{label}</span>
-  </div>
+const Step = ({ icon, label, status }: { icon: any, label: string, status: 'active' | 'pending' | 'completed' }) => {
+    let circleClass = "bg-gray-200 text-gray-400";
+    let textClass = "text-gray-400";
+
+    if (status === 'active') {
+        circleClass = "bg-gray-800 text-white shadow-xl scale-110 ring-4 ring-gray-100";
+        textClass = "text-black font-extrabold mt-4";
+    } else {
+        textClass = "text-gray-400 font-medium mt-4";
+    }
+
+    return (
+        <div className="flex flex-col items-center z-10 w-56 text-center">
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${circleClass}`}>
+                {icon}
+            </div>
+            <span className={`text-xl ${textClass}`}>{label}</span>
+        </div>
+    );
+};
+
+const Connector = ({ status }: { status: 'active' | 'pending' }) => (
+    <div className={`hidden md:block flex-1 h-2 mx-4 -mt-12 rounded-full ${status === 'active' ? 'bg-gray-800' : 'bg-gray-200'}`} />
 );
 
-const ArrowDivider = () => (
-  <div className="hidden lg:block flex-1 h-1.5 bg-black mx-4 -mt-14 rounded-full" /> 
+/* --- ICONS --- */
+const IconDocument = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
 );
 
-/* --- ICONS (SVG) --- */
-
-const IconDocumentEdit = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-14 h-14">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-  </svg>
+const IconClock = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
 );
 
-const IconDocumentSearch = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-14 h-14">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-  </svg>
-);
-
-const IconCheckCircle = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-14 h-14">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
+const IconCheck = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
 );
 
 export default TemporaryDashboard;

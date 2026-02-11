@@ -1,25 +1,30 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
+import mongoose from 'mongoose';
+import authRoutes from './routes/authRoutes';
+import profileRoutes from './routes/profileRoutes';
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || "";
 
 // Middleware
 app.use(cors()); // Allow frontend requests
 app.use(express.json()); // Parse JSON bodies
 
-// 1. Test Route
-app.get('/', (req: Request, res: Response) => {
-  res.send('ITAC Staff Portal API is Running!');
-});
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// 2. Mock API Route (We will replace this later with a Database)
-app.get('/api/test', (req: Request, res: Response) => {
-  res.json({ message: "Hello from the Backend!", status: "Success" });
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+  // 1. Test Route
+app.get('/', (req: Request, res: Response) => {
+  res.send('ITAC Staff Portal API is Running & DB Connected!');
 });
 
 // Start Server
