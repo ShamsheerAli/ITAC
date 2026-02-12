@@ -1,197 +1,236 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
+import api from '../api/axios';
 
-// 1. Define the Status Types to match your columns
-type TicketStatus = 
-  | "New Inquiry"
-  | "Awaiting Documents"
-  | "Ready for audit"
-  | "Audit Scheduled"
-  | "Report writing";
+// --- ICONS ---
+const IconSearch = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+);
+const IconFilter = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+    </svg>
+);
+const IconSort = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+    </svg>
+);
+const IconUsers = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+);
 
-// 2. Define the Ticket Interface
-interface Ticket {
-  id: string;
-  companyName: string;
-  clientId: string;
-  status: TicketStatus;
-  date?: string; // Optional date for "Audit Scheduled"
-}
-
-const StaffKanban = () => {
-  // 3. Mock Data
-  const [tickets] = useState<Ticket[]>([
-    // New Inquiry
-    { id: "1", companyName: "ITW Paslode Power Nailing", clientId: "OK1165", status: "New Inquiry" },
-    { id: "2", companyName: "Koax Corp", clientId: "OK1166", status: "New Inquiry" },
-    { id: "3", companyName: "American Airlines", clientId: "OK1167", status: "New Inquiry" },
-    { id: "4", companyName: "ClimaCool Corp", clientId: "OK1168", status: "New Inquiry" },
-
-    // Awaiting Documents
-    { id: "5", companyName: "Checotah Casino", clientId: "OK1169", status: "Awaiting Documents" },
-    { id: "6", companyName: "ClimateCraft, Inc.", clientId: "OK1170", status: "Awaiting Documents" },
-
-    // Ready for audit
-    { id: "7", companyName: "VacuWorx", clientId: "OK1171", status: "Ready for audit" },
-    { id: "8", companyName: "Muscogee Casino", clientId: "OK1172", status: "Ready for audit" },
-    { id: "9", companyName: "Oklahoma City Zoo", clientId: "OK1173", status: "Ready for audit" },
-    { id: "10", companyName: "AAF International", clientId: "OK1174", status: "Ready for audit" },
-    { id: "11", companyName: "Wako, LLC", clientId: "OK1175", status: "Ready for audit" },
-    { id: "12", companyName: "One Fire Casino", clientId: "OK1176", status: "Ready for audit" },
-
-    // Audit Scheduled
-    { id: "13", companyName: "Kingspan Roofing", clientId: "OK1177", status: "Audit Scheduled", date: "12/08/25" },
-    { id: "14", companyName: "Crusoe Tulsa 1", clientId: "OK1178", status: "Audit Scheduled", date: "12/22/25" },
-    { id: "15", companyName: "Ferroloy Inc", clientId: "OK1179", status: "Audit Scheduled", date: "02/01/25" },
-
-    // Report writing
-    { id: "16", companyName: "LOG10, LLC", clientId: "OK1178", status: "Report writing" },
-    { id: "17", companyName: "Elder Care", clientId: "OK1179", status: "Report writing" },
-    { id: "18", companyName: "SPF America", clientId: "OK1180", status: "Report writing" },
-    { id: "19", companyName: "PTMW, Inc", clientId: "OK1181", status: "Report writing" },
-  ]);
-
-  const columns: TicketStatus[] = [
-    "New Inquiry",
-    "Awaiting Documents",
-    "Ready for audit",
-    "Audit Scheduled",
-    "Report writing",
-  ];
-
-  return (
-    <div className="w-full h-full flex flex-col">
-      
-      {/* HEADER */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-center text-black uppercase tracking-wider">
-          Kanban Board
-        </h1>
-        <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
-      </div>
-
-      {/* CONTROLS BAR */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        
-        {/* Left: Count */}
-        <div className="flex items-center gap-2 text-[#FE5C00] text-lg font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span className="text-gray-700">Total Active Clients : <span className="text-black font-bold">{tickets.length}</span></span>
-        </div>
-
-        {/* Right: Search & Filters */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
-             <div className="relative flex-1 md:w-80">
-                 <input 
-                    type="text" 
-                    placeholder="Search Company name or Id" 
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-[#FE5C00] text-sm"
-                />
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
-
-            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-                Filter
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
-                Sort
-            </button>
-        </div>
-      </div>
-
-      {/* KANBAN BOARD GRID */}
-      <div className="flex-1 overflow-x-auto">
-        <div className="grid grid-cols-5 min-w-[1200px] border border-gray-200 rounded-lg overflow-hidden bg-white h-full min-h-[600px]">
-            
-            {columns.map((colName) => (
-                <div key={colName} className="flex flex-col border-r border-gray-200 last:border-r-0">
-                    {/* Column Header */}
-                    <div className="bg-gray-50 py-4 text-center border-b border-gray-200">
-                        <span className="text-gray-600 font-semibold text-lg">{colName}</span>
-                    </div>
-
-                    {/* Column Content */}
-                    <div className="p-4 space-y-3 flex-1 bg-white">
-                        {tickets
-                            .filter(t => t.status === colName)
-                            .map(ticket => (
-                                <KanbanCard key={ticket.id} ticket={ticket} />
-                            ))
-                        }
-                    </div>
-                </div>
-            ))}
-
-        </div>
-      </div>
-
-      {/* FOOTER SAVE BUTTON */}
-      <div className="flex justify-end mt-6">
-          <button className="bg-[#FE5C00] text-white px-10 py-2 rounded shadow hover:bg-orange-700 transition font-bold text-lg">
-            Save
-          </button>
-      </div>
-
-    </div>
-  );
+// --- COLUMN CONFIGURATION ---
+const columnsFromBackend = {
+  'New Inquiry': { name: 'New Inquiry', items: [] as any[], color: 'bg-blue-500' },
+  'Awaiting Documents': { name: 'Awaiting Documents', items: [] as any[], color: 'bg-orange-500' },
+  'Ready for audit': { name: 'Ready for audit', items: [] as any[], color: 'bg-green-500' },
+  'Audit Scheduled': { name: 'Audit Scheduled', items: [] as any[], color: 'bg-cyan-500' },
+  'Report writing': { name: 'Report writing', items: [] as any[], color: 'bg-pink-500' },
 };
 
-/* --- SUB-COMPONENT: KANBAN CARD --- */
+const StaffKanban = () => {
+  const navigate = useNavigate(); // 2. Initialize Hook
+  const [columns, setColumns] = useState(columnsFromBackend);
+  const [loading, setLoading] = useState(true);
+  const [totalClients, setTotalClients] = useState(0);
 
-const KanbanCard = ({ ticket }: { ticket: Ticket }) => {
-    const navigate = useNavigate();
+  // 1. Fetch Clients and Sort
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/profile/admin/all');
+        const allClients = res.data;
+        setTotalClients(allClients.length);
+        
+        const newColumns: any = JSON.parse(JSON.stringify(columnsFromBackend));
 
-    // Determine dot color based on status
-    const getDotColor = (status: TicketStatus) => {
-        switch(status) {
-            case "New Inquiry": return "bg-blue-500";
-            case "Awaiting Documents": return "bg-orange-500";
-            case "Ready for audit": return "bg-green-500";
-            case "Audit Scheduled": return "bg-cyan-500";
-            case "Report writing": return "bg-purple-500";
-            default: return "bg-gray-500";
-        }
+        allClients.forEach((client: any) => {
+           // Default status fallback
+           let status = client.status || 'New Inquiry';
+           
+           // Ensure status matches one of our keys, else default to New Inquiry
+           if (!newColumns[status]) status = 'New Inquiry';
+           
+           newColumns[status].items.push(client);
+        });
+
+        setColumns(newColumns);
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to load Kanban data", err);
+      }
     };
+    fetchData();
+  }, []);
 
-    // --- NAVIGATION LOGIC ---
-    const handleClick = () => {
-        if (ticket.status === "New Inquiry") {
-            // Navigate to Client Review Page
-            navigate(`/staff-client-review/${ticket.clientId}`);
-        } else if (ticket.status === "Awaiting Documents") {
-            // Navigate to Document Review Page
-            navigate(`/staff-document-review/${ticket.clientId}`);
-        }
-    };
+  // 2. Drag & Drop Logic
+  const onDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+    const { source, destination } = result;
 
-    // Determine if card should show pointer cursor and hover effect
-    const isClickable = ticket.status === "New Inquiry" || ticket.status === "Awaiting Documents";
+    if (source.droppableId !== destination.droppableId) {
+      const sourceColumn = columns[source.droppableId as keyof typeof columns];
+      const destColumn = columns[destination.droppableId as keyof typeof columns];
+      const sourceItems = [...sourceColumn.items];
+      const destItems = [...destColumn.items];
+      const [removed] = sourceItems.splice(source.index, 1);
+      
+      // Update the item's local status immediately
+      removed.status = destColumn.name;
+      
+      destItems.splice(destination.index, 0, removed);
 
-    return (
-        <div 
-            onClick={handleClick}
-            className={`flex items-center gap-2 p-3 rounded-lg border border-gray-200 shadow-sm transition bg-white 
-                ${isClickable ? "cursor-pointer hover:shadow-md hover:border-[#FE5C00]" : "cursor-default"}
-            `}
-        >
-            {/* Status Dot */}
-            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${getDotColor(ticket.status)}`} />
-            
-            {/* Text Content */}
-            <div className="text-xs font-medium text-gray-700 truncate leading-tight">
-                {ticket.companyName} ({ticket.clientId})
-                {ticket.date && (
-                    <span className="text-gray-500 block mt-0.5 text-[10px]">
-                        - {ticket.date}
-                    </span>
-                )}
+      setColumns({
+        ...columns,
+        [source.droppableId]: { ...sourceColumn, items: sourceItems },
+        [destination.droppableId]: { ...destColumn, items: destItems },
+      });
+
+      // Update Backend
+      try {
+        await api.put(`/profile/status/${removed._id}`, { status: destColumn.name });
+      } catch (err) {
+        alert("Failed to save changes.");
+      }
+    } else {
+      const column = columns[source.droppableId as keyof typeof columns];
+      const copiedItems = [...column.items];
+      const [removed] = copiedItems.splice(source.index, 1);
+      copiedItems.splice(destination.index, 0, removed);
+      
+      setColumns({
+        ...columns,
+        [source.droppableId]: { ...column, items: copiedItems }
+      });
+    }
+  };
+
+  if(loading) return <div className="p-10 text-center">Loading Board...</div>;
+
+  return (
+    <div className="min-h-screen bg-white p-6 font-sans">
+      
+      {/* 1. HEADER */}
+      <div className="text-center mb-6">
+         <h1 className="text-2xl font-bold uppercase tracking-wide inline-block border-b-4 border-[#FE5C00] pb-1">
+            Kanban Board
+         </h1>
+      </div>
+
+      {/* 2. MAIN BOARD CONTAINER */}
+      <div className="border border-gray-200 rounded-lg shadow-sm bg-white overflow-hidden">
+        
+        {/* TOOLBAR */}
+        <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 bg-gray-50/50 gap-4">
+            {/* Left: Count */}
+            <div className="flex items-center">
+                <IconUsers />
+                <span className="text-gray-600 font-medium text-lg">
+                    Total Active Clients : <span className="font-bold text-black">{totalClients}</span>
+                </span>
+            </div>
+
+            {/* Right: Controls */}
+            <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="relative flex-1 md:w-64">
+                    <span className="absolute left-3 top-2.5"><IconSearch /></span>
+                    <input 
+                        type="text" 
+                        placeholder="Search Company name or Id" 
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-[#FE5C00]"
+                    />
+                </div>
+                <button className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 text-sm font-medium text-gray-700">
+                    <IconFilter /> Filter
+                </button>
+                <button className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 text-sm font-medium text-gray-700">
+                    <IconSort /> Sort
+                </button>
             </div>
         </div>
-    );
+
+        {/* DRAG & DROP AREA (GRID LAYOUT) */}
+        <div className="overflow-x-auto">
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div className="grid grid-cols-5 min-w-[1000px] divide-x divide-gray-200">
+                    
+                    {/* COLUMNS */}
+                    {Object.entries(columns).map(([columnId, column]) => (
+                        <div key={columnId} className="flex flex-col min-h-[600px]">
+                            
+                            {/* Column Header */}
+                            <div className="p-4 text-center border-b border-gray-200 bg-gray-50">
+                                <h3 className="text-gray-600 font-semibold text-sm uppercase">{column.name}</h3>
+                            </div>
+
+                            {/* Droppable Area */}
+                            <Droppable droppableId={columnId}>
+                                {(provided, snapshot) => (
+                                    <div
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                        className={`flex-1 p-3 space-y-3 transition-colors duration-200 ${snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-white'}`}
+                                    >
+                                        {column.items.map((item: any, index: number) => (
+                                            <Draggable key={item._id} draggableId={item._id} index={index}>
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        // 3. NAVIGATION ON CLICK
+                                                        onClick={() => navigate(`/staff-client-review/${item._id}`)}
+                                                        className={`bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center gap-3
+                                                            ${snapshot.isDragging ? 'ring-2 ring-[#FE5C00] shadow-xl rotate-2' : ''}`}
+                                                        style={{ ...provided.draggableProps.style }}
+                                                    >
+                                                        {/* Status Dot */}
+                                                        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${column.color}`}></div>
+                                                        
+                                                        {/* Content */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-gray-700 truncate">
+                                                                {item.companyName}
+                                                            </p>
+                                                            {/* Showing ID if available, otherwise shortened ID */}
+                                                            <p className="text-[10px] text-gray-400 mt-0.5">
+                                                                (ID: {item._id.substring(item._id.length - 6)})
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </div>
+                    ))}
+                </div>
+            </DragDropContext>
+        </div>
+
+        {/* FOOTER */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+            <button 
+                onClick={() => alert("All changes are saved automatically!")}
+                className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-2 px-8 rounded shadow-sm transition text-sm"
+            >
+                Save
+            </button>
+        </div>
+
+      </div>
+    </div>
+  );
 };
 
 export default StaffKanban;

@@ -1,241 +1,180 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/axios";
+
+// --- ICONS ---
+const IconBack = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 hover:text-black transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+);
 
 const StaffClientReview = () => {
-  const { clientId } = useParams();
-  const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [popupType, setPopupType] = useState<"approve" | "reject" | null>(null);
+  const { clientId } = useParams(); // Using correct param name
+  const navigate = useNavigate();
+  const [client, setClient] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState<string>("Industrial TAC");
 
-  const handleApprove = () => {
-    if (selectedService) {
-      setPopupType("approve");
-    } else {
-      alert("Please select a service type first.");
+  useEffect(() => {
+    const fetchClient = async () => {
+      if (!clientId) return;
+      try {
+        const res = await api.get(`/profile/details/${clientId}`);
+        setClient(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching client details", err);
+        setLoading(false);
+      }
+    };
+    fetchClient();
+  }, [clientId]);
+
+  const handleApprove = async () => {
+    if (!confirm(`Are you sure you want to approve ${client?.companyName}?`)) return;
+    try {
+      await api.put(`/profile/status/${client._id}`, { status: 'Approved' });
+      alert("Client Approved Successfully!");
+      navigate('/staff-kanban');
+    } catch (err) {
+      alert("Failed to approve client.");
     }
   };
 
+  const handleReject = async () => {
+    if (!confirm("Are you sure you want to REJECT this client?")) return;
+    try {
+      await api.put(`/profile/status/${client._id}`, { status: 'Rejected' });
+      alert("Client Rejected.");
+      navigate('/staff-kanban');
+    } catch (err) {
+      alert("Failed to reject client.");
+    }
+  };
+
+  if (loading) return <div className="p-10 text-center">Loading Review Details...</div>;
+  if (!client) return <div className="p-10 text-center text-red-500">Client not found.</div>;
+
+  // SAFE ID ACCESS HELPER
+  // Handles if user is populated (object) or raw string
+  const displayId = client.user?._id 
+    ? client.user._id.substring(client.user._id.length - 6) 
+    : (typeof client.user === 'string' ? client.user.substring(client.user.length - 6) : 'N/A');
+
   return (
-    <div className="w-full min-h-full flex flex-col relative bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-6 font-sans">
       
-      {/* 1. HEADER & BREADCRUMBS */}
-      <div className="bg-white border-b border-gray-200 px-8 py-4 mb-8 flex items-center gap-3 shadow-sm">
-        <Link to="/staff-kanban" className="text-gray-500 hover:text-[#FE5C00] transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-        </Link>
-        <span className="text-gray-300">|</span>
-        <span className="text-sm font-medium text-gray-500">Staff Dashboard</span>
-        <span className="text-gray-300">/</span>
-        <span className="text-sm font-bold text-black">Client Review</span>
+      {/* TOP BAR */}
+      <div className="flex items-center gap-2 mb-6 text-sm text-gray-500 bg-white p-3 rounded-md shadow-sm border border-gray-200">
+        <button onClick={() => navigate(-1)} className="p-1"><IconBack /></button>
+        <span className="cursor-pointer hover:underline" onClick={() => navigate('/staff-kanban')}>Dashboard</span>
+        <span>/</span>
+        <span className="font-bold text-gray-800">Client Review</span>
       </div>
 
-      {/* 2. MAIN LAYOUT: TWO COLUMNS */}
-      <div className="flex-1 max-w-[1600px] w-full mx-auto px-6 lg:px-12 pb-12 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
         
-        {/* --- LEFT COLUMN: CLIENT DETAILS (Takes up 2/3 space) --- */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* LEFT COLUMN: CLIENT DETAILS */}
+        <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full">
             
-            {/* CLIENT HEADER SECTION */}
-            <div className="bg-slate-50 p-8 border-b border-gray-100 flex flex-col md:flex-row items-center gap-6">
-                {/* Avatar */}
-                <div className="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden flex-shrink-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                        alt="Client Profile"
-                        className="w-full h-full object-cover"
-                    />
+            {/* HEADER SECTION */}
+            <div className="p-8 border-b border-gray-200 bg-gray-50/50 flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" className="w-full h-full object-cover" />
                 </div>
-                {/* Title Info */}
-                <div className="text-center md:text-left flex-1">
-                    <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
-                         <h1 className="text-2xl font-bold text-black">ITW Paslode Power Nailing</h1>
-                         <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">
-                            {clientId || "OK1165"}
-                         </span>
-                    </div>
-                    <p className="text-gray-500 font-medium">Contact: Steven Simpson</p>
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                        {client.companyName}
+                        {/* FIXED: Safe ID Display */}
+                        <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md font-bold uppercase tracking-wide">
+                            ID: {displayId}
+                        </span>
+                    </h1>
+                    <p className="text-gray-500 mt-1">Contact: <span className="font-medium text-gray-700">{client.contactName}</span></p>
                 </div>
             </div>
 
-            {/* DATA GRID SECTION */}
+            {/* DETAILS GRID */}
             <div className="p-8">
-                <h3 className="text-lg font-bold text-black mb-6 border-b border-gray-100 pb-2">
-                    Application Details
-                </h3>
+                <h3 className="text-xl font-bold text-black border-b border-gray-200 pb-2 mb-6">Application Details</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                    <DetailGroup title="Contact Information">
-                        <DetailRow label="Email" value="ssimpso@paslode.com" />
-                        <DetailRow label="Phone" value="224-532-8454" />
-                        <DetailRow label="Address" value="1600 Patrick Dr" />
-                        <DetailRow label="City, State, Zip" value="Pocahontas, AR, 72455" />
-                    </DetailGroup>
+                    <div className="space-y-6">
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Contact Information</h4>
+                        <InfoRow label="Email" value={client.contactEmail} />
+                        <InfoRow label="Phone" value={client.contactPhone} />
+                        <InfoRow label="Address" value={client.streetAddress} />
+                        <InfoRow label="City, State, Zip" value={`${client.city}, ${client.state}, ${client.zipCode}`} />
+                    </div>
 
-                    <DetailGroup title="Building & Operations">
-                        <DetailRow label="Building Size" value="90,000 sq ft" />
-                        <DetailRow label="Rural Location?" value="No" />
-                        <DetailRow label="SIC Code" value="12345" />
-                        <DetailRow label="NAICS" value="N/A" />
-                    </DetailGroup>
+                    <div className="space-y-6">
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Building & Operations</h4>
+                        <InfoRow label="Building Size" value={client.buildingSize} />
+                        <InfoRow label="Rural Location?" value="No" /> 
+                        <InfoRow label="SIC Code" value={client.sicCode} />
+                        <InfoRow label="NAICS" value={client.naics} />
+                    </div>
 
-                    <DetailGroup title="Financials">
-                        <DetailRow label="Annual Utility Exp." value="$ 20,000" />
-                        <DetailRow label="Annual Energy Cons." value="$ 70,000" />
-                        <DetailRow label="Annual Gross Sales" value="$ 100,000" />
-                    </DetailGroup>
+                    <div className="space-y-6 pt-6 md:pt-0">
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Financials</h4>
+                        <InfoRow label="Annual Utility Exp." value={client.utilityExpenses} />
+                        <InfoRow label="Annual Energy Cons." value={client.energyConsumption} />
+                        <InfoRow label="Annual Gross Sales" value={client.grossSales} />
+                    </div>
 
-                    <DetailGroup title="Other Details">
-                        <DetailRow label="Previous Assessments" value="None" />
-                        <DetailRow label="Agri. Production" value="N/A" />
-                        <DetailRow label="Wastewater Size" value="4 million gal/day" />
-                    </DetailGroup>
+                    <div className="space-y-6 pt-6 md:pt-0">
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Other Details</h4>
+                        <InfoRow label="Previous Assessments" value="None" />
+                        <InfoRow label="Agri. Production" value="N/A" />
+                    </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-gray-100">
-                    <p className="text-sm text-gray-400 font-bold uppercase mb-2">Additional Notes</p>
-                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg text-sm italic">
-                        No additional notes provided by the client.
-                    </p>
+                <div className="mt-10">
+                    <h4 className="text-gray-400 font-bold text-sm uppercase tracking-wide mb-2">Additional Notes</h4>
+                    <div className="bg-gray-100 p-4 rounded-md text-gray-600 text-sm italic border border-gray-200">
+                        {client.description || "No additional notes provided by the client."}
+                    </div>
                 </div>
             </div>
         </div>
 
+        {/* RIGHT COLUMN: ACTION SIDEBAR */}
+        <div className="w-full lg:w-96 bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-6">
+            <h3 className="text-xl font-bold text-black mb-1">Review Action</h3>
+            <p className="text-sm text-gray-500 mb-6">Select a service level to approve</p>
 
-        {/* --- RIGHT COLUMN: ACTIONS (Takes up 1/3 space) --- */}
-        <div className="lg:col-span-1 space-y-6 sticky top-6">
-            
-            {/* DECISION CARD */}
-            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-black mb-1">Review Action</h2>
-                <p className="text-sm text-gray-500 mb-6">Select a service level to approve.</p>
-                
-                {/* Service Selection */}
-                <div className="space-y-3 mb-8">
-                    <ServiceOption 
-                        id="industrial" 
-                        label="Industrial TAC" 
-                        selected={selectedService === "Industrial TAC"} 
-                        onClick={() => setSelectedService("Industrial TAC")} 
-                    />
-                    <ServiceOption 
-                        id="commercial" 
-                        label="Commercial ITAC" 
-                        selected={selectedService === "Commercial ITAC"} 
-                        onClick={() => setSelectedService("Commercial ITAC")} 
-                    />
-                    <ServiceOption 
-                        id="reac" 
-                        label="REAC" 
-                        selected={selectedService === "REAC"} 
-                        onClick={() => setSelectedService("REAC")} 
-                    />
-                </div>
+            <div className="space-y-3 mb-8">
+                <ServiceOption label="Industrial TAC" selected={selectedService === "Industrial TAC"} onClick={() => setSelectedService("Industrial TAC")} />
+                <ServiceOption label="Commercial ITAC" selected={selectedService === "Commercial ITAC"} onClick={() => setSelectedService("Commercial ITAC")} />
+                <ServiceOption label="REAC" selected={selectedService === "REAC"} onClick={() => setSelectedService("REAC")} />
+            </div>
 
-                {/* Buttons */}
-                <div className="space-y-3">
-                    <button 
-                        onClick={handleApprove}
-                        className="w-full bg-[#FE5C00] hover:bg-orange-700 text-white py-4 rounded-lg shadow-md transition font-bold text-lg flex items-center justify-center gap-2 group"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        Approve & Assign
-                    </button>
-
-                    <button 
-                        onClick={() => setPopupType("reject")}
-                        className="w-full bg-white hover:bg-gray-50 text-red-600 border border-red-200 py-3 rounded-lg transition font-semibold text-lg flex items-center justify-center gap-2"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        Reject Client
-                    </button>
-                </div>
+            <div className="space-y-4">
+                <button onClick={handleApprove} className="w-full bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 rounded shadow-sm transition">Approve & Assign</button>
+                <button onClick={handleReject} className="w-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold py-3 rounded shadow-sm transition flex items-center justify-center gap-2">✕ Reject Client</button>
             </div>
         </div>
 
       </div>
-
-      {/* 3. POPUP MODAL */}
-      {popupType && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl relative p-8 text-center animate-fade-in-up">
-                
-                {/* Icon Circle */}
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${popupType === 'approve' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                    {popupType === 'approve' ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    )}
-                </div>
-
-                {/* Content */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    {popupType === "approve" ? "Client Approved!" : "Client Rejected"}
-                </h3>
-                
-                <p className="text-gray-500 mb-8 leading-relaxed">
-                    {popupType === "approve" ? (
-                        <>You have selected this client for <strong>{selectedService}</strong> services. An automated message will be sent regarding next steps.</>
-                    ) : (
-                        "Client has been marked as not eligible for services. An automated rejection message will be sent."
-                    )}
-                </p>
-
-                <button 
-                    onClick={() => setPopupType(null)}
-                    className="w-full bg-gray-900 text-white py-3 rounded-lg font-bold hover:bg-black transition"
-                >
-                    Close
-                </button>
-
-            </div>
-        </div>
-      )}
-
     </div>
   );
 };
 
-/* --- SUB-COMPONENTS FOR CLEANER CODE --- */
-
-// Helper for grouping details
-const DetailGroup = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="space-y-4">
-        <h4 className="text-xs font-bold text-[#FE5C00] uppercase tracking-wider mb-2">{title}</h4>
-        <div className="space-y-3 pl-2 border-l-2 border-gray-100">
-            {children}
-        </div>
-    </div>
-);
-
-// Helper for a single row of data
-const DetailRow = ({ label, value }: { label: string, value: string }) => (
+// HELPER COMPONENTS
+const InfoRow = ({ label, value }: { label: string, value: string }) => (
     <div>
-        <span className="block text-xs text-gray-400 font-medium mb-0.5">{label}</span>
-        <span className="block text-sm font-semibold text-gray-800">{value}</span>
+        <span className="block text-xs text-gray-400 font-bold uppercase">{label}</span>
+        <span className="block text-gray-800 font-medium">{value || "N/A"}</span>
     </div>
 );
 
-// Helper for Radio Button Cards
-const ServiceOption = ({ id, label, selected, onClick }: { id: string, label: string, selected: boolean, onClick: () => void }) => (
-    <div 
-        onClick={onClick}
-        className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
-            ${selected 
-                ? "border-[#FE5C00] bg-orange-50 text-[#FE5C00]" 
-                : "border-gray-100 hover:border-orange-200 bg-gray-50 text-gray-600"
-            }
-        `}
-    >
-        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
-            ${selected ? "border-[#FE5C00]" : "border-gray-300"}
-        `}>
-            {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#FE5C00]" />}
+const ServiceOption = ({ label, selected, onClick }: any) => (
+    <div onClick={onClick} className={`flex items-center p-3 rounded-md border cursor-pointer transition-all ${selected ? 'border-[#FE5C00] bg-orange-50 ring-1 ring-[#FE5C00]' : 'border-gray-200 hover:bg-gray-50'}`}>
+        <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-3 ${selected ? 'border-[#FE5C00]' : 'border-gray-400'}`}>
+            {selected && <div className="w-2 h-2 rounded-full bg-[#FE5C00]" />}
         </div>
-        <span className={`font-bold ${selected ? "text-[#FE5C00]" : "text-gray-700"}`}>
-            {label}
-        </span>
+        <span className={`font-medium ${selected ? 'text-[#FE5C00]' : 'text-gray-700'}`}>{label}</span>
     </div>
 );
 

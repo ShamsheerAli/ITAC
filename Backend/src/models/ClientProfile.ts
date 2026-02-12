@@ -17,6 +17,12 @@ export interface IClientProfile extends Document {
   sicCode: string;
   naics: string;
   description: string;
+  status: string;
+  documents: {
+    name: string;
+    path: string;
+    uploadedAt: Date;
+  }[];
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -36,6 +42,14 @@ const ClientProfileSchema: Schema = new Schema({
   sicCode: { type: String },
   naics: { type: String },
   description: { type: String },
+  status: { type: String, default: 'New Inquiry' },
+  documents: [
+    {
+      name: { type: String },
+      path: { type: String },
+      uploadedAt: { type: Date, default: Date.now }
+    }
+  ]
 }, { timestamps: true });
 
 export default mongoose.model<IClientProfile>('ClientProfile', ClientProfileSchema);
