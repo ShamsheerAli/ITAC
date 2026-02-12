@@ -31,8 +31,24 @@ const TemporaryDashboard = () => {
 
   // --- LOGIC: DETERMINE CURRENT STEP ---
   let activeStep = 1; 
-  if (profile) activeStep = 2; 
-  if (profile?.status === 'Approved') activeStep = 3; 
+  const currentStatus = profile?.status || 'New Inquiry';
+
+  // STEP 3: ACCESS GRANTED
+  // If they are Approved, Awaiting Documents, or further along -> They need the Main Dashboard
+  if (['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(currentStatus)) {
+      activeStep = 3;
+  }
+  
+  // STEP 2: UNDER REVIEW
+  // If profile exists but not yet approved/advanced
+  else if (profile) {
+      activeStep = 2; 
+  }
+  
+  // STEP 1: JUST STARTED
+  else {
+      activeStep = 1;
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">

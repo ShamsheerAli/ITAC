@@ -33,15 +33,19 @@ const StaffClientReview = () => {
 
   const handleApprove = async () => {
     if (!confirm(`Are you sure you want to approve ${client?.companyName}?`)) return;
+
     try {
-      await api.put(`/profile/status/${client._id}`, { status: 'Approved' });
-      alert("Client Approved Successfully!");
+      await api.put(`/profile/status/${client._id}`, { 
+        status: 'Approved', 
+        serviceType: selectedService // <--- NOW WE SAVE THIS!
+      });
+      
+      alert("Client Approved & Service Assigned!");
       navigate('/staff-kanban');
     } catch (err) {
       alert("Failed to approve client.");
     }
   };
-
   const handleReject = async () => {
     if (!confirm("Are you sure you want to REJECT this client?")) return;
     try {

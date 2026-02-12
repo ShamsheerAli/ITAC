@@ -77,15 +77,22 @@ router.post('/upload', upload.single('file'), async (req: any, res: Response): P
 });
 
 // @route   PUT /api/profile/status/:id
-// @desc    Update client status (e.g. Move them on Kanban board)
+// @desc    Update client status AND service type
 router.put('/status/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { status } = req.body;
+    // Destructure status and serviceType from body
+    const { status, serviceType } = req.body; 
+
+    // Create update object dynamically
+    const updateData: any = { status };
+    if (serviceType) updateData.serviceType = serviceType; // Only update if provided
+
     const profile = await ClientProfile.findByIdAndUpdate(
       req.params.id, 
-      { status }, 
+      updateData, // Use the dynamic object
       { new: true }
     );
+
     if (!profile) {
       res.status(404).json({ message: 'Profile not found' });
       return;

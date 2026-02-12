@@ -23,6 +23,7 @@ export interface IClientProfile extends Document {
     path: string;
     uploadedAt: Date;
   }[];
+  serviceType: string;
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -49,7 +50,8 @@ const ClientProfileSchema: Schema = new Schema({
       path: { type: String },
       uploadedAt: { type: Date, default: Date.now }
     }
-  ]
+  ],
+  serviceType: { type: String, default: "" },
 }, { timestamps: true });
 
 export default mongoose.model<IClientProfile>('ClientProfile', ClientProfileSchema);

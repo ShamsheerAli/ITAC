@@ -1,6 +1,43 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // --- FETCH DATA ---
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+
+      const fetchProfile = async () => {
+        try {
+          const res = await api.get(`/profile/${parsedUser.id}`);
+          setProfile(res.data);
+        } catch (err) {
+          console.error("Error fetching profile", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProfile();
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  if (loading) return <div className="p-10 text-center text-gray-500">Loading Dashboard...</div>;
+
+  // --- TRACKING LOGIC ---
+  const hasDocuments = profile?.documents && profile.documents.length > 0;
+  const isReviewing = profile?.status === 'Reviewing' || profile?.status === 'Ready for audit' || profile?.status === 'Audit Scheduled';
+  const isReady = profile?.status === 'Ready for audit' || profile?.status === 'Audit Scheduled';
+
   return (
     <div className="w-full space-y-8">
       
@@ -19,7 +56,7 @@ const Dashboard = () => {
             {/* Profile Image */}
             <div className="flex-shrink-0">
                <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+                src={profile?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"} 
                 alt="Profile" 
                 className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
               />
@@ -27,23 +64,23 @@ const Dashboard = () => {
 
             {/* Details - Centered and Large */}
             <div className="text-center w-full space-y-2 text-xl text-gray-800 font-medium">
-              <p><span className="font-bold text-black">Name:</span> Steven Simpson</p>
-              <p><span className="font-bold text-black">Company:</span> ITW Paslode Power Nailing</p>
+              <p><span className="font-bold text-black">Name:</span> {profile?.contactName || user?.name}</p>
+              <p><span className="font-bold text-black">Company:</span> {profile?.companyName || "N/A"}</p>
               <p>
                 <span className="font-bold text-black">Email:</span>{" "}
-                <a href="mailto:ssimpso@paslode.com" className="underline hover:text-[#FE5C00]">
-                  ssimpso@paslode.com
+                <a href={`mailto:${user?.email}`} className="underline hover:text-[#FE5C00]">
+                  {user?.email}
                 </a>
               </p>
-              <p><span className="font-bold text-black">Phone:</span> +1 224-532-8454</p>
+              <p><span className="font-bold text-black">Phone:</span> {profile?.contactPhone || "N/A"}</p>
               
               {/* --- UPDATED ADDRESS SECTION --- */}
-              <p><span className="font-bold text-black">Street Address:</span> 1600 Patrick Dr</p>
-              <p><span className="font-bold text-black">City:</span> Pocahontas</p>
+              <p><span className="font-bold text-black">Street Address:</span> {profile?.streetAddress || "N/A"}</p>
+              <p><span className="font-bold text-black">City:</span> {profile?.city || "N/A"}</p>
               <p>
-                <span className="font-bold text-black">State:</span> AR
+                <span className="font-bold text-black">State:</span> {profile?.state || "N/A"}
                 <span className="mx-3 text-gray-400">|</span> 
-                <span className="font-bold text-black">Zip Code:</span> 72455
+                <span className="font-bold text-black">Zip Code:</span> {profile?.zipCode || "N/A"}
               </p>
               {/* ------------------------------- */}
 
@@ -109,7 +146,8 @@ const Dashboard = () => {
             {/* Step 1 */}
             <StepItem 
               icon={<IconDocumentCheck />} 
-              label="Documents Received" 
+              label="Documents Received"
+              isActive={hasDocuments} // Logic Applied
             />
 
             {/* Arrow */}
@@ -118,7 +156,8 @@ const Dashboard = () => {
             {/* Step 2 */}
             <StepItem 
               icon={<IconDocumentSearch />} 
-              label="Documents Review" 
+              label="Documents Review"
+              isActive={isReviewing} // Logic Applied
             />
 
             {/* Arrow */}
@@ -127,7 +166,8 @@ const Dashboard = () => {
             {/* Step 3 */}
             <StepItem 
               icon={<IconCheckCircle />} 
-              label="Ready to schedule" 
+              label="Ready to schedule"
+              isActive={isReady} // Logic Applied
             />
 
         </div>
@@ -139,12 +179,13 @@ const Dashboard = () => {
 
 /* --- SUB-COMPONENTS FOR TRACKING SYSTEM --- */
 
-const StepItem = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
+const StepItem = ({ icon, label, isActive }: { icon: React.ReactNode; label: string, isActive?: boolean }) => (
   <div className="flex flex-col items-center z-10 text-center">
-    <div className="w-28 h-28 rounded-full bg-slate-600 flex items-center justify-center text-white mb-6 shadow-lg transform hover:scale-105 transition duration-300">
+    <div className={`w-28 h-28 rounded-full flex items-center justify-center text-white mb-6 shadow-lg transform transition duration-300
+        ${isActive ? 'bg-[#FE5C00] scale-105' : 'bg-slate-600'}`}> 
       {icon}
     </div>
-    <span className="text-black font-bold text-xl">{label}</span>
+    <span className={`font-bold text-xl ${isActive ? 'text-[#FE5C00]' : 'text-black'}`}>{label}</span>
   </div>
 );
 

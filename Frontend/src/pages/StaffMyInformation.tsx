@@ -1,15 +1,11 @@
-import { Link } from "react-router-dom";
+
 
 const StaffMyInformation = () => {
   return (
     <div className="w-full h-full flex flex-col">
       
       {/* BREADCRUMB HEADER (Matches design) */}
-      <div className="bg-black text-white px-8 py-2 mb-8 -mt-8 -mx-8">
-        <span className="text-sm font-medium">
-            <Link to="/staff-dashboard" className="hover:text-[#FE5C00]">Home</Link> / Update Information
-        </span>
-      </div>
+      
 
       {/* MAIN CONTENT CARD */}
       <div className="flex-1 flex justify-center items-start pt-10">
