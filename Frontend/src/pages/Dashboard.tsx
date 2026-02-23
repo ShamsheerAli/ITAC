@@ -85,7 +85,7 @@ const Dashboard = () => {
               {/* ------------------------------- */}
 
               <div className="pt-6 flex justify-center">
-                <Link to="/update-details">
+                <Link to="/dashboard/update-details">
                     <button className="bg-[#FE5C00] text-white px-10 py-3 rounded shadow hover:bg-orange-700 transition font-bold uppercase text-base tracking-wider">
                     Update
                     </button>

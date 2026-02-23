@@ -128,9 +128,9 @@ const TemporaryDashboard = () => {
                  {/* Card Body */}
                 <div className="p-10 flex-1 flex flex-col items-center justify-center text-center">
                     <p className="text-black font-medium text-xl leading-relaxed mb-12 max-w-2xl">
-                        Go through our services by clicking the <strong>“Services”</strong> button below, 
+                        Go through our services by clicking the <strong>“Resources”</strong> button below, 
                         and update your details by clicking the <strong>“Update Information”</strong> button. 
-                        <br/><span className="text-gray-500 mt-2 block italic">One of our team members will review your details and reach out shortly.</span>
+                        <br/><span className="text-gray-500 mt-2 block italic">One of our ITAC team members will review your details and reach out shortly.</span>
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-8 justify-center w-full">

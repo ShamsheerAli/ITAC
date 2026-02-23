@@ -10,7 +10,7 @@ const IconBack = () => (
 );
 
 const StaffClientReview = () => {
-  const { clientId } = useParams(); // Using correct param name
+  const { clientId } = useParams(); 
   const navigate = useNavigate();
   const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -33,19 +33,18 @@ const StaffClientReview = () => {
 
   const handleApprove = async () => {
     if (!confirm(`Are you sure you want to approve ${client?.companyName}?`)) return;
-
     try {
       await api.put(`/profile/status/${client._id}`, { 
-        status: 'Approved', 
-        serviceType: selectedService // <--- NOW WE SAVE THIS!
+        status: 'Approved',
+        serviceType: selectedService 
       });
-      
       alert("Client Approved & Service Assigned!");
       navigate('/staff-kanban');
     } catch (err) {
       alert("Failed to approve client.");
     }
   };
+
   const handleReject = async () => {
     if (!confirm("Are you sure you want to REJECT this client?")) return;
     try {
@@ -61,7 +60,6 @@ const StaffClientReview = () => {
   if (!client) return <div className="p-10 text-center text-red-500">Client not found.</div>;
 
   // SAFE ID ACCESS HELPER
-  // Handles if user is populated (object) or raw string
   const displayId = client.user?._id 
     ? client.user._id.substring(client.user._id.length - 6) 
     : (typeof client.user === 'string' ? client.user.substring(client.user.length - 6) : 'N/A');
@@ -90,7 +88,6 @@ const StaffClientReview = () => {
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                         {client.companyName}
-                        {/* FIXED: Safe ID Display */}
                         <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md font-bold uppercase tracking-wide">
                             ID: {displayId}
                         </span>
@@ -104,6 +101,7 @@ const StaffClientReview = () => {
                 <h3 className="text-xl font-bold text-black border-b border-gray-200 pb-2 mb-6">Application Details</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                    
                     <div className="space-y-6">
                         <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Contact Information</h4>
                         <InfoRow label="Email" value={client.contactEmail} />
@@ -115,7 +113,8 @@ const StaffClientReview = () => {
                     <div className="space-y-6">
                         <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Building & Operations</h4>
                         <InfoRow label="Building Size" value={client.buildingSize} />
-                        <InfoRow label="Rural Location?" value="No" /> 
+                        {/* ✅ FIXED: Now pulls actual data instead of hardcoded "No" */}
+                        <InfoRow label="Rural Location?" value={client.isRuralArea} /> 
                         <InfoRow label="SIC Code" value={client.sicCode} />
                         <InfoRow label="NAICS" value={client.naics} />
                     </div>
@@ -129,6 +128,8 @@ const StaffClientReview = () => {
 
                     <div className="space-y-6 pt-6 md:pt-0">
                         <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Other Details</h4>
+                        {/* ✅ ADDED: Small business check */}
+                        <InfoRow label="Small Business (SBI)?" value={client.isSmallBusiness} />
                         <InfoRow label="Previous Assessments" value="None" />
                         <InfoRow label="Agri. Production" value="N/A" />
                     </div>

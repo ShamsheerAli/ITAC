@@ -24,6 +24,9 @@ export interface IClientProfile extends Document {
     uploadedAt: Date;
   }[];
   serviceType: string;
+  isSmallBusiness?: string;
+  isRuralArea?: string;
+  referredBy?: string;
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -52,6 +55,9 @@ const ClientProfileSchema: Schema = new Schema({
     }
   ],
   serviceType: { type: String, default: "" },
+  isSmallBusiness: { type: String, default: "" },
+  isRuralArea: { type: String, default: "" },
+  referredBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export default mongoose.model<IClientProfile>('ClientProfile', ClientProfileSchema);

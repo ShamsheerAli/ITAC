@@ -35,6 +35,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/TemporaryDashboard" element={<TemporaryDashboard />} />
+        <Route path="/update-details" element={<UpdateDetails />} />
 
         {/* ================= CLIENT ROUTES (Sidebar Layout) ================= */}
         {/* These pages get the Sidebar + The Global Header from above */}

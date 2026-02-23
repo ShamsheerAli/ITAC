@@ -89,10 +89,10 @@ const DashboardLayout = () => {
                 active={activeTab === "/inbox"} 
             />
             <SidebarItem 
-                to="/update-details" 
+                to="/dashboard/update-details"  // Updated Path
                 label="My Information" 
                 icon={<IconInfo />} 
-                active={activeTab === "/update-details"} 
+                active={activeTab === "/dashboard/update-details"} 
             />
             <SidebarItem 
                 to="/upload-documents" 
