@@ -112,7 +112,3 @@ temp/
 *.njsproj
 *.sln
 *.sw?
-
-# Package files
-package.json
-package-lock.json
