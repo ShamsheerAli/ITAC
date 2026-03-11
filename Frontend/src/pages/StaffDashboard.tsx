@@ -23,32 +23,89 @@ const StaffDashboard = () => {
   const [clients, setClients] = useState<any[]>([]); // State for Real Data
   const [loading, setLoading] = useState(true);
 
-  // --- 1. FETCH REAL DATA ---
+  // --- ARCHIVE FUNCTION ---
+  const handleArchive = async (clientId: string) => {
+    if (!window.confirm("Are you sure you want to archive this client?")) return;
+  
+    try {
+      await api.put(`/profile/${clientId}/archive`);
+      // Remove the archived client from the current screen without refreshing
+      setClients(prevClients => prevClients.filter(c => c.id !== clientId)); 
+    } catch (err) {
+      console.error("Failed to archive client", err);
+      alert("Failed to archive client.");
+    }
+  };
+
+  // --- FETCH REAL DATA & GEOCODE ---
   useEffect(() => {
+    // Helper function to turn an address into Lat/Lng coordinates
+    const getCoordinates = async (fullAddress: string) => {
+        if (!fullAddress || fullAddress.trim() === '') return null;
+
+        // 1. Check if we already found and saved these coordinates in the browser cache
+        const cachedCoords = localStorage.getItem(`geo_${fullAddress}`);
+        if (cachedCoords) return JSON.parse(cachedCoords);
+
+        // 2. If not cached, fetch from the free OpenStreetMap API
+        try {
+            // Added a small delay to respect the free API's rate limit rules
+            await new Promise(resolve => setTimeout(resolve, 600)); 
+            
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(fullAddress)}`);
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                // Save it to cache so it loads instantly next time!
+                localStorage.setItem(`geo_${fullAddress}`, JSON.stringify(coords));
+                return coords;
+            }
+        } catch (error) {
+            console.error("Geocoding failed for:", fullAddress);
+        }
+        return null; // Return null if address is invalid or not found
+    };
+
     const fetchClients = async () => {
       try {
         const res = await api.get('/profile/admin/all');
-        
-        // Transform the DB data to match our UI shape
-        const formattedClients = res.data.map((profile: any, index: number) => ({
-            id: profile.user?._id || "Unknown", // Use MongoDB ID
-            refId: generateRefId(profile.createdAt, index), // Generate readable ID
-            companyName: profile.companyName || "Unnamed Company",
-            contactName: profile.user?.name || "Unknown User", // Get name from User Login
-            contactNumber: profile.contactPhone || "N/A",
-            visitDate: new Date(profile.createdAt).toLocaleDateString(), // Use creation date
-            status: profile.status || "New Inquiry", // Use status from DB
-            image: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", // Placeholder
-            
-            // MOCK LOCATION GENERATOR (Random spots around Oklahoma for demo)
-            // Center is roughly 35.5, -97.5. We add small random variance.
-            location: { 
-                lat: 35.5 + (Math.random() - 0.5) * 2, 
-                lng: -97.5 + (Math.random() - 0.5) * 2 
-            } 
-        }));
+        const activeProfiles = res.data.filter((profile: any) => {
+         const role = profile.user?.role;
+         return !profile.isArchived && role !== 'staff' && role !== 'admin'; 
+        });
 
-        setClients(formattedClients);
+        const clientsWithLocations = [];
+
+        // Loop through clients to get their addresses
+        for (let i = 0; i < activeProfiles.length; i++) {
+            const profile = activeProfiles[i];
+            
+            // Construct the full address string from your database fields
+            const addressParts = [profile.streetAddress, profile.city, profile.state, profile.zipCode].filter(Boolean);
+            const fullAddress = addressParts.join(', ');
+
+            // Try to get real coordinates, otherwise default to Oklahoma State University
+            const realLocation = await getCoordinates(fullAddress);
+            const finalLocation = realLocation || { 
+                lat: 36.1156 + (Math.random() - 0.5) * 0.1, // OSU Stillwater Area
+                lng: -97.0584 + (Math.random() - 0.5) * 0.1 
+            };
+
+            clientsWithLocations.push({
+                id: profile.user?._id || "Unknown", 
+                refId: generateRefId(profile.createdAt, i), 
+                companyName: profile.companyName || "Unnamed Company",
+                contactName: profile.user?.name || "Unknown User", 
+                contactNumber: profile.contactPhone || "N/A",
+                visitDate: new Date(profile.createdAt).toLocaleDateString(), 
+                status: profile.status || "New Inquiry", 
+                image: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", 
+                location: finalLocation
+            });
+        }
+
+        setClients(clientsWithLocations);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching clients:", err);
@@ -143,7 +200,7 @@ const StaffDashboard = () => {
 
       {/* BOTTOM SECTION: DASHBOARD TABLE */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
-        <div className="bg-white p-6 text-center border-b border-gray-200">
+        <div className="bg-white p-6 text-center border-b border-gray-200 flex justify-center items-center relative">
             <h2 className="text-3xl font-bold text-black uppercase tracking-wider">Dashboard</h2>
         </div>
 
@@ -153,12 +210,15 @@ const StaffDashboard = () => {
                 <span>Total Clients : {clients.length}</span>
             </div>
 
-            <div className="flex-1 max-w-xl relative">
+            <div className="flex-1 max-w-xl relative flex items-center gap-4">
                  <input 
                     type="text" 
                     placeholder="Search by Company..." 
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-[#FE5C00]"
+                    className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-[#FE5C00]"
                 />
+                <Link to="/staff-archived-clients" className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded shadow whitespace-nowrap transition">
+                    Archived Clients
+                </Link>
             </div>
         </div>
 
@@ -228,16 +288,19 @@ const StaffDashboard = () => {
                                 {activeMenuId === client.id && (
                                     <div className="absolute right-8 top-12 w-40 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-left animate-in fade-in zoom-in-95 duration-100">
                                         <button 
-                                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FE5C00] transition border-t border-gray-100"
+                                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FE5C00] transition border-b border-gray-100"
                                             onClick={() => navigate(`/staff-inbox/${client.id}`)}
                                         >
                                             Message
                                         </button>
                                         <button 
-                                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FE5C00] transition border-t border-gray-100"
-                                            onClick={() => navigate(`/staff-client-details/${client.id}`)}
+                                            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition font-medium"
+                                            onClick={() => {
+                                                handleArchive(client.id);
+                                                setActiveMenuId(null); // Close menu after clicking
+                                            }}
                                         >
-                                            View Details
+                                            Archive
                                         </button>
                                     </div>
                                 )}

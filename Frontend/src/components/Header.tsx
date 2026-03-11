@@ -28,7 +28,7 @@ const Header = () => {
           <img
             src={Images.osuItacLogo}
             alt="OSU"
-            className="h-10 md:h-20 lg:h-30 w-auto object-contain relative z-10"
+            className="h-10 md:h-10 lg:h-25 w-auto object-contain relative z-10"
           />
 
           {/* RIGHT IMAGE */}

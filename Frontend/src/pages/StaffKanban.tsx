@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import api from '../api/axios';
@@ -25,6 +25,11 @@ const IconUsers = () => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>
 );
+const IconReject = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
 
 // --- COLUMN CONFIGURATION ---
 const columnsFromBackend = {
@@ -36,28 +41,31 @@ const columnsFromBackend = {
 };
 
 const StaffKanban = () => {
-  const navigate = useNavigate(); // 2. Initialize Hook
+  const navigate = useNavigate(); 
   const [columns, setColumns] = useState(columnsFromBackend);
   const [loading, setLoading] = useState(true);
   const [totalClients, setTotalClients] = useState(0);
 
-  // 1. Fetch Clients and Sort
+  // --- 1. Fetch Clients and Sort ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await api.get('/profile/admin/all');
         const allClients = res.data;
-        setTotalClients(allClients.length);
+        
+        // FILTER OUT ARCHIVED CLIENTS
+        const activeClients = allClients.filter((client: any) => {
+         const role = client.user?.role;
+        return !client.isArchived && role !== 'staff' && role !== 'admin';
+        });
+        
+        setTotalClients(activeClients.length);
         
         const newColumns: any = JSON.parse(JSON.stringify(columnsFromBackend));
 
-        allClients.forEach((client: any) => {
-           // Default status fallback
+        activeClients.forEach((client: any) => {
            let status = client.status || 'New Inquiry';
-           
-           // Ensure status matches one of our keys, else default to New Inquiry
            if (!newColumns[status]) status = 'New Inquiry';
-           
            newColumns[status].items.push(client);
         });
 
@@ -70,7 +78,30 @@ const StaffKanban = () => {
     fetchData();
   }, []);
 
-  // 2. Drag & Drop Logic
+  // --- 2. Reject & Archive Logic ---
+  const handleReject = async (e: React.MouseEvent, profile: any, columnId: string, index: number) => {
+      e.stopPropagation(); // Prevents clicking the card from navigating to the review page
+      
+      if (!window.confirm(`Are you sure you want to reject and archive ${profile.companyName}?`)) return;
+
+      try {
+          // Pass the User ID to match our backend route { user: id }
+          const userId = profile.user?._id || profile.user;
+          await api.put(`/profile/${userId}/archive`);
+
+          // Remove the card from the board locally
+          const newColumns: any = { ...columns };
+          newColumns[columnId].items.splice(index, 1);
+          
+          setColumns(newColumns);
+          setTotalClients(prev => prev - 1); // Decrease the total count
+      } catch (err) {
+          console.error("Failed to reject client", err);
+          alert("Failed to reject and archive client.");
+      }
+  };
+
+  // --- 3. Drag & Drop Logic ---
   const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
     const { source, destination } = result;
@@ -82,7 +113,6 @@ const StaffKanban = () => {
       const destItems = [...destColumn.items];
       const [removed] = sourceItems.splice(source.index, 1);
       
-      // Update the item's local status immediately
       removed.status = destColumn.name;
       
       destItems.splice(destination.index, 0, removed);
@@ -117,19 +147,18 @@ const StaffKanban = () => {
   return (
     <div className="min-h-screen bg-white p-6 font-sans">
       
-      {/* 1. HEADER */}
+      {/* HEADER */}
       <div className="text-center mb-6">
          <h1 className="text-2xl font-bold uppercase tracking-wide inline-block border-b-4 border-[#FE5C00] pb-1">
             Kanban Board
          </h1>
       </div>
 
-      {/* 2. MAIN BOARD CONTAINER */}
+      {/* MAIN BOARD CONTAINER */}
       <div className="border border-gray-200 rounded-lg shadow-sm bg-white overflow-hidden">
         
         {/* TOOLBAR */}
         <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 bg-gray-50/50 gap-4">
-            {/* Left: Count */}
             <div className="flex items-center">
                 <IconUsers />
                 <span className="text-gray-600 font-medium text-lg">
@@ -137,7 +166,6 @@ const StaffKanban = () => {
                 </span>
             </div>
 
-            {/* Right: Controls */}
             <div className="flex items-center gap-3 w-full md:w-auto">
                 <div className="relative flex-1 md:w-64">
                     <span className="absolute left-3 top-2.5"><IconSearch /></span>
@@ -156,7 +184,7 @@ const StaffKanban = () => {
             </div>
         </div>
 
-        {/* DRAG & DROP AREA (GRID LAYOUT) */}
+        {/* DRAG & DROP AREA */}
         <div className="overflow-x-auto">
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="grid grid-cols-5 min-w-[1000px] divide-x divide-gray-200">
@@ -165,12 +193,10 @@ const StaffKanban = () => {
                     {Object.entries(columns).map(([columnId, column]) => (
                         <div key={columnId} className="flex flex-col min-h-[600px]">
                             
-                            {/* Column Header */}
                             <div className="p-4 text-center border-b border-gray-200 bg-gray-50">
                                 <h3 className="text-gray-600 font-semibold text-sm uppercase">{column.name}</h3>
                             </div>
 
-                            {/* Droppable Area */}
                             <Droppable droppableId={columnId}>
                                 {(provided, snapshot) => (
                                     <div
@@ -185,25 +211,33 @@ const StaffKanban = () => {
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        // 3. NAVIGATION ON CLICK
                                                         onClick={() => navigate(`/staff-client-review/${item._id}`)}
-                                                        className={`bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center gap-3
+                                                        className={`bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-start gap-3 relative
                                                             ${snapshot.isDragging ? 'ring-2 ring-[#FE5C00] shadow-xl rotate-2' : ''}`}
                                                         style={{ ...provided.draggableProps.style }}
                                                     >
                                                         {/* Status Dot */}
-                                                        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${column.color}`}></div>
+                                                        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 ${column.color}`}></div>
                                                         
                                                         {/* Content */}
-                                                        <div className="flex-1 min-w-0">
+                                                        <div className="flex-1 min-w-0 pr-6">
                                                             <p className="text-xs font-bold text-gray-700 truncate">
                                                                 {item.companyName}
                                                             </p>
-                                                            {/* Showing ID if available, otherwise shortened ID */}
                                                             <p className="text-[10px] text-gray-400 mt-0.5">
                                                                 (ID: {item._id.substring(item._id.length - 6)})
                                                             </p>
                                                         </div>
+
+                                                        {/* REJECT/ARCHIVE BUTTON */}
+                                                        <button
+                                                            onClick={(e) => handleReject(e, item, columnId, index)}
+                                                            className="absolute top-2 right-2 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                                                            title="Reject & Archive Client"
+                                                        >
+                                                            <IconReject />
+                                                        </button>
+
                                                     </div>
                                                 )}
                                             </Draggable>

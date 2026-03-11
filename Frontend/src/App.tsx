@@ -21,7 +21,8 @@ import StaffAddClient from './pages/StaffAddClient';
 import StaffClientReview from './pages/StaffClientReview';
 import StaffDocumentReview from './pages/StaffDocumentReview';
 import StaffInbox from './pages/StaffInbox';
-import StaffClientDetails from './pages/StaffClientDetails'
+import StaffClientDetails from './pages/StaffClientDetails';
+import StaffArchivedClients from './pages/StaffArchivedClients';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           <Route path="/staff-document-review/:clientId" element={<StaffDocumentReview />} />
           <Route path="/staff-inbox/:clientId?" element={<StaffInbox />} />
           <Route path="/staff-client-details/:clientId" element={<StaffClientDetails />} />
+          <Route path="/staff-archived-clients" element={<StaffArchivedClients />} />
         </Route>
 
       </Routes>

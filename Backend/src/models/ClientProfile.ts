@@ -27,6 +27,7 @@ export interface IClientProfile extends Document {
   isSmallBusiness?: string;
   isRuralArea?: string;
   referredBy?: string;
+  isArchived?: boolean;
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -58,6 +59,7 @@ const ClientProfileSchema: Schema = new Schema({
   isSmallBusiness: { type: String, default: "" },
   isRuralArea: { type: String, default: "" },
   referredBy: { type: String, default: "" },
+  isArchived: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.model<IClientProfile>('ClientProfile', ClientProfileSchema);

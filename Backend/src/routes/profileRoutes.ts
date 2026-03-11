@@ -104,6 +104,43 @@ router.put('/status/:id', async (req: Request, res: Response): Promise<void> => 
   }
 });
 
+// @route   PUT /api/profile/:id/archive
+// @desc    Archive a client
+router.put('/:id/archive', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Find by the user field instead of _id to match what the frontend sends
+    const profile = await ClientProfile.findOneAndUpdate(
+      { user: id }, 
+      { isArchived: true },
+      { new: true }
+    );
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    res.json({ message: "Client archived successfully", profile });
+  } catch (error) {
+    console.error("Archive Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @route   PUT /api/profile/:id/unarchive
+// @desc    Unarchive a client
+router.put('/:id/unarchive', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await ClientProfile.findOneAndUpdate(
+      { user: id }, 
+      { isArchived: false },
+      { new: true }
+    );
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    res.json({ message: "Client restored successfully", profile });
+  } catch (error) {
+    console.error("Unarchive Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // =========================================================================
 // 2. GENERIC ROUTES (MUST BE AT THE BOTTOM)
 // =========================================================================
