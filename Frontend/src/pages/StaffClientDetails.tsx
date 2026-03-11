@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios'; // Make sure this path is correct
 
 const StaffClientDetails = () => {
-  const { id } = useParams<{ id: string }>(); // Grabs the ID from the URL
+  const { clientId } = useParams<{ clientId: string }>(); // Grabs the ID from the URL
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +11,7 @@ const StaffClientDetails = () => {
     const fetchClientDetails = async () => {
       try {
         // Assuming your backend uses the same endpoint we used for the client update page
-        const res = await api.get(`/profile/${id}`);
+        const res = await api.get(`/profile/${clientId}`);
         setClientData(res.data);
       } catch (err) {
         console.error("Failed to fetch client details", err);
@@ -20,10 +20,12 @@ const StaffClientDetails = () => {
       }
     };
 
-    if (id) {
-      fetchClientDetails();
-    }
-  }, [id]);
+    if (clientId) {
+    fetchClientDetails();
+  } else {
+    setLoading(false);
+  }
+}, [clientId]);
 
   if (loading) {
     return <div className="p-10 text-center text-gray-500 font-bold">Loading client details...</div>;
@@ -60,7 +62,7 @@ const StaffClientDetails = () => {
             <h1 className="text-2xl font-bold flex items-center gap-3">
               {clientData.companyName || 'Unknown Company'}
               <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-normal">
-                {id}
+                {clientId}
               </span>
             </h1>
             <p className="text-gray-500 mt-1">Contact: {clientData.contactName || 'N/A'}</p>
