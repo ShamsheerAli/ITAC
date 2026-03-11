@@ -15,17 +15,33 @@ const Dashboard = () => {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
 
+      // SAFETY PATCH: Check for both .id and ._id depending on how it was saved during login
+      const currentUserId = parsedUser._id || parsedUser.id;
+
+      if (!currentUserId) {
+          console.error("No valid user ID found in local storage.");
+          navigate("/login");
+          return;
+      }
+
       const fetchProfile = async () => {
         try {
-          const res = await api.get(`/profile/${parsedUser.id}`);
-          setProfile(res.data);
+          // Use the safe ID
+          const res = await api.get(`/profile/${currentUserId}`);
+          
+          // Double-check we actually got data back before setting it
+          if (res.data) {
+             setProfile(res.data);
+          }
         } catch (err) {
           console.error("Error fetching profile", err);
         } finally {
           setLoading(false);
         }
       };
+      
       fetchProfile();
+      
     } else {
       navigate("/login");
     }
