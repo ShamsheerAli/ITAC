@@ -211,7 +211,14 @@ const StaffKanban = () => {
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        onClick={() => navigate(`/staff-client-review/${item._id}`)}
+                                                        onClick={() => {
+                                                            // Check if the current column is "Awaiting Documents"
+                                                            if (column.name === 'Awaiting Documents') {
+                                                                navigate(`/staff-document-review/${item._id}`);
+                                                            } else {
+                                                                navigate(`/staff-client-review/${item._id}`);
+                                                            }
+                                                        }}
                                                         className={`bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-start gap-3 relative
                                                             ${snapshot.isDragging ? 'ring-2 ring-[#FE5C00] shadow-xl rotate-2' : ''}`}
                                                         style={{ ...provided.draggableProps.style }}
@@ -227,6 +234,12 @@ const StaffKanban = () => {
                                                             <p className="text-[10px] text-gray-400 mt-0.5">
                                                                 (ID: {item._id.substring(item._id.length - 6)})
                                                             </p>
+                                                            {item.status === 'Awaiting Documents' && item.documents?.length > 0 && (
+                                                                <span className="absolute -top-1 -right-4 flex h-3 w-3">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                                            </span>
+                                                            )}
                                                         </div>
 
                                                         {/* REJECT/ARCHIVE BUTTON */}

@@ -15,8 +15,19 @@ const TemporaryDashboard = () => {
 
       const fetchProfile = async () => {
         try {
-          const res = await api.get(`/profile/${parsedUser.id}`);
-          setProfile(res.data);
+          const res = await api.get(`/profile/${parsedUser.id || parsedUser._id}`);
+          const fetchedProfile = res.data;
+          setProfile(fetchedProfile);
+
+          // --- BUG FIX: AUTO-REDIRECT LOGIC ---
+          const status = fetchedProfile?.status || 'New Inquiry';
+          const isApproved = ['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(status);
+          
+          // If they are approved AND they have clicked the button before, send them straight through!
+          if (isApproved && localStorage.getItem('hasEnteredMainDashboard') === 'true') {
+              navigate('/dashboard');
+          }
+
         } catch (err) {
           console.log("No profile found.");
         }
@@ -193,7 +204,12 @@ const TemporaryDashboard = () => {
             {activeStep === 3 && (
                 <div className="text-center mt-12 animate-fade-in">
                     <p className="text-green-600 font-bold text-lg mb-4">You have been approved!</p>
-                    <Link to="/dashboard">
+                    
+                    {/* ADD THE onClick EVENT TO THIS LINK */}
+                    <Link 
+                        to="/dashboard"
+                        onClick={() => localStorage.setItem('hasEnteredMainDashboard', 'true')}
+                    >
                         <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-12 rounded shadow-lg transition text-xl">
                             Enter Main Dashboard
                         </button>

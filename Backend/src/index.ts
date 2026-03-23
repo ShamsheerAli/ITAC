@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes';
@@ -14,6 +15,8 @@ const MONGO_URI = process.env.MONGO_URI || "";
 // Middleware
 app.use(cors()); // Allow frontend requests
 app.use(express.json()); // Parse JSON bodies
+// Serve the 'uploads' folder publicly so the frontend can download files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully"))
