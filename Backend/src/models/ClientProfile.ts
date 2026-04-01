@@ -60,6 +60,23 @@ const ClientProfileSchema: Schema = new Schema({
   isRuralArea: { type: String, default: "" },
   referredBy: { type: String, default: "" },
   isArchived: { type: Boolean, default: false },
+  proposedAuditDates: { 
+    type: [String], // Array of strings to hold the dates (e.g., ["2026-04-10", "2026-04-15"])
+    default: [] 
+  },
+  auditNotes: { 
+    type: String, 
+    default: "" 
+  },
+  confirmedAuditDate: { 
+    type: String, 
+    default: "" 
+  },
+  isAuditConfirmed: { 
+    type: Boolean, 
+    default: false 
+  }
+
 }, { timestamps: true });
 
 export default mongoose.model<IClientProfile>('ClientProfile', ClientProfileSchema);

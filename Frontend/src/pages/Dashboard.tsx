@@ -90,7 +90,6 @@ const Dashboard = () => {
               </p>
               <p><span className="font-bold text-black">Phone:</span> {profile?.contactPhone || "N/A"}</p>
               
-              {/* --- UPDATED ADDRESS SECTION --- */}
               <p><span className="font-bold text-black">Street Address:</span> {profile?.streetAddress || "N/A"}</p>
               <p><span className="font-bold text-black">City:</span> {profile?.city || "N/A"}</p>
               <p>
@@ -98,7 +97,6 @@ const Dashboard = () => {
                 <span className="mx-3 text-gray-400">|</span> 
                 <span className="font-bold text-black">Zip Code:</span> {profile?.zipCode || "N/A"}
               </p>
-              {/* ------------------------------- */}
 
               <div className="pt-6 flex justify-center">
                 <Link to="/dashboard/update-details">
@@ -113,40 +111,107 @@ const Dashboard = () => {
 
         {/* RIGHT CARD: Action Center */}
         <div className="bg-white p-2 flex flex-col justify-between h-full min-h-[400px]">
-           <div className="mb-6">
+          <div className="mb-6">
             <h2 className="text-3xl font-bold text-center text-black">Action Center</h2>
             <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
           </div>
 
-          {/* Main Text Area */}
-          <div className="flex-grow flex items-center justify-center px-6">
-            <div className="text-gray-800 text-2xl leading-9 text-center font-medium">
-              You have been selected for ITAC services.
-              <br />
-              Upload the required documents by clicking
-              <br />
-              on “Upload Documents” button.
-            </div>
-          </div>
+          {/* DYNAMIC CONTENT BASED ON STATUS */}
+          {profile?.status === 'Ready for audit' ? (
+            <>
+              {/* 1. Ready for Audit View */}
+              <div className="flex-grow flex items-center justify-center px-6">
+                <div className="text-gray-800 text-2xl leading-9 text-center font-medium">
+                  Your documents are all clear!
+                  <br /><br />
+                  We are ready to schedule your on-site energy audit.
+                </div>
+              </div>
+              <div className="flex flex-col gap-4 mt-8 px-6">
+                <Link to="/schedule-audit" className="w-full">
+                  <button className="w-full bg-[#FE5C00] text-white py-5 rounded shadow-lg hover:bg-orange-700 transition font-extrabold text-2xl uppercase tracking-widest animate-pulse border-2 border-[#FE5C00] hover:border-orange-700">
+                    Schedule Audit
+                  </button>
+                </Link>
+              </div>
+            </>
+          ) : profile?.status === 'Audit Scheduled' ? (
+            
+            // CHECK IF STAFF HAS CONFIRMED YET
+            profile?.isAuditConfirmed ? (
+              <>
+                {/* --- 2A. OFFICIALLY CONFIRMED VIEW --- */}
+                <div className="flex-grow flex flex-col items-center justify-center px-6 text-center">
+                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-sm border border-green-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                   </div>
+                   <div className="text-gray-800 text-2xl font-bold mb-4">
+                      Your audit is officially scheduled!
+                   </div>
+                   <div className="bg-green-50 border-2 border-green-500 rounded-lg p-5 inline-block mb-6 shadow-sm">
+                      <p className="text-2xl font-extrabold text-green-700">
+                         {profile?.confirmedAuditDate?.replace('Client Proposed: ', '').replace('Staff Proposed: ', '')}
+                      </p>
+                   </div>
+                   <div className="text-gray-600 text-lg leading-relaxed">
+                      Our ITAC team will arrive on this date. We look forward to working with you!
+                   </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* --- 2B. WAITING FOR STAFF CONFIRMATION VIEW --- */}
+                <div className="flex-grow flex flex-col items-center justify-center px-6 text-center">
+                   <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#FE5C00]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                   </div>
+                   <div className="text-gray-800 text-xl font-medium mb-4">
+                      Your proposed audit date is:
+                   </div>
+                   <div className="bg-orange-50 border-2 border-[#FE5C00] rounded-lg p-4 inline-block mb-6 shadow-sm">
+                      <p className="text-xl font-extrabold text-[#FE5C00]">
+                         {profile?.confirmedAuditDate?.replace('Client Proposed: ', '').replace('Staff Proposed: ', '') || "Date pending"}
+                      </p>
+                   </div>
+                   <div className="text-gray-600 text-lg leading-relaxed">
+                      One of our ITAC team members will review your selection and confirm the final date shortly.
+                   </div>
+                </div>
+              </>
+            )
 
-          {/* Buttons */}
-          <div className="flex flex-wrap gap-4 mt-8">
-            <button className="flex-1 bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
-              Resources
-            </button>
-            <Link to="/upload-documents" className="flex-1">
-                <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
-                Upload Documents
+          ) : (
+            <>
+              {/* 3. Default / Awaiting Documents View */}
+              <div className="flex-grow flex items-center justify-center px-6">
+                <div className="text-gray-800 text-2xl leading-9 text-center font-medium">
+                  You have been selected for ITAC services.
+                  <br />
+                  Upload the required documents by clicking
+                  <br />
+                  on “Upload Documents” button.
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-4 mt-8">
+                <button className="flex-1 bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
+                  Resources
                 </button>
-            </Link>
-            <Link to="/inbox" className="flex-1">
-                <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
-                Inbox
-                </button>
-            </Link>
+                <Link to="/upload-documents" className="flex-1">
+                    <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
+                    Upload Documents
+                    </button>
+                </Link>
+                <Link to="/inbox" className="flex-1">
+                    <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
+                    Inbox
+                    </button>
+                </Link>
+              </div>
+            </>
+          )}
           </div>
-        </div>
-
+        
+      {/* THIS IS THE MISSING DIV THAT BROKE THE FILE */}
       </div>
 
       {/* BOTTOM SECTION: Tracking System */}

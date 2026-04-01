@@ -103,6 +103,33 @@ router.put('/status/:id', async (req: Request, res: Response): Promise<void> => 
     res.status(500).send('Server Error');
   }
 });
+// @route   PUT /api/profile/:id/schedule
+// @desc    Save proposed audit dates and notes
+router.put('/:id/schedule', async (req, res) => {
+  try {
+    const { proposedAuditDates, auditNotes } = req.body;
+    
+    // Find the profile by its ID and update the dates/notes. 
+    // We also automatically move them to the "Audit Scheduled" column!
+    const profile = await ClientProfile.findByIdAndUpdate(
+      req.params.id, 
+      { 
+          proposedAuditDates, 
+          auditNotes,
+      },
+      { new: true }
+    );
+    
+    if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+    }
+    
+    res.json({ message: "Schedule updated successfully", profile });
+  } catch (error) {
+    console.error("Scheduling Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // @route   PUT /api/profile/:id/archive
 // @desc    Archive a client
@@ -141,6 +168,50 @@ router.put('/:id/unarchive', async (req, res) => {
   }
 });
 
+// @route   PUT /api/profile/:userId/confirm-schedule
+// @desc    Client confirms their final audit date
+router.put('/:userId/confirm-schedule', async (req, res) => {
+  try {
+    const { confirmedAuditDate } = req.body;
+    
+    // Find the profile by the USER ID (because the client frontend uses the User ID)
+    const profile = await ClientProfile.findOneAndUpdate(
+      { user: req.params.userId }, 
+      { 
+          confirmedAuditDate,
+          status: 'Audit Scheduled' // Automatically move them on the Kanban board!
+      },
+      { new: true }
+    );
+    
+    if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+    }
+    
+    res.json({ message: "Audit scheduled successfully", profile });
+  } catch (error) {
+    console.error("Schedule Confirmation Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// @route   PUT /api/profile/:id/staff-confirm-audit
+// @desc    Staff officially confirms the client's selected audit date
+router.put('/:id/staff-confirm-audit', async (req, res) => {
+  try {
+    const profile = await ClientProfile.findByIdAndUpdate(
+      req.params.id, 
+      { isAuditConfirmed: true },
+      { new: true }
+    );
+    
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    
+    res.json({ message: "Audit officially confirmed!", profile });
+  } catch (error) {
+    console.error("Confirmation Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 // =========================================================================
 // 2. GENERIC ROUTES (MUST BE AT THE BOTTOM)
 // =========================================================================

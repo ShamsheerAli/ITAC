@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import TemporaryDashboard from './pages/TemporaryDashboard'
+import StaffAuditScheduling from './pages/StaffAuditScheduling';
 
 // --- CLIENT PAGES ---
 import Dashboard from './pages/Dashboard'
@@ -11,6 +12,7 @@ import Inbox from './pages/Inbox'
 import UpdateDetails from './pages/ClientUpdateDetails' 
 import UploadDocuments from './pages/UploadDocuments'
 import DashboardLayout from './layouts/DashboardLayout' 
+import ClientAuditScheduling from './pages/ClientAuditScheduling';
 
 // --- STAFF PAGES ---
 import StaffDashboard from './pages/StaffDashboard';
@@ -23,6 +25,7 @@ import StaffDocumentReview from './pages/StaffDocumentReview';
 import StaffInbox from './pages/StaffInbox';
 import StaffClientDetails from './pages/StaffClientDetails';
 import StaffArchivedClients from './pages/StaffArchivedClients';
+import StaffAuditConfirmation from './pages/StaffAuditConfirmation';
 
 function App() {
   return (
@@ -45,6 +48,7 @@ function App() {
             <Route path="/update-details" element={<UpdateDetails />} />
             <Route path="/upload-documents" element={<UploadDocuments />} />
             <Route path="/inbox" element={<Inbox />} />
+            <Route path="/schedule-audit" element={<ClientAuditScheduling />} />
         </Route>
 
         {/* ================= STAFF ROUTES (Staff Sidebar Layout) ================= */}
@@ -59,6 +63,8 @@ function App() {
           <Route path="/staff-inbox/:clientId?" element={<StaffInbox />} />
           <Route path="/staff-client-details/:clientId" element={<StaffClientDetails />} />
           <Route path="/staff-archived-clients" element={<StaffArchivedClients />} />
+          <Route path="/staff-audit-scheduling/:clientId" element={<StaffAuditScheduling />} />
+          <Route path="/staff-audit-confirmation/:clientId" element={<StaffAuditConfirmation />} />
         </Route>
 
       </Routes>

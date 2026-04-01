@@ -19,12 +19,12 @@ const TemporaryDashboard = () => {
           const fetchedProfile = res.data;
           setProfile(fetchedProfile);
 
-          // --- BUG FIX: AUTO-REDIRECT LOGIC ---
           const status = fetchedProfile?.status || 'New Inquiry';
           const isApproved = ['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(status);
           
-          // If they are approved AND they have clicked the button before, send them straight through!
-          if (isApproved && localStorage.getItem('hasEnteredMainDashboard') === 'true') {
+          // AUTO-REDIRECT: If the database says they are advanced past step 2,
+          // instantly bounce them to the main dashboard. No button required!
+          if (isApproved) {
               navigate('/dashboard');
           }
 

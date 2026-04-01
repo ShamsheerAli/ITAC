@@ -46,10 +46,16 @@ const StaffDocumentReview = () => {
 
   // --- DOCUMENT SORTING LOGIC ---
   const uploadedDocs = profile.documents || [];
-  const uploadedDocNames = uploadedDocs.map((doc: any) => doc.name);
   
-  // Find which required documents are missing
-  const missingDocs = REQUIRED_DOCUMENTS.filter(reqDoc => !uploadedDocNames.includes(reqDoc));
+  // Convert all uploaded names to lowercase and remove extra spaces for a bulletproof comparison
+  const uploadedDocNames = uploadedDocs.map((doc: any) => 
+      (doc.name || "").trim().toLowerCase()
+  );
+  
+  // Find which required documents are missing by checking against the lowercase list
+  const missingDocs = REQUIRED_DOCUMENTS.filter(reqDoc => 
+      !uploadedDocNames.includes(reqDoc.trim().toLowerCase())
+  );
   
   // Determine Tracking Status
   const isAllUploaded = missingDocs.length === 0;
