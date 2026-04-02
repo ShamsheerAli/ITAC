@@ -212,6 +212,30 @@ router.put('/:id/staff-confirm-audit', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// @route   PUT /api/profile/:userId/remove-document
+// @desc    Removes a specific document from the client's profile
+// @route   PUT /api/profile/:userId/remove-document
+// @desc    Removes a specific document from the client's profile
+router.put('/:userId/remove-document', async (req, res) => {
+  try {
+    const { path } = req.body; // <-- Changed to look for the specific file path
+    
+    // Pull the exact document that matches this unique file path
+    const profile = await ClientProfile.findOneAndUpdate(
+      { user: req.params.userId },
+      { $pull: { documents: { path: path } } },
+      { new: true }
+    );
+
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+    res.json({ message: "Document removed successfully", profile });
+  } catch (error) {
+    console.error("Remove Document Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 // =========================================================================
 // 2. GENERIC ROUTES (MUST BE AT THE BOTTOM)
 // =========================================================================

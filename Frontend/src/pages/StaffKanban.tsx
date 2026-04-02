@@ -232,25 +232,37 @@ const StaffKanban = () => {
                                                         <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 ${column.color}`}></div>
                                                         
                                                         {/* Content */}
-                                                        <div className="flex-1 min-w-0 pr-6">
-                                                            <p className="text-xs font-bold text-gray-700 truncate">
-                                                                {item.companyName}
-                                                            </p>
-                                                            <div className="flex items-center text-[10px] text-gray-400 mt-0.5 gap-2">
-                                                                <span>(ID: {item._id.substring(item._id.length - 6)})</span>
-                                                                {item.status === 'Audit Scheduled' && item.confirmedAuditDate && (
-                                                                    <span className="text-[#FE5C00] font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
-                                                                        {item.confirmedAuditDate.replace('Client Proposed: ', '').replace('Staff Proposed: ', '')}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                            {item.status === 'Awaiting Documents' && item.documents?.length > 0 && (
-                                                                <span className="absolute -top-1 -right-4 flex h-3 w-3">
-                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                                            </span>
-                                                            )}
-                                                        </div>
+        <div className="flex-1 min-w-0 pr-6">
+            <p className="text-xs font-bold text-gray-700 truncate">
+                {item.companyName}
+            </p>
+            <div className="flex items-center text-[10px] text-gray-400 mt-1 gap-2">
+                <span>(ID: {item._id.substring(item._id.length - 6)})</span>
+                
+                {/* --- UX FIX: INLINE RED NOTIFICATION BADGE --- */}
+                {(
+                    // Condition 1: Awaiting Documents AND client uploaded files
+                    (item.status === 'Awaiting Documents' && item.documents?.length > 0) ||
+                    
+                    // Condition 2: Ready for Audit AND no valid dates have been proposed
+                    (item.status === 'Ready for audit' && (!item.proposedAuditDates || item.proposedAuditDates.filter((d: string) => d && d.trim() !== '').length === 0)) ||
+                    // Condition 3: Audit Scheduled AND staff hasn't officially confirmed the date yet
+                    (item.status === 'Audit Scheduled' && !item.isAuditConfirmed)
+                ) && (
+                    <span className="relative flex h-2.5 w-2.5" title="Action Required">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                )}
+
+                {/* SHOW DATE IF AUDIT IS SCHEDULED */}
+                {item.status === 'Audit Scheduled' && item.confirmedAuditDate && (
+                    <span className="text-[#FE5C00] font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
+                        {item.confirmedAuditDate.replace('Client Proposed: ', '').replace('Staff Proposed: ', '')}
+                    </span>
+                )}
+            </div>
+        </div>
 
                                                         {/* REJECT/ARCHIVE BUTTON */}
                                                         <button
