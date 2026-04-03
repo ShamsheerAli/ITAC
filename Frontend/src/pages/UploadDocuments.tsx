@@ -110,7 +110,7 @@ const UploadDocuments = () => {
         {/* UPLOAD ROWS */}
         <div className="space-y-8 pb-10">
           <UploadRow 
-            label="Most Recent Utility Bills" 
+            label="Most Recent Utility Bills(Last 12 months)" 
             docName="Utility Bills" 
             uploadingDoc={uploadingDoc} 
             allDocuments={allDocuments}

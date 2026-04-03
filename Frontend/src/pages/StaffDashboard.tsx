@@ -22,6 +22,7 @@ const StaffDashboard = () => {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [clients, setClients] = useState<any[]>([]); // State for Real Data
   const [loading, setLoading] = useState(true);
+  const [unreadMessages, setUnreadMessages] = useState<any[]>([]);
 
   // --- ARCHIVE FUNCTION ---
   const handleArchive = async (clientId: string) => {
@@ -67,6 +68,17 @@ const StaffDashboard = () => {
         return null; // Return null if address is invalid or not found
     };
 
+    const fetchUnread = async () => {
+        try {
+            const res = await api.get('/messages/admin/unread');
+            setUnreadMessages(res.data);
+        } catch (err) {
+            console.error("Failed to fetch unread messages");
+        }
+    };
+    
+    fetchUnread();
+    
     const fetchClients = async () => {
       try {
         const res = await api.get('/profile/admin/all');
@@ -114,6 +126,10 @@ const StaffDashboard = () => {
     };
 
     fetchClients();
+    
+    // Check for unread messages every 5 seconds
+    const interval = setInterval(fetchUnread, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Helper: Generate Ref ID (MMDDYYYY + Index)
@@ -151,19 +167,25 @@ const StaffDashboard = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {clients.map((client) => (
-                    <Marker key={client.id} position={[client.location.lat, client.location.lng]}>
-                        <Popup>
-                            <div className="text-center">
-                                <strong className="block text-sm">{client.companyName}</strong>
-                                <span className="text-xs text-gray-500">{client.status}</span>
-                                <Link to={`/staff-inbox/${client.id}`} className="text-[#FE5C00] text-xs underline mt-1 block">
-                                    Message
-                                </Link>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
+                {clients.map((client) => {
+                    const hasUnread = unreadMessages.some(msg => msg.clientUserId === client.id);
+                    return (
+                        <Marker key={client.id} position={[client.location.lat, client.location.lng]}>
+                            <Popup>
+                                <div className="text-center">
+                                    <strong className="block text-sm">{client.companyName}</strong>
+                                    <span className="text-xs text-gray-500">{client.status}</span>
+                                    
+                                    {/* MAP POPUP: Add a tiny red dot to the Message link if unread! */}
+                                    <Link to={`/staff-inbox/${client.id}`} className="text-[#FE5C00] text-xs underline mt-1 flex items-center justify-center gap-1">
+                                        Message
+                                        {hasUnread && <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>}
+                                    </Link>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    );
+                })}
            </MapContainer>
         </div>
 
@@ -237,7 +259,10 @@ const StaffDashboard = () => {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                    {clients.map((client) => (
+                    {clients.map((client) => {
+                        const hasUnread = unreadMessages.some(msg => msg.clientUserId === client.id);
+
+                        return (
                         <tr key={client.id} className="hover:bg-gray-50 transition relative">
                             
                             {/* REF ID */}
@@ -247,14 +272,22 @@ const StaffDashboard = () => {
                                 </span>
                             </td>
 
-                            {/* COMPANY */}
+                            {/* COMPANY NAME + NOTIFICATION BADGE */}
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     <img src={client.image} alt="" className="w-10 h-10 rounded-full object-cover" />
-                                    <div>
+                                    <div className="flex items-center gap-2">
                                         <Link to={`/staff-client-details/${client.id}`} className="font-bold text-gray-900 hover:text-[#FE5C00]">
                                             {client.companyName}
                                         </Link>
+                                        
+                                        {/* TABLE NOTIFICATION: Pulsing Red Dot */}
+                                        {hasUnread && (
+                                            <span className="relative flex h-3 w-3" title="New Unread Message!">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </td>
@@ -288,16 +321,17 @@ const StaffDashboard = () => {
                                 {activeMenuId === client.id && (
                                     <div className="absolute right-8 top-12 w-40 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-left animate-in fade-in zoom-in-95 duration-100">
                                         <button 
-                                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FE5C00] transition border-b border-gray-100"
+                                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FE5C00] transition border-b border-gray-100 flex items-center justify-between"
                                             onClick={() => navigate(`/staff-inbox/${client.id}`)}
                                         >
                                             Message
+                                            {hasUnread && <span className="h-2 w-2 bg-red-500 rounded-full"></span>}
                                         </button>
                                         <button 
                                             className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition font-medium"
                                             onClick={() => {
                                                 handleArchive(client.id);
-                                                setActiveMenuId(null); // Close menu after clicking
+                                                setActiveMenuId(null); 
                                             }}
                                         >
                                             Archive
@@ -306,7 +340,7 @@ const StaffDashboard = () => {
                                 )}
                             </td>
                         </tr>
-                    ))}
+                    )})}
                 </tbody>
             </table>
         </div>

@@ -79,90 +79,11 @@ const TemporaryDashboard = () => {
       </div>
 
       <div className="flex-1 w-full px-8 py-10 space-y-10 max-w-[1920px] mx-auto">
-        
-        {/* 2. TOP CARDS GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 h-full">
-            
-            {/* LEFT: MY INFORMATION */}
-            <div className="rounded-xl overflow-hidden shadow-md flex flex-col border border-gray-200 bg-[#E0E0E0]">
-                {/* Header Bar */}
-                <div className="bg-[#757575] text-white text-center py-3 font-bold text-2xl tracking-wide uppercase">
-                    My Information
-                </div>
-                
-                {/* Card Body */}
-                <div className="p-8 flex-1 flex flex-col items-center justify-center">
-                    <div className="flex flex-col xl:flex-row items-center gap-8 w-full">
-                         {/* Profile Pic */}
-                        <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-gray-300">
-                             <img 
-                                src={profile?.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
-                                alt="Profile" 
-                                className="w-full h-full object-cover" 
-                            />
-                        </div>
-
-                        {/* Info List */}
-                        <div className="text-center xl:text-left space-y-2 w-full text-black">
-                             <p className="text-2xl font-bold mb-2">{user.name}</p>
-                             <p className="text-lg"><span className="font-serif font-semibold">Company:</span> {profile?.companyName || "Not Updated"}</p>
-                             <p className="text-lg"><span className="font-serif font-semibold">Email:</span> <span className="underline decoration-dotted">{user.email}</span></p> 
-                             <p className="text-lg"><span className="font-serif font-semibold">Phone:</span> {profile?.contactPhone || "Not Updated"}</p>
-                             <div className="mt-3 text-base text-gray-800 leading-snug bg-white/50 p-3 rounded-lg border border-gray-300 inline-block xl:block">
-                                 <p><span className="font-bold">Address:</span> {profile?.streetAddress || "N/A"}</p>
-                                 <p>{profile?.city ? `${profile.city}, ${profile.state || ""}, ${profile.zipCode || ""}` : "No address on file"}</p>
-                             </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-10 w-full text-center">
-                        <Link to="/update-details">
-                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 px-16 rounded shadow-md transition transform active:scale-95 uppercase tracking-wider text-xl">
-                                UPDATE
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-
-            {/* RIGHT: ACTION CENTER */}
-            <div className="rounded-xl overflow-hidden shadow-md flex flex-col border border-gray-200 bg-white">
-                 {/* Header Bar */}
-                 <div className="pt-6 px-6">
-                    <h2 className="text-3xl font-bold text-black text-center mb-2">
-                        Action Center
-                    </h2>
-                    {/* FULL WIDTH ORANGE LINE */}
-                    <div className="w-full h-1.5 bg-[#FE5C00] rounded-full"></div>
-                 </div>
-
-                 {/* Card Body */}
-                <div className="p-10 flex-1 flex flex-col items-center justify-center text-center">
-                    <p className="text-black font-medium text-xl leading-relaxed mb-12 max-w-2xl">
-                        Go through our services by clicking the <strong>“Resources”</strong> button below, 
-                        and update your details by clicking the <strong>“Update Information”</strong> button. 
-                        <br/><span className="text-gray-500 mt-2 block italic">One of our ITAC team members will review your details and reach out shortly.</span>
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-8 justify-center w-full">
-                        <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
-                            Resources
-                        </button>
-                        <Link to="/update-details">
-                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
-                                Update Information
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {/* 3. TRACKING SYSTEM */}
         <div className="rounded-xl overflow-hidden shadow-md bg-[#FAFAFA] border border-gray-200 pb-12">
              <div className="pt-6 px-6 mb-12">
                 <h2 className="text-3xl font-bold text-black text-center mb-2">
-                    Tracking System
+                    Tracking System(Steps to do)
                 </h2>
                 {/* FULL WIDTH ORANGE LINE */}
                 <div className="w-full h-1.5 bg-[#FE5C00] rounded-full"></div>
@@ -217,6 +138,88 @@ const TemporaryDashboard = () => {
                 </div>
             )}
         </div>
+        
+        {/* 2. TOP CARDS GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 h-full">
+
+            {/* LEFT: ACTION CENTER */}
+            <div className="bg-white p-6 flex flex-col justify-between h-full min-h-[400px] rounded-xl shadow-lg border border-[#FE5C00]/30 relative">
+          
+          {/* Subtle background glow effect for extra emphasis */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -z-10 opacity-50"></div>
+
+          <div className="mb-6 z-10">
+            <h2 className="text-3xl font-bold text-center text-black">Action Center</h2>
+            <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
+          </div>
+
+                 {/* Card Body */}
+                <div className="p-10 flex-1 flex flex-col items-center justify-center text-center">
+                    <p className="text-black font-medium text-xl leading-relaxed mb-12 max-w-2xl">
+                        Go through our services by clicking the <strong>“Resources”</strong> button below, 
+                        and update your details by clicking the <strong>“Update Information”</strong> button. 
+                        <br/><span className="text-black-500 mt-2 block italic">One of our ITAC team members will review your details and reach out shortly.</span>
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-8 justify-center w-full">
+                        <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
+                            Resources
+                        </button>
+                        <Link to="/update-details">
+                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
+                                Update Information
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+            
+            {/* RIGHT: MY INFORMATION */}
+            <div className="rounded-xl overflow-hidden shadow-md flex flex-col border border-gray-200 bg-[#E0E0E0]">
+                {/* Header Bar */}
+                <div className="bg-[#757575] text-white text-center py-3 font-bold text-2xl tracking-wide uppercase">
+                    My Information
+                </div>
+                
+                {/* Card Body */}
+                <div className="p-8 flex-1 flex flex-col items-center justify-center">
+                    <div className="flex flex-col xl:flex-row items-center gap-8 w-full">
+                         {/* Profile Pic */}
+                        <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-gray-300">
+                             <img 
+                                src={profile?.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                            />
+                        </div>
+
+                        {/* Info List */}
+                        <div className="text-center xl:text-left space-y-2 w-full text-black">
+                             <p className="text-2xl font-bold mb-2">{user.name}</p>
+                             <p className="text-lg"><span className="font-serif font-semibold">Company:</span> {profile?.companyName || "Not Updated"}</p>
+                             <p className="text-lg"><span className="font-serif font-semibold">Email:</span> <span className="underline decoration-dotted">{user.email}</span></p> 
+                             <p className="text-lg"><span className="font-serif font-semibold">Phone:</span> {profile?.contactPhone || "Not Updated"}</p>
+                             <div className="mt-3 text-base text-gray-800 leading-snug bg-white/50 p-3 rounded-lg border border-gray-300 inline-block xl:block">
+                                 <p><span className="font-bold">Address:</span> {profile?.streetAddress || "N/A"}</p>
+                                 <p>{profile?.city ? `${profile.city}, ${profile.state || ""}, ${profile.zipCode || ""}` : "No address on file"}</p>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-10 w-full text-center">
+                        <Link to="/update-details">
+                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 px-16 rounded shadow-md transition transform active:scale-95 uppercase tracking-wider text-xl">
+                                UPDATE
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
+        
 
       </div>
     </div>

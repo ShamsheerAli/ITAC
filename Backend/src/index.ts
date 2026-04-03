@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
+import messageRoutes from './routes/messageRoutes';
 // Load environment variables
 dotenv.config();
 
@@ -14,6 +15,8 @@ const MONGO_URI = process.env.MONGO_URI || "";
 
 // Middleware
 app.use(cors()); // Allow frontend requests
+
+
 app.use(express.json()); // Parse JSON bodies
 // Serve the 'uploads' folder publicly so the frontend can download files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -25,6 +28,7 @@ mongoose.connect(MONGO_URI)
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/messages', messageRoutes);
   // 1. Test Route
 app.get('/', (req: Request, res: Response) => {
   res.send('ITAC Staff Portal API is Running & DB Connected!');

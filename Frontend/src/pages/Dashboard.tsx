@@ -56,62 +56,55 @@ const Dashboard = () => {
 
   return (
     <div className="w-full space-y-8">
+      {/* BOTTOM SECTION: Tracking System */}
+      <div className="bg-white pt-8 w-full">
+        <div className="mb-10">
+            <h2 className="text-3xl font-bold text-center text-black">Tracking system(Steps to do)</h2>
+            <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
+        </div>
+
+        {/* PROGRESS BAR */}
+        <div className="bg-gray-50 rounded-xl p-14 border border-gray-100 flex flex-col lg:flex-row items-center justify-center gap-10 w-full">
+            
+            {/* Step 1 */}
+            <StepItem 
+              icon={<IconDocumentCheck />} 
+              label="Documents Received"
+              isActive={hasDocuments} // Logic Applied
+            />
+
+            {/* Arrow */}
+            <ArrowDivider />
+
+            {/* Step 2 */}
+            <StepItem 
+              icon={<IconDocumentSearch />} 
+              label="Documents Review"
+              isActive={isReviewing} // Logic Applied
+            />
+
+            {/* Arrow */}
+            <ArrowDivider />
+
+            {/* Step 3 */}
+            <StepItem 
+              icon={<IconCheckCircle />} 
+              label="Ready to schedule"
+              isActive={isReady} // Logic Applied
+            />
+
+        </div>
+      </div>
       
       {/* TOP SECTION: GRID OF 2 CARDS */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        
-        {/* LEFT CARD: My Information */}
-        <div className="bg-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col h-full min-h-[400px]">
-          {/* Header */}
-          <div className="bg-slate-600 text-white text-center py-4 font-bold text-2xl tracking-wide">
-            My Information
-          </div>
-          
-          {/* Content */}
-          <div className="p-8 flex flex-col sm:flex-row items-center justify-center gap-8 flex-grow">
-            {/* Profile Image */}
-            <div className="flex-shrink-0">
-               <img
-                src={profile?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"} 
-                alt="Profile" 
-                className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
-              />
-            </div>
-
-            {/* Details - Centered and Large */}
-            <div className="text-center w-full space-y-2 text-xl text-gray-800 font-medium">
-              <p><span className="font-bold text-black">Name:</span> {profile?.contactName || user?.name}</p>
-              <p><span className="font-bold text-black">Company:</span> {profile?.companyName || "N/A"}</p>
-              <p>
-                <span className="font-bold text-black">Email:</span>{" "}
-                <a href={`mailto:${user?.email}`} className="underline hover:text-[#FE5C00]">
-                  {user?.email}
-                </a>
-              </p>
-              <p><span className="font-bold text-black">Phone:</span> {profile?.contactPhone || "N/A"}</p>
-              
-              <p><span className="font-bold text-black">Street Address:</span> {profile?.streetAddress || "N/A"}</p>
-              <p><span className="font-bold text-black">City:</span> {profile?.city || "N/A"}</p>
-              <p>
-                <span className="font-bold text-black">State:</span> {profile?.state || "N/A"}
-                <span className="mx-3 text-gray-400">|</span> 
-                <span className="font-bold text-black">Zip Code:</span> {profile?.zipCode || "N/A"}
-              </p>
-
-              <div className="pt-6 flex justify-center">
-                <Link to="/dashboard/update-details">
-                    <button className="bg-[#FE5C00] text-white px-10 py-3 rounded shadow hover:bg-orange-700 transition font-bold uppercase text-base tracking-wider">
-                    Update
-                    </button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* RIGHT CARD: Action Center */}
-        <div className="bg-white p-2 flex flex-col justify-between h-full min-h-[400px]">
-          <div className="mb-6">
+        <div className="bg-white p-6 flex flex-col justify-between h-full min-h-[400px] rounded-xl shadow-lg border border-[#FE5C00]/30 relative">
+          
+          {/* Subtle background glow effect for extra emphasis */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -z-10 opacity-50"></div>
+
+          <div className="mb-6 z-10">
             <h2 className="text-3xl font-bold text-center text-black">Action Center</h2>
             <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
           </div>
@@ -211,48 +204,61 @@ const Dashboard = () => {
           )}
           </div>
         
+        {/* LEFT CARD: My Information */}
+        <div className="bg-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col h-full min-h-[400px]">
+          {/* Header */}
+          <div className="bg-slate-600 text-white text-center py-4 font-bold text-2xl tracking-wide">
+            My Information
+          </div>
+          
+          {/* Content */}
+          <div className="p-8 flex flex-col sm:flex-row items-center justify-center gap-8 flex-grow">
+            {/* Profile Image */}
+            <div className="flex-shrink-0">
+               <img
+                src={profile?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"} 
+                alt="Profile" 
+                className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
+              />
+            </div>
+
+            {/* Details - Centered and Large */}
+            <div className="text-center w-full space-y-2 text-xl text-gray-800 font-medium">
+              <p><span className="font-bold text-black">Name:</span> {profile?.contactName || user?.name}</p>
+              <p><span className="font-bold text-black">Company:</span> {profile?.companyName || "N/A"}</p>
+              <p>
+                <span className="font-bold text-black">Email:</span>{" "}
+                <a href={`mailto:${user?.email}`} className="underline hover:text-[#FE5C00]">
+                  {user?.email}
+                </a>
+              </p>
+              <p><span className="font-bold text-black">Phone:</span> {profile?.contactPhone || "N/A"}</p>
+              
+              <p><span className="font-bold text-black">Street Address:</span> {profile?.streetAddress || "N/A"}</p>
+              <p><span className="font-bold text-black">City:</span> {profile?.city || "N/A"}</p>
+              <p>
+                <span className="font-bold text-black">State:</span> {profile?.state || "N/A"}
+                <span className="mx-3 text-gray-400">|</span> 
+                <span className="font-bold text-black">Zip Code:</span> {profile?.zipCode || "N/A"}
+              </p>
+
+              <div className="pt-6 flex justify-center">
+                <Link to="/update-details">
+                    <button className="bg-[#FE5C00] text-white px-10 py-3 rounded shadow hover:bg-orange-700 transition font-bold uppercase text-base tracking-wider">
+                    Update
+                    </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+        
       {/* THIS IS THE MISSING DIV THAT BROKE THE FILE */}
       </div>
 
-      {/* BOTTOM SECTION: Tracking System */}
-      <div className="bg-white pt-8 w-full">
-        <div className="mb-10">
-            <h2 className="text-3xl font-bold text-center text-black">Tracking system</h2>
-            <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
-        </div>
-
-        {/* PROGRESS BAR */}
-        <div className="bg-gray-50 rounded-xl p-14 border border-gray-100 flex flex-col lg:flex-row items-center justify-center gap-10 w-full">
-            
-            {/* Step 1 */}
-            <StepItem 
-              icon={<IconDocumentCheck />} 
-              label="Documents Received"
-              isActive={hasDocuments} // Logic Applied
-            />
-
-            {/* Arrow */}
-            <ArrowDivider />
-
-            {/* Step 2 */}
-            <StepItem 
-              icon={<IconDocumentSearch />} 
-              label="Documents Review"
-              isActive={isReviewing} // Logic Applied
-            />
-
-            {/* Arrow */}
-            <ArrowDivider />
-
-            {/* Step 3 */}
-            <StepItem 
-              icon={<IconCheckCircle />} 
-              label="Ready to schedule"
-              isActive={isReady} // Logic Applied
-            />
-
-        </div>
-      </div>
+      
 
     </div>
   );

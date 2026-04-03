@@ -96,6 +96,40 @@ const StaffDocumentReview = () => {
             <div className="h-1.5 bg-[#FE5C00] w-24 mx-auto rounded-full" />
         </div>
 
+        {/* 4. TRACKING SYSTEM */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-10">
+            <h3 className="text-xl font-bold text-black mb-8 text-center">Current Status</h3>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative">
+                
+                {/* Step 1: Missing Docs */}
+                <StepItem 
+                    icon={<IconFileCross />} 
+                    label="Missing Documents" 
+                    status={isAllUploaded ? 'success' : 'error'} 
+                />
+
+                <StepConnector status={isAllUploaded ? 'active' : 'pending'} />
+
+                {/* Step 2: Waiting for approval */}
+                <StepItem 
+                    icon={<IconFileClock />} 
+                    label="Waiting for approval" 
+                    status={isAllUploaded ? 'active' : 'pending'} 
+                />
+
+                <StepConnector status="pending" />
+
+                {/* Step 3: Ready */}
+                <StepItem 
+                    icon={<IconCheckCircle />} 
+                    label="Ready to schedule" 
+                    status="pending" 
+                />
+
+            </div>
+        </div>
+
         {/* 3. DOCUMENT STATUS CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             
@@ -147,39 +181,7 @@ const StaffDocumentReview = () => {
 
         </div>
 
-        {/* 4. TRACKING SYSTEM */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-10">
-            <h3 className="text-xl font-bold text-black mb-8 text-center">Current Status</h3>
-            
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative">
-                
-                {/* Step 1: Missing Docs */}
-                <StepItem 
-                    icon={<IconFileCross />} 
-                    label="Missing Documents" 
-                    status={isAllUploaded ? 'success' : 'error'} 
-                />
-
-                <StepConnector status={isAllUploaded ? 'active' : 'pending'} />
-
-                {/* Step 2: Waiting for approval */}
-                <StepItem 
-                    icon={<IconFileClock />} 
-                    label="Waiting for approval" 
-                    status={isAllUploaded ? 'active' : 'pending'} 
-                />
-
-                <StepConnector status="pending" />
-
-                {/* Step 3: Ready */}
-                <StepItem 
-                    icon={<IconCheckCircle />} 
-                    label="Ready to schedule" 
-                    status="pending" 
-                />
-
-            </div>
-        </div>
+        
 
         {/* 5. ACTION BUTTONS */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
