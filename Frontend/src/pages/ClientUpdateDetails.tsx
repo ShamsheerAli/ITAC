@@ -89,10 +89,7 @@ const UpdateDetails = () => {
     const user = JSON.parse(storedUser);
 
     try {
-      await api.post('/profile', {
-        userId: user.id,
-        ...formData
-      });
+      await api.put(`/profile/${user.id}`, formData);
       
       alert('Details Updated Successfully!');
 

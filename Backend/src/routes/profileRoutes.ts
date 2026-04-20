@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import ClientProfile from '../models/ClientProfile';
 import { upload } from '../middleware/uploadMiddleware'; // Ensure this path is correct
+import User from '../models/User'; 
+import { sendNewInquiryEmail } from '../utils/mailer';
 
 const router = express.Router();
 
@@ -292,6 +294,51 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
+  }
+});
+
+
+// @route   PUT /api/profile/:id
+// @desc    Update OR Create client profile AND trigger Staff Email
+router.put('/:id', async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log(`🚨 ===> FRONTEND SUCCESSFULLY HIT THE PUT ROUTE! User ID: ${req.params.id}`);
+    const userId = req.params.id;
+
+    // 1. Check if profile exists
+    const existingProfile = await ClientProfile.findOne({ user: userId as any });
+    
+    // If it doesn't exist, OR if it's currently a 'New Inquiry', it's a first-time update!
+    const isFirstTimeUpdate = !existingProfile || existingProfile.status === 'New Inquiry';
+
+    // 2. Update OR Create (upsert) the profile!
+    const updatedProfile = await ClientProfile.findOneAndUpdate(
+      { user: userId as any },
+      { $set: { ...req.body, user: userId } }, // Save form data + ensure User ID is attached
+      { new: true, upsert: true, setDefaultsOnInsert: true } // UPSERT creates it if missing!
+    );
+
+    console.log("👉 Profile saved! Attempting email sequence...");
+
+    // 3. Send the Email (Temporarily sending on ALL updates to test it)
+    if (updatedProfile) {
+        // Fetch the User account to get their email address
+        const userAccount = await User.findById(userId);
+        const clientEmail = userAccount ? userAccount.email : 'Unknown Email';
+        const companyName = updatedProfile.companyName || 'New Client';
+        
+        console.log(`✉️ Sending email alert for: ${companyName}`);
+        
+        // Fire off the email in the background
+        sendNewInquiryEmail(clientEmail, companyName)
+            .then(() => console.log("✅ Email sent successfully!"))
+            .catch(err => console.error("❌ Email failed:", err));
+    }
+
+    res.json({ message: "Profile saved successfully", profile: updatedProfile });
+  } catch (error) {
+    console.error("Update Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
