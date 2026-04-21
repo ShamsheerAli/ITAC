@@ -9,6 +9,20 @@ const UploadDocuments = () => {
   const [profile, setProfile] = useState<any>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  const handleSaveAndReturn = async () => {
+    try {
+      // Notify the backend that we are done uploading!
+      await api.post(`/profile/${currentUserId}/submit-documents`);
+      
+      // Send them back to the dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      console.error("Error notifying staff:", err);
+      // Even if the email fails, we still want to let them return to the dashboard
+      navigate('/dashboard'); 
+    }
+  };
+
   const fetchProfile = useCallback(async (userId: string) => {
     try {
       const res = await api.get(`/profile/${userId}`);
@@ -91,9 +105,10 @@ const UploadDocuments = () => {
         {/* ======================= */}
         
         {/* SAVE BUTTON - TUCKED NEATLY ABOVE THE SECTION ON THE RIGHT */}
+        {/* SAVE BUTTON */}
         <div className="flex justify-end mb-4">
             <button 
-              onClick={() => navigate('/dashboard')} 
+              onClick={handleSaveAndReturn}
               className="bg-[#FE5C00] text-white px-8 py-3 rounded shadow-md hover:bg-orange-700 transition font-bold text-lg flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

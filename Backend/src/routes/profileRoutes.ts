@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import ClientProfile from '../models/ClientProfile';
 import { upload } from '../middleware/uploadMiddleware'; // Ensure this path is correct
 import User from '../models/User'; 
-import { sendNewInquiryEmail } from '../utils/mailer';
+import { sendNewInquiryEmail, sendClientApprovalEmail, sendDocumentUploadEmail, sendAuditDatesProposedEmail, sendAuditDateSelectedEmail, sendAuditConfirmedEmail } from '../utils/mailer';
 
 const router = express.Router();
 
@@ -78,55 +78,121 @@ router.post('/upload', upload.single('file'), async (req: any, res: Response): P
   }
 });
 
-// @route   PUT /api/profile/status/:id
-// @desc    Update client status AND service type
-router.put('/status/:id', async (req: Request, res: Response): Promise<void> => {
+
+// @route   POST /api/profile/:userId/submit-documents
+// @desc    Client confirms they are done uploading. Notifies staff and updates status.
+router.post('/:userId/submit-documents', async (req: Request, res: Response): Promise<void> => {
   try {
-    // Destructure status and serviceType from body
-    const { status, serviceType } = req.body; 
-
-    // Create update object dynamically
-    const updateData: any = { status };
-    if (serviceType) updateData.serviceType = serviceType; // Only update if provided
-
-    const profile = await ClientProfile.findByIdAndUpdate(
-      req.params.id, 
-      updateData, // Use the dynamic object
+    // 1. Find the profile
+    const profile = await ClientProfile.findOneAndUpdate(
+      { user: req.params.userId },
+      { status: 'Documents Submitted' }, // Automatically update their status!
       { new: true }
     );
 
     if (!profile) {
+      res.status(404).json({ message: "Profile not found" });
+      return;
+    }
+
+    // 2. Fire the email to the staff
+    const clientName = profile.contactName || 'A Client';
+    const companyName = profile.companyName || 'Unknown Company';
+    
+    sendDocumentUploadEmail(clientName, companyName)
+        .catch(err => console.error("❌ Document email failed:", err));
+
+    res.json({ message: "Documents submitted successfully", profile });
+  } catch (err) {
+    console.error("Submit Documents Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/// @route   PUT /api/profile/status/:id
+// @desc    Update client status AND service type AND email client if approved
+router.put('/status/:id', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { status, serviceType } = req.body; 
+
+    // 1. Get the existing profile BEFORE updating so we can check if the status is actually changing
+    const existingProfile = await ClientProfile.findById(req.params.id).populate('user', 'email name');
+    if (!existingProfile) {
       res.status(404).json({ message: 'Profile not found' });
       return;
     }
-    res.json(profile);
+
+    // 2. Create update object dynamically
+    const updateData: any = { status };
+    if (serviceType) updateData.serviceType = serviceType;
+
+    // 3. Update the database
+    const updatedProfile = await ClientProfile.findByIdAndUpdate(
+      req.params.id, 
+      updateData, 
+      { new: true }
+    ).populate('user', 'email name');
+
+    // 4. THE MAGIC: Check if we just moved them to the approval/document phase!
+    // We check `existingProfile.status !== status` so we don't spam them if the staff just updates the service type later!
+    const isNewlyApproved = (status === 'Awaiting Documents' || status === 'Ready for audit') && existingProfile.status !== status;
+
+    if (isNewlyApproved && updatedProfile && updatedProfile.user) {
+        // Extract the user's data safely
+        const clientEmail = (updatedProfile.user as any).email;
+        const clientName = updatedProfile.contactName || (updatedProfile.user as any).name || 'Valued Client';
+        const assignedService = updatedProfile.serviceType || 'our assessment services';
+        
+        console.log(`✉️ Sending approval email to client: ${clientEmail}`);
+        
+        // Fire off the email to the client in the background!
+        sendClientApprovalEmail(clientEmail, clientName, assignedService)
+            .catch(err => console.error("❌ Client email failed:", err));
+    }
+
+    res.json(updatedProfile);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 });
 // @route   PUT /api/profile/:id/schedule
-// @desc    Save proposed audit dates and notes
-router.put('/:id/schedule', async (req, res) => {
+// @desc    Save proposed audit dates, update status to Ready for Audit, and email client
+router.put('/:id/schedule', async (req: Request, res: Response): Promise<void> => {
   try {
     const { proposedAuditDates, auditNotes } = req.body;
     
-    // Find the profile by its ID and update the dates/notes. 
-    // We also automatically move them to the "Audit Scheduled" column!
+    // 1. Update the dates/notes AND automatically change their status to 'Ready for Audit'
+    // We also use .populate() so we can grab their email address for the mailer
     const profile = await ClientProfile.findByIdAndUpdate(
       req.params.id, 
       { 
           proposedAuditDates, 
           auditNotes,
+          status: 'Ready for audit' // Automatically moves them on the Kanban board!
       },
       { new: true }
-    );
+    ).populate('user', 'email name');
     
     if (!profile) {
-        return res.status(404).json({ message: "Profile not found" });
+        res.status(404).json({ message: "Profile not found" });
+        return;
+    }
+
+    // 2. Fire the email to the client
+    if (profile.user) {
+        // Extract the user's data safely
+        const clientEmail = (profile.user as any).email;
+        const clientName = profile.contactName || (profile.user as any).name || 'Valued Client';
+        
+        console.log(`✉️ Sending audit date proposal email to: ${clientEmail}`);
+        
+        // Fire off the email in the background!
+        sendAuditDatesProposedEmail(clientEmail, clientName)
+            .catch(err => console.error("❌ Proposed dates email failed:", err));
     }
     
-    res.json({ message: "Schedule updated successfully", profile });
+    res.json({ message: "Schedule updated successfully and client notified", profile });
   } catch (error) {
     console.error("Scheduling Error:", error);
     res.status(500).json({ message: "Server error" });
@@ -171,12 +237,12 @@ router.put('/:id/unarchive', async (req, res) => {
 });
 
 // @route   PUT /api/profile/:userId/confirm-schedule
-// @desc    Client confirms their final audit date
-router.put('/:userId/confirm-schedule', async (req, res) => {
+// @desc    Client confirms their final audit date and emails staff
+router.put('/:userId/confirm-schedule', async (req: Request, res: Response): Promise<void> => {
   try {
     const { confirmedAuditDate } = req.body;
     
-    // Find the profile by the USER ID (because the client frontend uses the User ID)
+    // 1. Find the profile by the USER ID and update the dates
     const profile = await ClientProfile.findOneAndUpdate(
       { user: req.params.userId }, 
       { 
@@ -187,8 +253,19 @@ router.put('/:userId/confirm-schedule', async (req, res) => {
     );
     
     if (!profile) {
-        return res.status(404).json({ message: "Profile not found" });
+        res.status(404).json({ message: "Profile not found" });
+        return;
     }
+
+    // 2. Fire the email to the staff
+    const clientName = profile.contactName || 'A Client';
+    const companyName = profile.companyName || 'Unknown Company';
+    
+    console.log(`✉️ Sending audit date selection email to staff for: ${companyName}`);
+    
+    // Fire off the email in the background!
+    sendAuditDateSelectedEmail(companyName, clientName, confirmedAuditDate)
+        .catch(err => console.error("❌ Date selection email failed:", err));
     
     res.json({ message: "Audit scheduled successfully", profile });
   } catch (error) {
@@ -196,18 +273,39 @@ router.put('/:userId/confirm-schedule', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 // @route   PUT /api/profile/:id/staff-confirm-audit
-// @desc    Staff officially confirms the client's selected audit date
+// @desc    Staff officially confirms the client's selected audit date and emails client
 router.put('/:id/staff-confirm-audit', async (req, res) => {
   try {
+    // 1. Update the database and populate the user so we can get their email
     const profile = await ClientProfile.findByIdAndUpdate(
       req.params.id, 
       { isAuditConfirmed: true },
       { new: true }
-    );
+    ).populate('user', 'email name');
     
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+    }
     
+    // Create a "safe" version of the profile to bypass TypeScript's strict rules
+    const safeProfile = profile as any;
+    
+    // 2. Fire the final email to the client!
+    if (safeProfile.user) {
+        const clientEmail = safeProfile.user.email;
+        const clientName = safeProfile.contactName || safeProfile.user.name || 'Valued Client';
+        const confirmedDate = safeProfile.confirmedAuditDate || 'your scheduled date';
+        
+        console.log(`✉️ Sending official confirmation email to: ${clientEmail}`);
+        
+        // Fire off the email in the background!
+        sendAuditConfirmedEmail(clientEmail, clientName, confirmedDate)
+            .catch(err => console.error("❌ Official confirmation email failed:", err));
+    }
+
     res.json({ message: "Audit officially confirmed!", profile });
   } catch (error) {
     console.error("Confirmation Error:", error);
@@ -321,7 +419,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     console.log("👉 Profile saved! Attempting email sequence...");
 
     // 3. Send the Email (Temporarily sending on ALL updates to test it)
-    if (updatedProfile) {
+    if (isFirstTimeUpdate && updatedProfile) {
         // Fetch the User account to get their email address
         const userAccount = await User.findById(userId);
         const clientEmail = userAccount ? userAccount.email : 'Unknown Email';
