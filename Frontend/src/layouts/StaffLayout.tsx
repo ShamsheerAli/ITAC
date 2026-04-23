@@ -51,7 +51,7 @@ const StaffLayout = () => {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('/staff-dashboard')) return 'Dashboard';
-    if (path.includes('/staff-kanban')) return 'Kanban Board';
+    if (path.includes('/staff-kanban')) return 'Client Progress Board';
     if (path.includes('/staff-info')) return 'My Information';
     if (path.includes('/add-new-client')) return 'Add New Client';
     if (path.includes('/staff-client-review')) return 'Client Review';
@@ -79,7 +79,7 @@ const StaffLayout = () => {
             />
             <SidebarItem 
                 to="/staff-kanban" 
-                label="Kanban Board" 
+                label="Client Progress Board" 
                 icon={<IconKanban />} 
                 active={activeTab === "/staff-kanban"} 
             />

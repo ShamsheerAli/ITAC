@@ -72,7 +72,7 @@ const StaffKanban = () => {
         setColumns(newColumns);
         setLoading(false);
       } catch (err) {
-        console.error("Failed to load Kanban data", err);
+        console.error("Failed to load Progress data", err);
       }
     };
     fetchData();
@@ -150,7 +150,7 @@ const StaffKanban = () => {
       {/* HEADER */}
       <div className="text-center mb-6">
          <h1 className="text-2xl font-bold uppercase tracking-wide inline-block border-b-4 border-[#FE5C00] pb-1">
-            Kanban Board
+            Client Progress Board
          </h1>
       </div>
 

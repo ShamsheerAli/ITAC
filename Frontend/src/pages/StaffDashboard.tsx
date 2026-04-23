@@ -207,7 +207,7 @@ const StaffDashboard = () => {
             <div className="flex flex-col gap-6 ml-6 justify-center">
                  <Link to="/staff-kanban">
                     <button className="w-48 bg-[#FE5C00] text-white px-6 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-lg text-center leading-tight">
-                        View kanban board
+                        View progress board
                     </button>
                  </Link>
                  <Link to="/add-new-client">

@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const StaffSidebar = () => {
   const navItems = [
     { name: "Dashboard", path: "/staff-dashboard" },
-    { name: "Kanban Board", path: "/staff-kanban" }, // Placeholder path
+    { name: "Client Progress Board", path: "/staff-kanban" }, // Placeholder path
     { name: "My Information", path: "/staff-info" },  // Placeholder path
     { name: "Add new client", path: "/add-new-client" },  // Placeholder path
   ];
