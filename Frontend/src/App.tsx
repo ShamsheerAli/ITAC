@@ -61,6 +61,7 @@ function App() {
           <Route path="/add-new-client" element={<StaffAddClient />} />
           <Route path="/staff-client-review/:clientId" element={<StaffClientReview />} />
           <Route path="/staff-document-review/:clientId" element={<StaffDocumentReview />} />
+          <Route path="/staff-inbox" element={<StaffInbox />} />
           <Route path="/staff-inbox/:clientId?" element={<StaffInbox />} />
           <Route path="/staff-client-details/:clientId" element={<StaffClientDetails />} />
           <Route path="/staff-archived-clients" element={<StaffArchivedClients />} />

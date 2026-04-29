@@ -1,5 +1,6 @@
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../api/axios"; // 🚨 Ensure this import path is correct!
 
 // --- ICONS ---
 const IconDashboard = () => (
@@ -37,10 +38,30 @@ const StaffLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("/staff-dashboard");
+  const [unreadCount, setUnreadCount] = useState(0); // 🚨 Added state for the red dot
 
+  // Track active tab
   useEffect(() => {
     setActiveTab(location.pathname);
   }, [location]);
+
+  // 🚨 Fetch unread messages for the sidebar
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await api.get('/messages/admin/unread');
+        setUnreadCount(res.data.length); 
+      } catch (err) {
+        console.error("Failed to fetch unread messages", err);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // Poll every 15 seconds to keep the red dot updated dynamically
+    const interval = setInterval(fetchUnreadCount, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -83,6 +104,16 @@ const StaffLayout = () => {
                 icon={<IconKanban />} 
                 active={activeTab === "/staff-kanban"} 
             />
+            
+            {/* 🚨 THE NEW INBOX TAB */}
+            <SidebarItem 
+                to="/staff-inbox" 
+                label="Inbox" 
+                icon={<IconInbox />} 
+                active={activeTab.includes("/staff-inbox")} // .includes allows it to stay active even when chatting with a specific client ID
+                badge={unreadCount} // Pass the unread count down!
+            />
+
             <SidebarItem 
                 to="/staff-info" 
                 label="My Information" 
@@ -95,7 +126,6 @@ const StaffLayout = () => {
                 icon={<IconAddClient />} 
                 active={activeTab === "/add-new-client"} 
             />
-            {/* You can add a Staff Inbox here if needed later */}
         </nav>
       </aside>
 
@@ -129,14 +159,24 @@ const StaffLayout = () => {
   );
 };
 
-// Sub-component for Sidebar Links
-const SidebarItem = ({ to, label, icon, active }: any) => (
-    <Link to={to} className={`flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200
+// 🚨 Updated Sub-component to accept and display the badge
+const SidebarItem = ({ to, label, icon, active, badge }: any) => (
+    <Link to={to} className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200
         ${active ? 'bg-orange-50 text-[#FE5C00]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-        <span className={`${active ? 'text-[#FE5C00]' : 'text-gray-400'}`}>
-            {icon}
-        </span>
-        {label}
+        
+        <div className="flex items-center">
+            <span className={`${active ? 'text-[#FE5C00]' : 'text-gray-400'}`}>
+                {icon}
+            </span>
+            {label}
+        </div>
+
+        {/* Display Red Dot if there are unread messages */}
+        {badge > 0 && (
+            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                {badge}
+            </span>
+        )}
     </Link>
 );
 
