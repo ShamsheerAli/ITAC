@@ -187,7 +187,7 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link to="/resources">
-                  <button className="bg-[#FE5C00] text-white px-6 py-2 rounded shadow-md hover:bg-orange-700 font-bold transition">
+                  <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
                     Resources
                     </button>
                 </Link>
