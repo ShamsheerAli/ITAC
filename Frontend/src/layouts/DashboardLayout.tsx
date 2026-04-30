@@ -80,7 +80,7 @@ const DashboardLayout = () => {
             />
             <SidebarItem 
                 to="#" 
-                label="Services" 
+                label="Resources"
                 icon={<IconServices />} 
                 active={false} 
             />

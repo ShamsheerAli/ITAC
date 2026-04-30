@@ -162,9 +162,11 @@ const TemporaryDashboard = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-8 justify-center w-full">
-                        <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
-                            Resources
-                        </button>
+                        <Link to="/resources">
+                  <button className="bg-[#FE5C00] text-white px-6 py-2 rounded shadow-md hover:bg-orange-700 font-bold transition">
+                    Resources
+                    </button>
+                </Link>
                         <Link to="/update-details">
                             <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
                                 Update Information

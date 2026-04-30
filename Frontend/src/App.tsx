@@ -14,6 +14,7 @@ import UpdateDetails from './pages/ClientUpdateDetails'
 import UploadDocuments from './pages/UploadDocuments'
 import DashboardLayout from './layouts/DashboardLayout' 
 import ClientAuditScheduling from './pages/ClientAuditScheduling';
+import Resources from './pages/Resources';
 
 // --- STAFF PAGES ---
 import StaffDashboard from './pages/StaffDashboard';
@@ -50,6 +51,7 @@ function App() {
             <Route path="/upload-documents" element={<UploadDocuments />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/schedule-audit" element={<ClientAuditScheduling />} />
+            <Route path="/resources" element={<Resources />} />
         </Route>
 
         {/* ================= STAFF ROUTES (Staff Sidebar Layout) ================= */}
