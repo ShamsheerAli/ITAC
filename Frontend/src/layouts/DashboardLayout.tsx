@@ -79,10 +79,10 @@ const DashboardLayout = () => {
                 active={activeTab === "/dashboard"} 
             />
             <SidebarItem 
-                to="#" 
+                to="/resources" 
                 label="Resources"
                 icon={<IconServices />} 
-                active={false} 
+                active={activeTab === "/resources"} 
             />
             <SidebarItem 
                 to="/inbox" 
