@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 
 // 🚨 IMPORT THE IMAGES DIRECTLY FROM YOUR ASSETS FOLDER
 // (Make sure the extensions match your actual files: .jpg, .jpeg, or .png)
-import itacImage from '../assets/images/itac-guidelines.jpg';
-import reacImage from '../assets/images/reac-guidelines.jpg';
+import itacImage from '../assets/images/itac-guidelines.png';
+import reacImage from '../assets/images/reac-guidelines.png';
 
 const Resources = () => {
   const navigate = useNavigate();
