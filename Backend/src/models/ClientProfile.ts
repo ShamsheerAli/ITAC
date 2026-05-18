@@ -14,7 +14,7 @@ export interface IClientProfile extends Document {
   utilityExpenses: string;
   energyConsumption: string;
   grossSales: string;
-  sicCode: string;
+  businessDescription: string;
   naics: string;
   description: string;
   status: string;
@@ -24,8 +24,9 @@ export interface IClientProfile extends Document {
     uploadedAt: Date;
   }[];
   serviceType: string;
-  isSmallBusiness?: string;
-  isRuralArea?: string;
+  naturalGasProvider: string;
+  electricityProvider: string;
+  naturalGasTransporter: string;
   referredBy?: string;
   isArchived?: boolean;
 }
@@ -44,7 +45,7 @@ const ClientProfileSchema: Schema = new Schema({
   utilityExpenses: { type: String },
   energyConsumption: { type: String },
   grossSales: { type: String },
-  sicCode: { type: String },
+  businessDescription: { type: String },
   naics: { type: String },
   description: { type: String },
   status: { type: String, default: 'New Inquiry' },
@@ -56,8 +57,9 @@ const ClientProfileSchema: Schema = new Schema({
     }
   ],
   serviceType: { type: String, default: "" },
-  isSmallBusiness: { type: String, default: "" },
-  isRuralArea: { type: String, default: "" },
+  naturalGasProvider: { type: String },
+  electricityProvider: { type: String },
+  naturalGasTransporter: { type: String },
   referredBy: { type: String, default: "" },
   isArchived: { type: Boolean, default: false },
   proposedAuditDates: { 

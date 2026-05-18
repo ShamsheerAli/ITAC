@@ -7,7 +7,7 @@ const UpdateDetails = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   
-  // Initial State
+  // ✅ Fixed State: Names now perfectly match the questions being asked!
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -17,16 +17,17 @@ const UpdateDetails = () => {
     city: '',
     state: '',
     zipCode: '',
-    sicCode: '',
+    businessDescription: '', // Replaced sicCode
     naics: '',
     energyConsumption: '',
     grossSales: '',
     buildingSize: '',
     utilityExpenses: '',
-    isSmallBusiness: '',
-    isRuralArea: '',
-    description: '',
-    referredBy: '' // ✅ NEW FIELD
+    naturalGasProvider: '', // Replaced isSmallBusiness
+    electricityProvider: '', // Replaced isRuralArea
+    naturalGasTransporter: '', // Fixed duplicate name issue
+    referredBy: '', 
+    description: ''
   });
 
   useEffect(() => {
@@ -51,16 +52,17 @@ const UpdateDetails = () => {
             city: res.data.city || '',
             state: res.data.state || '',
             zipCode: res.data.zipCode || '',
-            sicCode: res.data.sicCode || '',
+            businessDescription: res.data.businessDescription || res.data.sicCode || '', // Fallback for old data
             naics: res.data.naics || '',
             energyConsumption: res.data.energyConsumption || '',
             grossSales: res.data.grossSales || '',
             buildingSize: res.data.buildingSize || '',
             utilityExpenses: res.data.utilityExpenses || '',
-            isSmallBusiness: res.data.isSmallBusiness || '',
-            isRuralArea: res.data.isRuralArea || '',
-            description: res.data.description || '',
-            referredBy: res.data.referredBy || '' // ✅ POPULATE NEW FIELD
+            naturalGasProvider: res.data.naturalGasProvider || '', 
+            electricityProvider: res.data.electricityProvider || '',
+            naturalGasTransporter: res.data.naturalGasTransporter || '',
+            referredBy: res.data.referredBy || '',
+            description: res.data.description || ''
           });
         }
       } catch (err) {
@@ -156,11 +158,11 @@ const UpdateDetails = () => {
                 </div>
             </div>
              <div>
-                <label className="block text-sm font-bold mb-1">SIC Code:<RequiredStar /></label>
-                <input required type="text" name="sicCode" value={formData.sicCode} onChange={handleChange} className="w-full border p-2 rounded" />
+                <label className="block text-sm font-bold mb-1">Business Description:<RequiredStar /></label>
+                <input required type="text" name="businessDescription" value={formData.businessDescription} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
              <div>
-                <label className="block text-sm font-bold mb-1">NAICS:<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">NAICS Code:<RequiredStar /></label>
                 <input required type="text" name="naics" value={formData.naics} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
         </div>
@@ -172,44 +174,39 @@ const UpdateDetails = () => {
                 <input required type="text" name="energyConsumption" value={formData.energyConsumption} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-1">Annual Gross sales:<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Annual Gross sales:$<RequiredStar /></label>
                 <input required type="text" name="grossSales" value={formData.grossSales} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-1">Building Size(Sq Feet):<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Total Size of All Buildings (Sq Feet):<RequiredStar /></label>
                 <input required type="text" name="buildingSize" value={formData.buildingSize} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-1">Annual utility expenses(Gas & Electricity):<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Total Annual utility expenses(Gas & Electricity):$<RequiredStar /></label>
                 <input required type="text" name="utilityExpenses" value={formData.utilityExpenses} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
 
             {/* Questions Section */}
             <div>
-                <label className="block text-sm font-bold mb-1">Are you considered as a small business? (According to SBI rule)<RequiredStar /></label>
-                <select required name="isSmallBusiness" value={formData.isSmallBusiness} onChange={handleChange} className="w-full border p-2 rounded bg-white">
-                    <option value="">Select an option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
+                <label className="block text-sm font-bold mb-1">Natural Gas Provider:</label>
+                <input required type="text" name="naturalGasProvider" value={formData.naturalGasProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/> 
             </div>
 
             <div>
-                <label className="block text-sm font-bold mb-1">Are you from rural area?<RequiredStar /></label>
-                <select required name="isRuralArea" value={formData.isRuralArea} onChange={handleChange} className="w-full border p-2 rounded bg-white">
-                    <option value="">Select an option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
+                <label className="block text-sm font-bold mb-1">Electricity Provider:</label>
+                <input required type="text" name="electricityProvider" value={formData.electricityProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/>
             </div>
 
-            {/* ✅ NEW QUESTION: Referred By (No Star) */}
+            <div>
+                <label className="block text-sm font-bold mb-1">Natural Gas Transporter (If Applicable):</label>
+                <input type="text" name="naturalGasTransporter" value={formData.naturalGasTransporter} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. ONG" />
+            </div>
             <div>
                 <label className="block text-sm font-bold mb-1">Referred By?</label>
                 <input type="text" name="referredBy" value={formData.referredBy} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. LinkedIn, Friend, Event" />
             </div>
 
-            {/* Additional Details (No Star) */}
+            {/* Additional Details */}
             <div>
                 <label className="block text-sm font-bold mb-1">Additional details</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} className="w-full border p-2 rounded h-24"></textarea>
