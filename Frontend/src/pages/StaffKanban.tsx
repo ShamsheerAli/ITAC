@@ -241,15 +241,19 @@ const StaffKanban = () => {
                 
                 {/* --- UX FIX: INLINE RED NOTIFICATION BADGE --- */}
                 {(
-                    // Condition 1: Awaiting Documents AND client uploaded files
+                    // Condition 1: New Inquiry AND no service assigned yet (NEEDS STAFF REVIEW)
+                    (item.status === 'New Inquiry' && !item.serviceType) ||
+
+                    // Condition 2: Awaiting Documents AND client uploaded files
                     (item.status === 'Awaiting Documents' && item.documents?.length > 0) ||
                     
-                    // Condition 2: Ready for Audit AND no valid dates have been proposed
+                    // Condition 3: Ready for Audit AND no valid dates have been proposed
                     (item.status === 'Ready for audit' && (!item.proposedAuditDates || item.proposedAuditDates.filter((d: string) => d && d.trim() !== '').length === 0)) ||
-                    // Condition 3: Audit Scheduled AND staff hasn't officially confirmed the date yet
+                    
+                    // Condition 4: Audit Scheduled AND staff hasn't officially confirmed the date yet
                     (item.status === 'Audit Scheduled' && !item.isAuditConfirmed)
                 ) && (
-                    <span className="relative flex h-2.5 w-2.5" title="Action Required">
+                    <span className="relative flex h-2.5 w-2.5 ml-2" title="Action Required">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                     </span>

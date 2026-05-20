@@ -152,7 +152,7 @@ const StaffClientReview = () => {
             <div className="space-y-3 mb-8">
                 <ServiceOption label="Industrial TAC" selected={selectedService === "Industrial TAC"} onClick={() => setSelectedService("Industrial TAC")} />
                 <ServiceOption label="Commercial ITAC" selected={selectedService === "Commercial ITAC"} onClick={() => setSelectedService("Commercial ITAC")} />
-                <ServiceOption label="REAC" selected={selectedService === "REAC"} onClick={() => setSelectedService("REAC")} />
+                {/* <ServiceOption label="REAC" selected={selectedService === "REAC"} onClick={() => setSelectedService("REAC")} /> */}
             </div>
 
             <div className="space-y-4">

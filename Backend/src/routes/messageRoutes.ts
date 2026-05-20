@@ -72,6 +72,35 @@ router.put('/admin/mark-read/:clientUserId', async (req, res) => {
   }
 });
 
+// @route   GET /api/messages/client/unread/:clientUserId
+// @desc    Gets ALL unread messages sent by STAFF to a specific client
+router.get('/client/unread/:clientUserId', async (req, res) => {
+  try {
+    const unreadMessages = await Message.find({ 
+      clientUserId: req.params.clientUserId, 
+      senderRole: 'staff', 
+      isRead: false 
+    });
+    res.json(unreadMessages);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching unread messages" });
+  }
+});
+
+// @route   PUT /api/messages/client/mark-read/:clientUserId
+// @desc    Client marks all staff messages as read when opening Inbox
+router.put('/client/mark-read/:clientUserId', async (req, res) => {
+  try {
+    await Message.updateMany(
+      { clientUserId: req.params.clientUserId, senderRole: 'staff', isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ message: "Messages marked as read" });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating messages" });
+  }
+});
+
 // =========================================================================
 // 2. DYNAMIC ROUTES (MUST BE AT THE BOTTOM)
 // =========================================================================

@@ -1,6 +1,7 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../api/axios";
 
 // --- ICONS ---
 const IconDashboard = () => (
@@ -39,10 +40,34 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("/dashboard");
+  const [unreadCount, setUnreadCount] = useState(0); // 🚨 NEW: Unread message state
 
   useEffect(() => {
     setActiveTab(location.pathname);
   }, [location]);
+
+  // 🚨 NEW: Fetch client's unread messages
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) return;
+      const user = JSON.parse(storedUser);
+      const userId = user._id || user.id;
+
+      try {
+        const res = await api.get(`/messages/client/unread/${userId}`);
+        setUnreadCount(res.data.length); 
+      } catch (err) {
+        console.error("Failed to fetch unread messages", err);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // Poll every 15 seconds to keep the red dot updated dynamically
+    const interval = setInterval(fetchUnreadCount, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -84,14 +109,16 @@ const DashboardLayout = () => {
                 icon={<IconServices />} 
                 active={activeTab === "/resources"} 
             />
+            {/* 🚨 UPDATED: Passing the badge prop to the Inbox item */}
             <SidebarItem 
                 to="/inbox" 
                 label="Inbox" 
                 icon={<IconInbox />} 
                 active={activeTab === "/inbox"} 
+                badge={unreadCount} 
             />
             <SidebarItem 
-                to="/update-details"  // Updated Path
+                to="/update-details"  
                 label="My Information" 
                 icon={<IconInfo />} 
                 active={activeTab === "/update-details"} 
@@ -135,14 +162,24 @@ const DashboardLayout = () => {
   );
 };
 
-// Sub-component for Sidebar Links
-const SidebarItem = ({ to, label, icon, active }: any) => (
-    <Link to={to} className={`flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200
+// 🚨 UPDATED: Sub-component now accepts 'badge' and renders the red dot layout
+const SidebarItem = ({ to, label, icon, active, badge }: any) => (
+    <Link to={to} className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200
         ${active ? 'bg-orange-50 text-[#FE5C00]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-        <span className={`${active ? 'text-[#FE5C00]' : 'text-gray-400'}`}>
-            {icon}
-        </span>
-        {label}
+        
+        <div className="flex items-center">
+            <span className={`${active ? 'text-[#FE5C00]' : 'text-gray-400'}`}>
+                {icon}
+            </span>
+            {label}
+        </div>
+
+        {/* Display Red Dot if there are unread messages */}
+        {badge > 0 && (
+            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                {badge}
+            </span>
+        )}
     </Link>
 );
 

@@ -30,6 +30,9 @@ const Inbox = () => {
       try {
         const res = await api.get(`/messages/${currentUserId}`);
         setMessages(res.data);
+        
+        // 🚨 NEW: Tell the database the client has read these messages!
+        await api.put(`/messages/client/mark-read/${currentUserId}`);
       } catch (err) {
         console.error("Failed to fetch messages", err);
       }

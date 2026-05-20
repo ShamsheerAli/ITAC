@@ -12,6 +12,7 @@ export interface IClientProfile extends Document {
   zipCode: string;
   buildingSize: string;
   utilityExpenses: string;
+  isGrossSalesLessThan250M: string,
   energyConsumption: string;
   grossSales: string;
   businessDescription: string;
@@ -44,6 +45,7 @@ const ClientProfileSchema: Schema = new Schema({
   buildingSize: { type: String },
   utilityExpenses: { type: String },
   energyConsumption: { type: String },
+  isGrossSalesLessThan250M: { type: String },
   grossSales: { type: String },
   businessDescription: { type: String },
   naics: { type: String },

@@ -36,7 +36,7 @@ const Resources = () => {
             </h1>
             <div className="h-1.5 bg-[#FE5C00] w-24 mx-auto rounded-full" />
             <p className="mt-4 text-gray-600 font-medium max-w-2xl mx-auto">
-                Review the specific eligibility criteria and offerings for our Department of Energy (ITAC) and Department of Agriculture (REAC) programs.
+                Review the specific eligibility criteria and offerings for our Department of Energy (ITAC){/* and Department of Agriculture (REAC) programs. */} 
             </p>
         </div>
 
@@ -58,20 +58,20 @@ const Resources = () => {
                 </div>
             </div>
 
-            {/* REAC Image Card */}
-            <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-transform duration-300 hover:shadow-lg">
+            {/* REAC Image Card 
+           <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-transform duration-300 hover:shadow-lg">
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
                     <h2 className="font-bold text-gray-800 text-lg">REAC Assessment Guidelines</h2>
                 </div>
                 <div className="p-4 bg-gray-50 flex justify-center">
-                    {/* 🚨 USE THE IMPORTED VARIABLE HERE */}
+                    
                     <img 
                         src={reacImage} 
                         alt="REAC Qualification Criteria" 
                         className="w-full max-w-4xl h-auto rounded-lg shadow-sm border border-gray-200"
                     />
                 </div>
-            </div>
+            </div>*/}
 
         </div>
 

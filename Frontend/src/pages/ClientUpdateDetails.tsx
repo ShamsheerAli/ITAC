@@ -7,7 +7,6 @@ const UpdateDetails = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   
-  // ✅ Fixed State: Names now perfectly match the questions being asked!
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -17,15 +16,16 @@ const UpdateDetails = () => {
     city: '',
     state: '',
     zipCode: '',
-    businessDescription: '', // Replaced sicCode
+    businessDescription: '', 
     naics: '',
     energyConsumption: '',
-    grossSales: '',
+    isGrossSalesLessThan250M: '', // ✅ NEW: Tracks the Yes/No radio button
+    grossSales: '',               // ✅ The actual amount text box
     buildingSize: '',
     utilityExpenses: '',
-    naturalGasProvider: '', // Replaced isSmallBusiness
-    electricityProvider: '', // Replaced isRuralArea
-    naturalGasTransporter: '', // Fixed duplicate name issue
+    naturalGasProvider: '', 
+    electricityProvider: '', 
+    naturalGasTransporter: '', 
     referredBy: '', 
     description: ''
   });
@@ -52,9 +52,10 @@ const UpdateDetails = () => {
             city: res.data.city || '',
             state: res.data.state || '',
             zipCode: res.data.zipCode || '',
-            businessDescription: res.data.businessDescription || res.data.sicCode || '', // Fallback for old data
+            businessDescription: res.data.businessDescription || res.data.sicCode || '',
             naics: res.data.naics || '',
             energyConsumption: res.data.energyConsumption || '',
+            isGrossSalesLessThan250M: res.data.isGrossSalesLessThan250M || '', // ✅ Fetch saved Yes/No
             grossSales: res.data.grossSales || '',
             buildingSize: res.data.buildingSize || '',
             utilityExpenses: res.data.utilityExpenses || '',
@@ -162,7 +163,7 @@ const UpdateDetails = () => {
                 <input required type="text" name="businessDescription" value={formData.businessDescription} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
              <div>
-                <label className="block text-sm font-bold mb-1">NAICS Code:<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">NAICS Code:</label>
                 <input required type="text" name="naics" value={formData.naics} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
         </div>
@@ -170,13 +171,58 @@ const UpdateDetails = () => {
         {/* RIGHT COLUMN */}
         <div className="space-y-4">
             <div>
-                <label className="block text-sm font-bold mb-1">Annual Energy Consumption:<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Annual Energy Consumption:</label>
                 <input required type="text" name="energyConsumption" value={formData.energyConsumption} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
-            <div>
-                <label className="block text-sm font-bold mb-1">Annual Gross sales:$<RequiredStar /></label>
-                <input required type="text" name="grossSales" value={formData.grossSales} onChange={handleChange} className="w-full border p-2 rounded" />
+
+            {/* ✅ UPDATED: Yes/No Radio Buttons & Conditional Amount Field */}
+            <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                <label className="block text-sm font-bold mb-2">
+                    Your Annual Gross sales are less than $250 million?
+                </label>
+                
+                {/* Radio Options */}
+                <div className="flex items-center gap-6 mb-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="isGrossSalesLessThan250M" 
+                            value="yes" 
+                            checked={formData.isGrossSalesLessThan250M === 'yes'} 
+                            onChange={handleChange} 
+                            className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
+                        /> 
+                        Yes
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="isGrossSalesLessThan250M" 
+                            value="no" 
+                            checked={formData.isGrossSalesLessThan250M === 'no'} 
+                            onChange={handleChange} 
+                            className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
+                        /> 
+                        No
+                    </label>
+                </div>
+
+                {/* Conditional Text Box (Shows up if either Yes or No is selected) */}
+                {formData.isGrossSalesLessThan250M !== '' && (
+                    <div className="animate-fade-in-down mt-2">
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Please provide the amount: $</label>
+                        <input 
+                            type="text" 
+                            name="grossSales" 
+                            value={formData.grossSales} 
+                            onChange={handleChange} 
+                            className="w-full border p-2 rounded focus:ring-2 focus:ring-[#FE5C00]/20 outline-none transition" 
+                            placeholder="e.g. 1500000"
+                        />
+                    </div>
+                )}
             </div>
+
             <div>
                 <label className="block text-sm font-bold mb-1">Total Size of All Buildings (Sq Feet):<RequiredStar /></label>
                 <input required type="text" name="buildingSize" value={formData.buildingSize} onChange={handleChange} className="w-full border p-2 rounded" />
