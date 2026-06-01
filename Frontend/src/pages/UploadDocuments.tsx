@@ -105,7 +105,6 @@ const UploadDocuments = () => {
         {/* ======================= */}
         
         {/* SAVE BUTTON - TUCKED NEATLY ABOVE THE SECTION ON THE RIGHT */}
-        {/* SAVE BUTTON */}
         <div className="flex justify-end mb-4">
             <button 
               onClick={handleSaveAndReturn}
@@ -121,17 +120,28 @@ const UploadDocuments = () => {
         {/* RESTORED CENTERED HEADER */}
         <SectionTitle title="Upload documents" />
 
-
         {/* UPLOAD ROWS */}
         <div className="space-y-8 pb-10">
+          {/* ✅ SPLIT UTILITY BILLS: Row 1 - Electricity */}
           <UploadRow 
-            label="Most Recent Utility Bills(Last 12 months)" 
-            docName="Utility Bills" 
+            label="Most Recent Electricity Bills (Last 12 months)" 
+            docName="Electricity Bills" 
             uploadingDoc={uploadingDoc} 
             allDocuments={allDocuments}
             handleFileUpload={handleFileUpload} 
             handleDeleteDocument={handleDeleteDocument}
           />
+
+          {/* ✅ SPLIT UTILITY BILLS: Row 2 - Gas */}
+          <UploadRow 
+            label="Most Recent Natural Gas Bills (Last 12 months)" 
+            docName="Natural Gas Bills" 
+            uploadingDoc={uploadingDoc} 
+            allDocuments={allDocuments}
+            handleFileUpload={handleFileUpload} 
+            handleDeleteDocument={handleDeleteDocument}
+          />
+
           <UploadRow 
             label="Confidentiality Statement" 
             docName="Confidentiality Statement" 
@@ -235,7 +245,7 @@ const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUploa
               className="hidden" 
               onChange={(e) => handleFileUpload(e, docName)}
               disabled={isUploading}
-              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" 
+              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xls,.xlsx,.csv" 
             />
           </label>
       </div>

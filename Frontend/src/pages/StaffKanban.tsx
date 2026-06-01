@@ -65,6 +65,9 @@ const StaffKanban = () => {
 
         activeClients.forEach((client: any) => {
            let status = client.status || 'New Inquiry';
+           if (status === 'Approved' || status === 'Documents Submitted' || status === 'Documents Uploaded') {
+               status = 'Awaiting Documents';
+           }
            if (!newColumns[status]) status = 'New Inquiry';
            newColumns[status].items.push(client);
         });
