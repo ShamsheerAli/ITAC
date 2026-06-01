@@ -107,37 +107,39 @@ const StaffClientReview = () => {
                         <InfoRow label="Email" value={client.contactEmail} />
                         <InfoRow label="Phone" value={client.contactPhone} />
                         <InfoRow label="Address" value={client.streetAddress} />
-                        <InfoRow label="City, State, Zip" value={`${client.city}, ${client.state}, ${client.zipCode}`} />
+                        <InfoRow label="City, State, Zip" value={`${client.city || ''}, ${client.state || ''} ${client.zipCode || ''}`} />
                     </div>
 
+                    {/* ✅ UPDATED: Building & Operations with new fields */}
                     <div className="space-y-6">
                         <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Building & Operations</h4>
-                        <InfoRow label="Building Size" value={client.buildingSize} />
-                        {/* ✅ FIXED: Now pulls actual data instead of hardcoded "No" */}
-                        <InfoRow label="Rural Location?" value={client.isRuralArea} /> 
-                        <InfoRow label="SIC Code" value={client.sicCode} />
-                        <InfoRow label="NAICS" value={client.naics} />
+                        <InfoRow label="Building Size (Sq Ft)" value={client.buildingSize} />
+                        <InfoRow label="Business Description" value={client.businessDescription || client.sicCode} /> 
+                        <InfoRow label="NAICS Code" value={client.naics} />
+                        <InfoRow label="Referred By" value={client.referredBy} />
                     </div>
 
+                    {/* ✅ UPDATED: Financials with the Yes/No logic and formatting */}
                     <div className="space-y-6 pt-6 md:pt-0">
-                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Financials</h4>
-                        <InfoRow label="Annual Utility Exp." value={client.utilityExpenses} />
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Energy & Financials</h4>
+                        <InfoRow label="Annual Utility Exp." value={client.utilityExpenses ? `$${client.utilityExpenses}` : ''} />
                         <InfoRow label="Annual Energy Cons." value={client.energyConsumption} />
-                        <InfoRow label="Annual Gross Sales" value={client.grossSales} />
+                        <InfoRow label="Gross Sales < $250M?" value={client.isGrossSalesLessThan250M ? client.isGrossSalesLessThan250M.toUpperCase() : ''} />
+                        <InfoRow label="Annual Gross Sales" value={client.grossSales ? `$${client.grossSales}` : ''} />
                     </div>
 
+                    {/* ✅ UPDATED: New Utility Providers Section */}
                     <div className="space-y-6 pt-6 md:pt-0">
-                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Other Details</h4>
-                        {/* ✅ ADDED: Small business check */}
-                        <InfoRow label="Small Business (SBI)?" value={client.isSmallBusiness} />
-                        <InfoRow label="Previous Assessments" value="None" />
-                        <InfoRow label="Agri. Production" value="N/A" />
+                        <h4 className="text-[#FE5C00] font-bold text-sm uppercase tracking-wide">Utility Providers</h4>
+                        <InfoRow label="Electricity Provider" value={client.electricityProvider} />
+                        <InfoRow label="Natural Gas Provider" value={client.naturalGasProvider} />
+                        <InfoRow label="Natural Gas Transporter" value={client.naturalGasTransporter} />
                     </div>
                 </div>
 
                 <div className="mt-10">
                     <h4 className="text-gray-400 font-bold text-sm uppercase tracking-wide mb-2">Additional Notes</h4>
-                    <div className="bg-gray-100 p-4 rounded-md text-gray-600 text-sm italic border border-gray-200">
+                    <div className="bg-gray-100 p-4 rounded-md text-gray-600 text-sm italic border border-gray-200 whitespace-pre-wrap">
                         {client.description || "No additional notes provided by the client."}
                     </div>
                 </div>
@@ -152,7 +154,6 @@ const StaffClientReview = () => {
             <div className="space-y-3 mb-8">
                 <ServiceOption label="Industrial TAC" selected={selectedService === "Industrial TAC"} onClick={() => setSelectedService("Industrial TAC")} />
                 <ServiceOption label="Commercial ITAC" selected={selectedService === "Commercial ITAC"} onClick={() => setSelectedService("Commercial ITAC")} />
-                {/* <ServiceOption label="REAC" selected={selectedService === "REAC"} onClick={() => setSelectedService("REAC")} /> */}
             </div>
 
             <div className="space-y-4">
