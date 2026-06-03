@@ -7,6 +7,8 @@ export interface IUser extends Document {
   passwordHash: string;
   role: 'client' | 'staff' | 'admin';
   createdAt: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
 }
 
 // 2. Define the Schema (For MongoDB)
@@ -16,6 +18,8 @@ const UserSchema: Schema = new Schema({
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['client', 'staff', 'admin'], default: 'client' },
   createdAt: { type: Date, default: Date.now },
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date },
 });
 
 // 3. Export the Model

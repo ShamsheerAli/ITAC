@@ -28,6 +28,8 @@ import StaffInbox from './pages/StaffInbox';
 import StaffClientDetails from './pages/StaffClientDetails';
 import StaffArchivedClients from './pages/StaffArchivedClients';
 import StaffAuditConfirmation from './pages/StaffAuditConfirmation';
+import ResetPassword from './pages/ResetPassword'
+import ForgotPassword from './pages/ForgotPassword'
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/TemporaryDashboard" element={<TemporaryDashboard />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         
 
         {/* ================= CLIENT ROUTES (Sidebar Layout) ================= */}
