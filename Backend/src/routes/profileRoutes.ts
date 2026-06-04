@@ -64,7 +64,8 @@ router.post('/upload', upload.single('file'), async (req: any, res: Response): P
     }
 
     profile.documents.push({
-      name: docName || req.file.originalname,
+      name: docName,
+      originalName: req.file.originalname,
       path: req.file.path,
       uploadedAt: new Date()
     });
@@ -86,7 +87,10 @@ router.post('/:userId/submit-documents', async (req: Request, res: Response): Pr
     // 1. Find the profile
     const profile = await ClientProfile.findOneAndUpdate(
       { user: req.params.userId },
-      { status: 'Documents Submitted' }, // Automatically update their status!
+      { 
+          status: 'Documents Submitted',
+          statusUpdatedAt: Date.now() // 🚨 NEW: Starts the timer for Kanban board!
+      }, 
       { new: true }
     );
 
@@ -125,6 +129,11 @@ router.put('/status/:id', async (req: Request, res: Response): Promise<void> => 
     // 2. Create update object dynamically
     const updateData: any = { status };
     if (serviceType) updateData.serviceType = serviceType;
+    
+    // 🚨 NEW: Only update the timer if the status is actually changing!
+    if (existingProfile.status !== status) {
+        updateData.statusUpdatedAt = Date.now();
+    }
 
     // 3. Update the database
     const updatedProfile = await ClientProfile.findByIdAndUpdate(
@@ -156,6 +165,7 @@ router.put('/status/:id', async (req: Request, res: Response): Promise<void> => 
     res.status(500).send('Server Error');
   }
 });
+
 // @route   PUT /api/profile/:id/schedule
 // @desc    Save proposed audit dates, update status to Ready for Audit, and email client
 router.put('/:id/schedule', async (req: Request, res: Response): Promise<void> => {
@@ -169,7 +179,8 @@ router.put('/:id/schedule', async (req: Request, res: Response): Promise<void> =
       { 
           proposedAuditDates, 
           auditNotes,
-          status: 'Ready for audit' // Automatically moves them on the Kanban board!
+          status: 'Ready for audit', // Automatically moves them on the Kanban board!
+          statusUpdatedAt: Date.now() // 🚨 NEW: Starts the timer for Kanban board!
       },
       { new: true }
     ).populate('user', 'email name');
@@ -247,7 +258,8 @@ router.put('/:userId/confirm-schedule', async (req: Request, res: Response): Pro
       { user: req.params.userId }, 
       { 
           confirmedAuditDate,
-          status: 'Audit Scheduled' // Automatically move them on the Kanban board!
+          status: 'Audit Scheduled', // Automatically move them on the Kanban board!
+          statusUpdatedAt: Date.now() // 🚨 NEW: Starts the timer for Kanban board!
       },
       { new: true }
     );
@@ -313,8 +325,6 @@ router.put('/:id/staff-confirm-audit', async (req, res) => {
   }
 });
 
-// @route   PUT /api/profile/:userId/remove-document
-// @desc    Removes a specific document from the client's profile
 // @route   PUT /api/profile/:userId/remove-document
 // @desc    Removes a specific document from the client's profile
 router.put('/:userId/remove-document', async (req, res) => {

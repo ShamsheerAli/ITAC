@@ -49,10 +49,71 @@ const Dashboard = () => {
 
   if (loading) return <div className="p-10 text-center text-gray-500">Loading Dashboard...</div>;
 
-  // --- TRACKING LOGIC ---
-  const hasDocuments = profile?.documents && profile.documents.length > 0;
-  const isReviewing = profile?.status === 'Reviewing' || profile?.status === 'Ready for audit' || profile?.status === 'Audit Scheduled';
-  const isReady = profile?.status === 'Ready for audit' || profile?.status === 'Audit Scheduled';
+  // --- DYNAMIC TRACKING LOGIC ---
+  const getTrackingSteps = () => {
+    // 1. Initial Default State
+    let steps = {
+      label1: "Upload Documents",
+      label2: "Review Data",
+      label3: "Schedule Assessment",
+      active1: false,
+      active2: false,
+      active3: false,
+    };
+
+    if (!profile) return steps;
+
+    const { status, proposedAuditDates, isAuditConfirmed, documents } = profile;
+    const hasDocs = documents && documents.length > 0;
+
+    // Activate Step 1 if they have uploaded anything
+    if (hasDocs || status === 'Documents Submitted' || status === 'Awaiting Documents') {
+      steps.active1 = true;
+    }
+
+    // 2. After documents uploaded
+    if (status === 'Documents Submitted' || (status === 'Awaiting Documents' && hasDocs)) {
+      steps.label1 = "Documents Uploaded";
+      steps.label2 = "Documents Being Reviewed by ITAC";
+      steps.label3 = "Schedule On-Site Assessment";
+      steps.active2 = true; // Review process has started
+    }
+
+    // 3. After Data Reviewed and Approved by ITAC admin
+    if (status === 'Ready for audit') {
+      steps.label1 = "Documents Uploaded";
+      steps.label2 = "Documents Approved by ITAC";
+      steps.label3 = "Schedule On-Site Assessment";
+      steps.active1 = true;
+      steps.active2 = true;
+
+      // 4. After client proposes dates
+      const hasProposedDates = proposedAuditDates && proposedAuditDates.filter((d: string) => d.trim() !== '').length > 0;
+      if (hasProposedDates) {
+        steps.label3 = "On-Site Assessment Being Scheduled";
+        steps.active3 = true; // Scheduling has started
+      }
+    }
+
+    // 5. After data set up and approved and confirmed
+    if (status === 'Audit Scheduled') {
+      steps.label1 = "Documents Uploaded";
+      steps.label2 = "Documents Approved by ITAC";
+      steps.active1 = true;
+      steps.active2 = true;
+      steps.active3 = true;
+      
+      if (isAuditConfirmed) {
+        steps.label3 = "On-Site Assessment Scheduled"; // Final confirmed state
+      } else {
+        steps.label3 = "On-Site Assessment Being Scheduled"; // Still waiting on staff
+      }
+    }
+
+    return steps;
+  };
+
+  const currentSteps = getTrackingSteps();
 
   return (
     <div className="w-full space-y-8">
@@ -69,8 +130,8 @@ const Dashboard = () => {
             {/* Step 1 */}
             <StepItem 
               icon={<IconDocumentCheck />} 
-              label="Documents Received"
-              isActive={hasDocuments} // Logic Applied
+              label={currentSteps.label1}
+              isActive={currentSteps.active1}
             />
 
             {/* Arrow */}
@@ -79,8 +140,8 @@ const Dashboard = () => {
             {/* Step 2 */}
             <StepItem 
               icon={<IconDocumentSearch />} 
-              label="Documents Review"
-              isActive={isReviewing} // Logic Applied
+              label={currentSteps.label2}
+              isActive={currentSteps.active2}
             />
 
             {/* Arrow */}
@@ -89,8 +150,8 @@ const Dashboard = () => {
             {/* Step 3 */}
             <StepItem 
               icon={<IconCheckCircle />} 
-              label="Ready to schedule"
-              isActive={isReady} // Logic Applied
+              label={currentSteps.label3}
+              isActive={currentSteps.active3}
             />
 
         </div>

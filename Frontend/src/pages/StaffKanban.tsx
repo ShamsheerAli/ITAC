@@ -46,6 +46,24 @@ const StaffKanban = () => {
   const [loading, setLoading] = useState(true);
   const [totalClients, setTotalClients] = useState(0);
 
+  // --- HELPER: Calculate Days in Stage ---
+  const getDaysInStage = (dateString: string) => {
+      if (!dateString) return 'Today';
+      const updatedDate = new Date(dateString);
+      const today = new Date();
+      
+      // Reset times to midnight to get accurate full-day differences
+      updatedDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = Math.abs(today.getTime() - updatedDate.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return '1 day';
+      return `${diffDays} days`;
+  };
+
   // --- 1. Fetch Clients and Sort ---
   useEffect(() => {
     const fetchData = async () => {
@@ -117,6 +135,7 @@ const StaffKanban = () => {
       const [removed] = sourceItems.splice(source.index, 1);
       
       removed.status = destColumn.name;
+      removed.statusUpdatedAt = new Date().toISOString();
       
       destItems.splice(destination.index, 0, removed);
 
@@ -240,7 +259,13 @@ const StaffKanban = () => {
                 {item.companyName}
             </p>
             <div className="flex items-center text-[10px] text-gray-400 mt-1 gap-2">
-                <span>(ID: {item._id.substring(item._id.length - 6)})</span>
+                <span className="flex items-center gap-1 font-medium" title="Time spent in this stage">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {/* Fallback to createdAt if statusUpdatedAt doesn't exist yet */}
+                {getDaysInStage(item.statusUpdatedAt || item.createdAt)}
+            </span>
                 
                 {/* --- UX FIX: INLINE RED NOTIFICATION BADGE --- */}
                 {(

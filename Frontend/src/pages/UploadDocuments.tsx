@@ -221,9 +221,15 @@ const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUploa
       <div className="w-full md:w-56 flex flex-col gap-3 items-center md:items-start">
           {uploadedFilesForThisRow.map((file: any, index: number) => (
              <div key={index} className="w-56 flex items-center justify-between bg-green-50 border-2 border-green-500 py-2.5 px-4 rounded shadow-sm text-green-700">
-                 <span className="font-bold text-sm flex items-center gap-2 truncate">
+                 <span 
+                    className="font-bold text-sm flex items-center gap-2 truncate" 
+                    title={file.originalName || `File ${index + 1}`}
+                 >
                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                     File {index + 1}
+                     
+                     <span className="truncate max-w-[110px]">
+                         {file.originalName || `File ${index + 1}`}
+                     </span>
                  </span>
                  <button 
                     onClick={() => handleDeleteDocument(file.path, docName)}

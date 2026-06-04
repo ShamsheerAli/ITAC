@@ -77,7 +77,7 @@ const Login = () => {
         </form>
 
         <p className="text-center mt-4 text-gray-600">
-          Forgot Password?? <Link to="/forgot-password" className="text-[#FE5C00] font-bold">Reset It</Link>
+          Forgot Password? <Link to="/forgot-password" className="text-[#FE5C00] font-bold">Reset It</Link>
         </p>
 
         <p className="text-center mt-4 text-gray-600">

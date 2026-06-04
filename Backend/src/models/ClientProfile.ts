@@ -19,8 +19,10 @@ export interface IClientProfile extends Document {
   naics: string;
   description: string;
   status: string;
+  statusUpdatedAt: Date;
   documents: {
     name: string;
+    originalName?: string; 
     path: string;
     uploadedAt: Date;
   }[];
@@ -51,9 +53,11 @@ const ClientProfileSchema: Schema = new Schema({
   naics: { type: String },
   description: { type: String },
   status: { type: String, default: 'New Inquiry' },
+  statusUpdatedAt: { type: Date, default: Date.now },
   documents: [
     {
       name: { type: String },
+      originalName: { type: String },
       path: { type: String },
       uploadedAt: { type: Date, default: Date.now }
     }
