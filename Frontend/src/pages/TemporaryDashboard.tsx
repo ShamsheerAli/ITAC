@@ -156,8 +156,8 @@ const TemporaryDashboard = () => {
                  {/* Card Body */}
                 <div className="p-10 flex-1 flex flex-col items-center justify-center text-center">
                     <p className="text-black font-medium text-xl leading-relaxed mb-12 max-w-2xl">
-                        Go through our services by clicking the <strong>“Resources”</strong> button below, 
-                        and update your details by clicking the <strong>“Update Information”</strong> button. 
+                        Review our services by clicking the <strong>“Resources”</strong> button below, 
+                        and tell us about your company by clicking the <strong>“Update Information”</strong> button below. 
                         <br/><span className="text-black-500 mt-2 block italic">One of our ITAC team members will review your details and reach out shortly.</span>
                     </p>
 

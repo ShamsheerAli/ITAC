@@ -98,6 +98,7 @@ const UploadDocuments = () => {
           <DownloadRow label="Confidentiality Statement" fileName="confidentiality_statement.pdf" />
           <DownloadRow label="Media Release form" fileName="media_release.pdf" />
           <DownloadRow label="Energy Assessment Application" fileName="energy_application.pdf" />
+          <DownloadRow label="OGE Consent for Electric Bill data" fileName="oge_consent.pdf" />
           <DownloadRow label="PSO Consent for Electric Bill data" fileName="pso_consent.pdf" />
         </div>
 
