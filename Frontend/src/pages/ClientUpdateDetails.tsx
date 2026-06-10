@@ -235,12 +235,12 @@ const UpdateDetails = () => {
             {/* Questions Section */}
             <div>
                 <label className="block text-sm font-bold mb-1">Natural Gas Provider:</label>
-                <input required type="text" name="naturalGasProvider" value={formData.naturalGasProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/> 
+                <input type="text" name="naturalGasProvider" value={formData.naturalGasProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/> 
             </div>
 
             <div>
                 <label className="block text-sm font-bold mb-1">Electricity Provider:</label>
-                <input required type="text" name="electricityProvider" value={formData.electricityProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/>
+                <input type="text" name="electricityProvider" value={formData.electricityProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/>
             </div>
 
             <div>

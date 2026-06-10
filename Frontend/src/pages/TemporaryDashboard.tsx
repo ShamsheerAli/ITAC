@@ -49,20 +49,17 @@ const TemporaryDashboard = () => {
   if (['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(currentStatus)) {
       activeStep = 3;
   }
-  
   // STEP 2: UNDER REVIEW
-  // If profile exists but not yet approved/advanced
   else if (profile) {
       activeStep = 2; 
   }
-  
   // STEP 1: JUST STARTED
   else {
       activeStep = 1;
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans flex flex-col">
+    <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
       
       {/* 1. SUB-HEADER (White, separated from top banner) */}
       <div className="bg-white w-full px-8 py-3 flex justify-between items-center border-b border-gray-300 shadow-sm z-10">
@@ -78,212 +75,71 @@ const TemporaryDashboard = () => {
         </button>
       </div>
 
-      <div className="flex-1 w-full px-8 py-10 space-y-10 max-w-[1920px] mx-auto">
-        {/* 3. TRACKING SYSTEM */}
-        <div className="rounded-xl overflow-hidden shadow-md bg-[#FAFAFA] border border-gray-200 pb-12">
-             <div className="pt-6 px-6 mb-12">
-                <h2 className="text-3xl font-bold text-black text-center mb-2">
-                    Tracking System(Steps to do)
-                </h2>
-                {/* FULL WIDTH ORANGE LINE */}
-                <div className="w-full h-1.5 bg-[#FE5C00] rounded-full"></div>
-             </div>
-
-            <div className="px-4 md:px-16 flex flex-col md:flex-row items-center justify-between relative max-w-7xl mx-auto w-full">
-                
-                {/* Step 1 */}
-                <Step 
-                    icon={<IconEdit />} 
-                    label="Update Information" 
-                    status={activeStep >= 1 ? 'completed' : 'pending'} 
-                    isActive={activeStep === 1}
-                />
-                
-                <Connector status={activeStep >= 2 ? 'active' : 'pending'} />
-                
-                {/* Step 2 */}
-                <Step 
-                    icon={<IconSearch />} 
-                    label="Details Review" 
-                    status={activeStep >= 2 ? 'completed' : 'pending'} 
-                    isActive={activeStep === 2}
-                />
-                
-                <Connector status={activeStep >= 3 ? 'active' : 'pending'} />
-                
-                {/* Step 3 */}
-                <Step 
-                    icon={<IconCheckCircle />} 
-                    label="Ready for next steps" 
-                    status={activeStep >= 3 ? 'completed' : 'pending'} 
-                    isActive={activeStep === 3}
-                />
-
-            </div>
-
-            {/* Approval Button */}
-            {activeStep === 3 && (
-                <div className="text-center mt-12 animate-fade-in">
-                    <p className="text-green-600 font-bold text-lg mb-4">You have been approved!</p>
-                    
-                    {/* ADD THE onClick EVENT TO THIS LINK */}
-                    <Link 
-                        to="/dashboard"
-                        onClick={() => localStorage.setItem('hasEnteredMainDashboard', 'true')}
-                    >
-                        <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-12 rounded shadow-lg transition text-xl">
-                            Enter Main Dashboard
-                        </button>
-                    </Link>
-                </div>
-            )}
-        </div>
+      {/* 2. MAIN CONTENT AREA */}
+      <div className="flex-1 w-full px-6 py-16 flex items-start justify-center max-w-[1920px] mx-auto">
         
-        {/* 2. TOP CARDS GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 h-full">
-
-            {/* LEFT: ACTION CENTER */}
-            <div className="bg-white p-6 flex flex-col justify-between h-full min-h-[400px] rounded-xl shadow-lg border border-[#FE5C00]/30 relative">
+        {/* FULL WIDTH ACTION CENTER */}
+        <div className="bg-white p-10 md:p-16 w-full max-w-5xl flex flex-col items-center min-h-[450px] rounded-2xl shadow-xl border border-[#FE5C00]/20 relative overflow-hidden">
           
           {/* Subtle background glow effect for extra emphasis */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -z-10 opacity-50"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-bl-full -z-10 opacity-70"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gray-50 rounded-tr-full -z-10 opacity-70"></div>
 
-          <div className="mb-6 z-10">
-            <h2 className="text-3xl font-bold text-center text-black">Action Center</h2>
-            <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
+          <div className="mb-10 z-10 w-full max-w-2xl">
+            <h2 className="text-4xl font-bold text-center text-black">Action Center</h2>
+            <div className="h-1.5 bg-[#FE5C00] w-full mt-4 rounded-full" />
           </div>
 
-                 {/* Card Body */}
-                <div className="p-10 flex-1 flex flex-col items-center justify-center text-center">
-                    <p className="text-black font-medium text-xl leading-relaxed mb-12 max-w-2xl">
-                        Review our services by clicking the <strong>“Resources”</strong> button below, 
-                        and tell us about your company by clicking the <strong>“Update Information”</strong> button below. 
-                        <br/><span className="text-black-500 mt-2 block italic">One of our ITAC team members will review your details and reach out shortly.</span>
-                    </p>
+          {/* DYNAMIC CONTENT BASED ON STEP */}
+          {activeStep === 3 ? (
+             <div className="flex-1 flex flex-col items-center justify-center text-center animate-fade-in w-full">
+                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-8 shadow-sm border border-green-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                 </div>
+                 <p className="text-green-700 font-extrabold text-3xl mb-10 tracking-wide">You have been approved!</p>
+                 
+                 <Link 
+                     to="/dashboard"
+                     onClick={() => localStorage.setItem('hasEnteredMainDashboard', 'true')}
+                     className="w-full max-w-md"
+                 >
+                     <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-12 rounded shadow-lg transition transform active:scale-95 text-xl uppercase tracking-wider">
+                         Enter Main Dashboard
+                     </button>
+                 </Link>
+             </div>
+          ) : (
+             <div className="flex-1 flex flex-col items-center justify-center text-center w-full">
+                 <p className="text-gray-800 font-medium text-2xl leading-relaxed mb-12 max-w-3xl">
+                     Review our services by clicking the <strong>“Resources”</strong> button below, 
+                     and tell us about your company by clicking the <strong>“Update Information”</strong> button. 
+                     <br/><br/>
+                     <span className="text-gray-500 text-lg italic block bg-gray-50 p-4 rounded-lg border border-gray-100">
+                         One of our ITAC team members will review your details and reach out shortly.
+                     </span>
+                 </p>
 
-                    <div className="flex flex-col sm:flex-row gap-8 justify-center w-full">
-                        <Link to="/resources">
-                  <button className="w-full h-full bg-[#FE5C00] text-white px-4 py-4 rounded shadow hover:bg-orange-700 transition font-bold text-xl text-center">
-                    Resources
-                    </button>
-                </Link>
-                        <Link to="/update-details">
-                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-4 px-10 rounded shadow-md transition uppercase tracking-wide text-lg min-w-[220px]">
-                                Update Information
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-            
-            {/* RIGHT: MY INFORMATION */}
-            <div className="rounded-xl overflow-hidden shadow-md flex flex-col border border-gray-200 bg-[#E0E0E0]">
-                {/* Header Bar */}
-                <div className="bg-[#757575] text-white text-center py-3 font-bold text-2xl tracking-wide uppercase">
-                    My Information
-                </div>
-                
-                {/* Card Body */}
-                <div className="p-8 flex-1 flex flex-col items-center justify-center">
-                    <div className="flex flex-col xl:flex-row items-center gap-8 w-full">
-                         {/* Profile Pic */}
-                        <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden flex-shrink-0 bg-gray-300">
-                             <img 
-                                src={profile?.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} 
-                                alt="Profile" 
-                                className="w-full h-full object-cover" 
-                            />
-                        </div>
+                 <div className="flex flex-col sm:flex-row gap-8 justify-center w-full max-w-2xl">
+                     <Link to="/resources" className="w-full sm:w-1/2">
+                         <button className="w-full h-full bg-[#FE5C00] text-white py-5 rounded shadow-md hover:shadow-lg hover:bg-orange-700 transition transform active:scale-95 font-bold text-xl text-center uppercase tracking-wide">
+                             Resources
+                         </button>
+                     </Link>
+                     <Link to="/update-details" className="w-full sm:w-1/2">
+                         <button className="w-full h-full bg-[#FE5C00] text-white py-5 rounded shadow-md hover:shadow-lg hover:bg-orange-700 transition transform active:scale-95 font-bold text-xl text-center uppercase tracking-wide">
+                             Update Information
+                         </button>
+                     </Link>
+                 </div>
+             </div>
+          )}
 
-                        {/* Info List */}
-                        <div className="text-center xl:text-left space-y-2 w-full text-black">
-                             <p className="text-2xl font-bold mb-2">{user.name}</p>
-                             <p className="text-lg"><span className="font-serif font-semibold">Company:</span> {profile?.companyName || "Not Updated"}</p>
-                             <p className="text-lg"><span className="font-serif font-semibold">Email:</span> <span className="underline decoration-dotted">{user.email}</span></p> 
-                             <p className="text-lg"><span className="font-serif font-semibold">Phone:</span> {profile?.contactPhone || "Not Updated"}</p>
-                             <div className="mt-3 text-base text-gray-800 leading-snug bg-white/50 p-3 rounded-lg border border-gray-300 inline-block xl:block">
-                                 <p><span className="font-bold">Address:</span> {profile?.streetAddress || "N/A"}</p>
-                                 <p>{profile?.city ? `${profile.city}, ${profile.state || ""}, ${profile.zipCode || ""}` : "No address on file"}</p>
-                             </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-10 w-full text-center">
-                        <Link to="/update-details">
-                            <button className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 px-16 rounded shadow-md transition transform active:scale-95 uppercase tracking-wider text-xl">
-                                UPDATE
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-
-            
         </div>
-
-        
-
       </div>
     </div>
   );
 };
-
-/* --- SUB-COMPONENTS --- */
-
-const Step = ({ icon, label, status, isActive }: { icon: any, label: string, status: 'completed' | 'pending', isActive: boolean }) => {
-    let circleClass = "bg-[#6B6B6B] text-white"; // Default Gray
-    
-    // Logic: If active or completed, keep it gray/dark gray as per your design
-    // The visual difference comes from the label boldness
-    
-    return (
-        <div className="flex flex-col items-center z-10 w-full md:w-auto text-center relative group">
-            <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${circleClass}`}>
-                {icon}
-            </div>
-            
-            {/* Completed Badge */}
-            {status === 'completed' && !isActive && (
-                <div className="absolute top-0 right-[calc(50%-2.5rem)] bg-green-500 rounded-full p-1 border-2 border-white shadow-sm">
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                </div>
-            )}
-            
-            <span className={`text-xl mt-4 ${isActive ? 'text-black font-extrabold' : 'text-gray-500 font-medium'}`}>{label}</span>
-            {isActive && <span className="text-xs text-[#FE5C00] font-bold uppercase tracking-widest mt-1">Current Step</span>}
-        </div>
-    );
-};
-
-const Connector = ({ status }: { status: 'active' | 'pending' }) => (
-    <div className="hidden md:flex flex-1 items-center justify-center px-4 -mt-10">
-         {/* Line */}
-         <div className={`h-1.5 w-full rounded-full ${status === 'active' ? 'bg-black' : 'bg-gray-300'}`}></div>
-         {/* Arrow Head */}
-         <svg className={`w-8 h-8 -ml-3 ${status === 'active' ? 'text-black' : 'text-gray-300'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-         </svg>
-    </div>
-);
-
-/* --- ICONS (Slightly larger for better visibility) --- */
-const IconEdit = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-         <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-    </svg>
-); 
-
-const IconSearch = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6" /> 
-    </svg>
-); 
-
-const IconCheckCircle = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
 
 export default TemporaryDashboard;
