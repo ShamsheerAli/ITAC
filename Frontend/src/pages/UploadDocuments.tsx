@@ -124,7 +124,6 @@ const UploadDocuments = () => {
 
         {/* UPLOAD ROWS */}
         <div className="space-y-8 pb-10">
-          {/* ✅ SPLIT UTILITY BILLS: Row 1 - Electricity */}
           <UploadRow 
             label="Most Recent Electricity Bills (Last 12 months)" 
             docName="Electricity Bills" 
@@ -134,7 +133,6 @@ const UploadDocuments = () => {
             handleDeleteDocument={handleDeleteDocument}
           />
 
-          {/* ✅ SPLIT UTILITY BILLS: Row 2 - Gas */}
           <UploadRow 
             label="Most Recent Natural Gas Bills (Last 12 months)" 
             docName="Natural Gas Bills" 
@@ -168,6 +166,27 @@ const UploadDocuments = () => {
             handleFileUpload={handleFileUpload} 
             handleDeleteDocument={handleDeleteDocument}
           />
+
+          {/* ✅ ADDED: OGE Consent Upload */}
+          <UploadRow 
+            label="OGE Consent for Electric Bill data" 
+            docName="OGE Consent Form" 
+            uploadingDoc={uploadingDoc} 
+            allDocuments={allDocuments}
+            handleFileUpload={handleFileUpload} 
+            handleDeleteDocument={handleDeleteDocument}
+          />
+
+          {/* ✅ ADDED: PSO Consent Upload */}
+          <UploadRow 
+            label="PSO Consent for Electric Bill data" 
+            docName="PSO Consent Form" 
+            uploadingDoc={uploadingDoc} 
+            allDocuments={allDocuments}
+            handleFileUpload={handleFileUpload} 
+            handleDeleteDocument={handleDeleteDocument}
+          />
+
           <UploadRow 
             label="Other Documents" 
             docName="Other Documents" 
@@ -238,7 +257,7 @@ const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUploa
                     className="text-red-400 hover:text-red-600 bg-white rounded-full p-0.5 shadow-sm hover:shadow transition flex-shrink-0 ml-2"
                     title="Remove Document"
                  >
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                  </button>
              </div>
           ))}
