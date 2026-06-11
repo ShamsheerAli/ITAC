@@ -20,7 +20,9 @@ const TemporaryDashboard = () => {
           setProfile(fetchedProfile);
 
           const status = fetchedProfile?.status || 'New Inquiry';
-          const isApproved = ['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(status);
+          
+          // 🚨 FIX 1: Added 'Documents Submitted' to the auto-redirect array
+          const isApproved = ['Approved', 'Awaiting Documents', 'Documents Submitted', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(status);
           
           // AUTO-REDIRECT: If the database says they are advanced past step 2,
           // instantly bounce them to the main dashboard. No button required!
@@ -45,8 +47,8 @@ const TemporaryDashboard = () => {
   const currentStatus = profile?.status || 'New Inquiry';
 
   // STEP 3: ACCESS GRANTED
-  // If they are Approved, Awaiting Documents, or further along -> They need the Main Dashboard
-  if (['Approved', 'Awaiting Documents', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(currentStatus)) {
+  // 🚨 FIX 2: Added 'Documents Submitted' to the active step array
+  if (['Approved', 'Awaiting Documents', 'Documents Submitted', 'Ready for audit', 'Audit Scheduled', 'Report writing'].includes(currentStatus)) {
       activeStep = 3;
   }
   // STEP 2: UNDER REVIEW

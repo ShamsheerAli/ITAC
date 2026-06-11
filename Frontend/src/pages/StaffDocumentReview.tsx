@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
-// The list of documents you expect every client to upload
+// 🚨 FIX 1: Updated the required documents to match the exact new names the clients are uploading!
 const REQUIRED_DOCUMENTS = [
-  "Utility Bills",
+  "Electricity Bills",
   "Confidentiality Statement",
   "Media Release Form",
   "Energy Assessment Application"
@@ -60,12 +60,24 @@ const StaffDocumentReview = () => {
   // Determine Tracking Status
   const isAllUploaded = missingDocs.length === 0;
 
-  // Helper to get the correct backend URL for downloads
+  // 🚨 FIX 2: Bulletproof URL generator to ensure there are no double slashes or missing domain names
   const getDownloadUrl = (path: string) => {
-    // If we are in dev (localhost), point to localhost. Otherwise, point to the live server.
-    const baseUrl = api.defaults.baseURL?.replace('/api', '') || '';
-    // Fix slashes just in case
-    const cleanPath = path.replace(/\\/g, '/');
+    if (!path) return '#';
+    
+    // Find the base URL from axios config (e.g., http://energyhub.okstate.edu:5000/api)
+    let baseUrl = api.defaults.baseURL || 'http://localhost:5000/api';
+    
+    // Strip off the '/api' at the end to get the root server URL
+    baseUrl = baseUrl.replace(/\/api\/?$/, '');
+
+    // Normalize the path (change Windows backslashes to forward slashes)
+    let cleanPath = path.replace(/\\/g, '/');
+    
+    // Ensure there's no double slash like "http://...//uploads/..."
+    if (cleanPath.startsWith('/')) {
+       cleanPath = cleanPath.substring(1);
+    }
+
     return `${baseUrl}/${cleanPath}`;
   };
 
@@ -146,7 +158,8 @@ const StaffDocumentReview = () => {
                         uploadedDocs.map((doc: any, i: number) => (
                             <DocumentRow 
                                 key={i} 
-                                label={doc.name} 
+                                // Show originalName if available, fallback to doc.name
+                                label={doc.originalName || doc.name} 
                                 date={new Date(doc.uploadedAt).toLocaleDateString()}
                                 downloadUrl={getDownloadUrl(doc.path)} 
                             />
@@ -213,18 +226,18 @@ const StaffDocumentReview = () => {
 
 /* --- SUB-COMPONENTS --- */
 
-// Notice we use an <a> tag here to hit the backend URL directly!
 const DocumentRow = ({ label, date, downloadUrl }: { label: string, date: string, downloadUrl: string }) => (
     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition group border border-gray-100">
-        <div className="flex flex-col">
-            <span className="text-gray-800 font-bold text-sm">{label}</span>
+        <div className="flex flex-col overflow-hidden max-w-[50%]">
+            <span className="text-gray-800 font-bold text-sm truncate" title={label}>{label}</span>
             <span className="text-xs text-gray-400">Uploaded: {date}</span>
         </div>
         <a 
             href={downloadUrl} 
+            download // 🚨 FIX 3: This forces the browser to actually download the file instead of opening a blank page!
             target="_blank" 
             rel="noopener noreferrer"
-            className="bg-gray-700 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded transition flex items-center gap-1 shadow-sm"
+            className="bg-gray-700 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded transition flex items-center gap-1 shadow-sm flex-shrink-0"
         >
             <span>View / Download</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
