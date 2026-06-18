@@ -21,7 +21,7 @@ import StaffDashboard from './pages/StaffDashboard';
 import StaffLayout from './layouts/StaffLayout';
 import StaffKanban from './pages/StaffKanban';
 import StaffMyInformation from './pages/StaffMyInformation';
-import StaffAddClient from './pages/StaffAddClient';
+import StaffAddClient from './pages/StaffAddPotentialClient';
 import StaffClientReview from './pages/StaffClientReview';
 import StaffDocumentReview from './pages/StaffDocumentReview';
 import StaffInbox from './pages/StaffInbox';
@@ -30,6 +30,7 @@ import StaffArchivedClients from './pages/StaffArchivedClients';
 import StaffAuditConfirmation from './pages/StaffAuditConfirmation';
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
+import StaffPotentialClients from './pages/StaffPotentialClients'
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/schedule-audit" element={<ClientAuditScheduling />} />
             <Route path="/resources" element={<Resources />} />
+            
         </Route>
 
         {/* ================= STAFF ROUTES (Staff Sidebar Layout) ================= */}
@@ -73,6 +75,7 @@ function App() {
           <Route path="/staff-archived-clients" element={<StaffArchivedClients />} />
           <Route path="/staff-audit-scheduling/:clientId" element={<StaffAuditScheduling />} />
           <Route path="/staff-audit-confirmation/:clientId" element={<StaffAuditConfirmation />} />
+          <Route path="/staff-leads" element={<StaffPotentialClients />} />
         </Route>
 
       </Routes>

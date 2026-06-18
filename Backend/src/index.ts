@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
 import messageRoutes from './routes/messageRoutes';
+import leadRoutes from './routes/leadRoutes';
 // Load environment variables
 dotenv.config();
 
@@ -30,6 +31,7 @@ mongoose.connect(MONGO_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/leads', leadRoutes);
   // 1. Test Route
 app.get('/', (req: Request, res: Response) => {
   res.send('ITAC Staff Portal API is Running & DB Connected!');

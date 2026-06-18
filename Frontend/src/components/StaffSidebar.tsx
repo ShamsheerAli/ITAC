@@ -30,6 +30,7 @@ const StaffSidebar = () => {
     { name: "Inbox", path: "/staff-inbox" }, // ✅ Added Inbox
     { name: "My Information", path: "/staff-info" },  
     { name: "Add new client", path: "/add-new-client" },  
+    { name: "Client Leads", path: "/staff-leads" },
   ];
 
   return (

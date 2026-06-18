@@ -13,6 +13,12 @@ const IconKanban = () => (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
     </svg>
 );
+// 🚨 NEW ICON: Users group representing Leads
+const IconLeads = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+  </svg>
+);
 const IconInbox = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -38,14 +44,14 @@ const StaffLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("/staff-dashboard");
-  const [unreadCount, setUnreadCount] = useState(0); // 🚨 Added state for the red dot
+  const [unreadCount, setUnreadCount] = useState(0); 
 
   // Track active tab
   useEffect(() => {
     setActiveTab(location.pathname);
   }, [location]);
 
-  // 🚨 Fetch unread messages for the sidebar
+  // Fetch unread messages for the sidebar
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
@@ -73,6 +79,7 @@ const StaffLayout = () => {
     const path = location.pathname;
     if (path.includes('/staff-dashboard')) return 'Dashboard';
     if (path.includes('/staff-kanban')) return 'Client Progress Board';
+    if (path.includes('/staff-leads')) return 'Potential Clients & Leads'; // 🚨 NEW TITLE LOGIC
     if (path.includes('/staff-info')) return 'My Information';
     if (path.includes('/add-new-client')) return 'Add New Client';
     if (path.includes('/staff-client-review')) return 'Client Review';
@@ -104,14 +111,21 @@ const StaffLayout = () => {
                 icon={<IconKanban />} 
                 active={activeTab === "/staff-kanban"} 
             />
+
+            {/* 🚨 THE NEW LEADS TAB */}
+            <SidebarItem 
+                to="/staff-leads" 
+                label="Potential Leads" 
+                icon={<IconLeads />} 
+                active={activeTab.includes("/staff-leads")} 
+            />
             
-            {/* 🚨 THE NEW INBOX TAB */}
             <SidebarItem 
                 to="/staff-inbox" 
                 label="Inbox" 
                 icon={<IconInbox />} 
-                active={activeTab.includes("/staff-inbox")} // .includes allows it to stay active even when chatting with a specific client ID
-                badge={unreadCount} // Pass the unread count down!
+                active={activeTab.includes("/staff-inbox")} 
+                badge={unreadCount} 
             />
 
             <SidebarItem 
@@ -159,7 +173,7 @@ const StaffLayout = () => {
   );
 };
 
-// 🚨 Updated Sub-component to accept and display the badge
+// Sub-component to accept and display the badge
 const SidebarItem = ({ to, label, icon, active, badge }: any) => (
     <Link to={to} className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200
         ${active ? 'bg-orange-50 text-[#FE5C00]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
