@@ -7,16 +7,16 @@ const StaffPotentialClients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   
-  // 🚨 NEW: State to track which lead is selected for the popup modal
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
+  
+  // 🚨 NEW: State for editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState<any>({});
 
   useEffect(() => {
     const fetchLeads = async () => {
         try {
             const res = await api.get('/leads');
-            // Assuming your backend might return archived leads, 
-            // you might want to filter them out here if you don't do it on the backend:
-            // const activeLeads = res.data.filter((lead: any) => !lead.isArchived);
             setLeads(res.data);
         } catch (err) {
             console.error("Failed to fetch leads", err);
@@ -32,11 +32,55 @@ const StaffPotentialClients = () => {
     (lead.contactName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // 🚨 NEW: Handle opening the modal and setting up edit state
+  const handleOpenModal = (lead: any) => {
+      setSelectedLead(lead);
+      setEditFormData(lead); // Pre-fill the edit form with current data
+      setIsEditing(false);   // Start in view mode
+  };
+
+  // 🚨 NEW: Handle changes when typing in edit mode
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+  };
+
+  // 🚨 NEW: Save the edited data to the backend
+  const handleSaveChanges = async () => {
+      try {
+          const res = await api.put(`/leads/${selectedLead._id}`, editFormData);
+          
+          // Update the table with the fresh data
+          setLeads(leads.map(l => l._id === selectedLead._id ? res.data : l));
+          
+          // Update the modal with the fresh data and close edit mode
+          setSelectedLead(res.data);
+          setIsEditing(false);
+          
+          alert("Lead updated successfully!");
+      } catch (err) {
+          console.error("Failed to update lead:", err);
+          alert("Error updating client data.");
+      }
+  };
+
   const handleConvertToActive = async (leadId: string, companyName: string) => {
-    if(window.confirm(`Are you sure you want to convert ${companyName} to an active client and send them a portal invitation?`)) {
+    // 🚨 FIX 1: Find the specific lead to check its data
+    const leadToConvert = leads.find(l => l._id === leadId);
+
+    // 🚨 FIX 2: Validation check! Stop them if there is no email.
+    if (!leadToConvert?.contactEmail || leadToConvert.contactEmail.trim() === '') {
+        alert(`Cannot convert ${companyName}! \n\nAn email address is required to send the portal invitation. Please click "Edit Details" and add an email address first.`);
+        return; // This stops the code from continuing!
+    }
+
+    if(window.confirm(`Are you sure you want to convert ${companyName} to an active client and send them a portal invitation to ${leadToConvert.contactEmail}?`)) {
         try {
-            // await api.post(`/leads/convert/${leadId}`);
-            alert(`Conversion triggered for ${companyName}!`);
+            
+            await api.post(`/leads/convert/${leadId}`);
+            
+            alert(`Conversion triggered for ${companyName}! Invitation sent to ${leadToConvert.contactEmail}.`);
+            
+            // Remove them from the frontend table
             setLeads(leads.filter(l => l._id !== leadId));
             setSelectedLead(null); // Close modal if open
         } catch (err) {
@@ -46,17 +90,13 @@ const StaffPotentialClients = () => {
     }
   };
 
-  // 🚨 NEW: Archive handler
   const handleArchiveLead = async (leadId: string, companyName: string) => {
     if(window.confirm(`Are you sure you want to archive the lead for ${companyName}?`)) {
         try {
-            // Send archive request to backend
             await api.put(`/leads/${leadId}/archive`);
             alert(`${companyName} has been archived.`);
-            
-            // Remove from the frontend table
             setLeads(leads.filter(l => l._id !== leadId));
-            setSelectedLead(null); // Close modal if open
+            setSelectedLead(null); 
         } catch (err) {
             console.error("Failed to archive lead:", err);
             alert("Error archiving client.");
@@ -112,6 +152,7 @@ const StaffPotentialClients = () => {
                             <th className="px-6 py-4 font-bold">Company</th>
                             <th className="px-6 py-4 font-bold">Primary Contact</th>
                             <th className="px-6 py-4 font-bold">Source</th>
+                            <th className="px-6 py-4 font-bold">Variation Type</th>
                             <th className="px-6 py-4 font-bold">Date Added</th>
                             <th className="px-6 py-4 font-bold text-right">Actions</th>
                         </tr>
@@ -119,7 +160,7 @@ const StaffPotentialClients = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">
+                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">
                                     Loading leads...
                                 </td>
                             </tr>
@@ -127,10 +168,9 @@ const StaffPotentialClients = () => {
                             filteredLeads.map((lead) => (
                                 <tr key={lead._id} className="hover:bg-orange-50/50 transition group">
                                     <td className="px-6 py-4">
-                                        {/* 🚨 NEW: Clickable Company Name */}
                                         <div 
-                                            className="font-bold text-gray-900 cursor-pointer hover:text-[#FE5C00] hover:underline transition"
-                                            onClick={() => setSelectedLead(lead)}
+                                            className="font-bold text-gray-900 cursor-pointer hover:text-[#FE5C00] hover:underline transition flex items-center gap-2"
+                                            onClick={() => handleOpenModal(lead)}
                                             title="Click to view details"
                                         >
                                             {lead.companyName}
@@ -146,12 +186,20 @@ const StaffPotentialClients = () => {
                                             {lead.leadSource || 'Manual Entry'}
                                         </span>
                                     </td>
+                                    <td className="px-6 py-4">
+                                        {lead.variationType ? (
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                                {lead.variationType}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400 italic text-sm">N/A</span>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
                                         {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                                         
-                                        {/* 🚨 NEW: Archive Button */}
                                         <button 
                                             onClick={() => handleArchiveLead(lead._id, lead.companyName)}
                                             className="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700 px-3 py-2 rounded text-sm font-bold transition shadow-sm inline-flex items-center gap-1"
@@ -161,7 +209,6 @@ const StaffPotentialClients = () => {
                                             Archive
                                         </button>
 
-                                        {/* Convert Button */}
                                         <button 
                                             onClick={() => handleConvertToActive(lead._id, lead.companyName)}
                                             className="bg-white border border-gray-300 text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border-green-300 px-4 py-2 rounded text-sm font-bold transition shadow-sm inline-flex items-center gap-2"
@@ -175,7 +222,7 @@ const StaffPotentialClients = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">
+                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">
                                     No potential clients found matching your search.
                                 </td>
                             </tr>
@@ -187,14 +234,16 @@ const StaffPotentialClients = () => {
         </div>
       </div>
 
-      {/* 🚨 NEW: MODAL OVERLAY FOR LEAD DETAILS */}
+      {/* MODAL OVERLAY FOR LEAD DETAILS & EDITING */}
       {selectedLead && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
                 
                 {/* Modal Header */}
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-800">Lead Details</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                        {isEditing ? 'Edit Lead Details' : 'Lead Details'}
+                    </h2>
                     <button 
                         onClick={() => setSelectedLead(null)}
                         className="text-gray-400 hover:text-red-500 transition p-1"
@@ -205,51 +254,120 @@ const StaffPotentialClients = () => {
 
                 {/* Modal Body (Scrollable) */}
                 <div className="p-8 overflow-y-auto flex-1">
+                    
+                    {/* Company Name Header (Editable) */}
                     <div className="mb-6">
-                        <h3 className="text-3xl font-extrabold text-[#FE5C00]">{selectedLead.companyName}</h3>
-                        <p className="text-sm text-gray-400 mt-1">Lead ID: {selectedLead._id} | Added: {new Date(selectedLead.createdAt).toLocaleDateString()}</p>
+                        {isEditing ? (
+                            <div>
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Company Name</label>
+                                <input 
+                                    type="text" 
+                                    name="companyName"
+                                    value={editFormData.companyName} 
+                                    onChange={handleEditChange}
+                                    className="w-full border border-gray-300 rounded px-3 py-2 text-xl font-bold text-[#FE5C00] outline-none focus:border-[#FE5C00]"
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                <h3 className="text-3xl font-extrabold text-[#FE5C00]">{selectedLead.companyName}</h3>
+                                <p className="text-sm text-gray-400 mt-1">Lead ID: {selectedLead._id} | Added: {new Date(selectedLead.createdAt).toLocaleDateString()}</p>
+                            </>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <DetailItem label="Contact Name" value={selectedLead.contactName} />
-                        <DetailItem label="Contact Email" value={selectedLead.contactEmail} isEmail />
-                        <DetailItem label="Contact Phone" value={selectedLead.contactPhone} />
-                        <DetailItem label="Lead Source" value={selectedLead.leadSource} />
+                        <EditableDetailItem label="Contact Name" name="contactName" value={isEditing ? editFormData.contactName : selectedLead.contactName} isEditing={isEditing} onChange={handleEditChange} />
+                        <EditableDetailItem label="Contact Email" name="contactEmail" value={isEditing ? editFormData.contactEmail : selectedLead.contactEmail} isEditing={isEditing} onChange={handleEditChange} isEmail />
+                        <EditableDetailItem label="Contact Phone" name="contactPhone" value={isEditing ? editFormData.contactPhone : selectedLead.contactPhone} isEditing={isEditing} onChange={handleEditChange} />
+                        <EditableDetailItem label="Lead Source" name="leadSource" value={isEditing ? editFormData.leadSource : selectedLead.leadSource} isEditing={isEditing} onChange={handleEditChange} />
                         
+                        {/* Address Fields */}
                         <div className="col-span-1 md:col-span-2">
-                            <DetailItem 
-                                label="Address" 
-                                value={`${selectedLead.address || ''} ${selectedLead.city ? `, ${selectedLead.city}` : ''} ${selectedLead.state || ''} ${selectedLead.zipCode || ''}`.trim()} 
-                            />
+                            {isEditing ? (
+                                <div className="grid grid-cols-6 gap-2">
+                                    <div className="col-span-6">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Address</label>
+                                        <input type="text" name="address" value={editFormData.address} onChange={handleEditChange} placeholder="Street" className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#FE5C00] text-sm" />
+                                    </div>
+                                    <div className="col-span-3">
+                                        <input type="text" name="city" value={editFormData.city} onChange={handleEditChange} placeholder="City" className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#FE5C00] text-sm" />
+                                    </div>
+                                    <div className="col-span-1">
+                                        <input type="text" name="state" value={editFormData.state} onChange={handleEditChange} placeholder="ST" className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#FE5C00] text-sm" />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <input type="text" name="zipCode" value={editFormData.zipCode} onChange={handleEditChange} placeholder="Zip" className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#FE5C00] text-sm" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <DetailItem 
+                                    label="Address" 
+                                    value={`${selectedLead.address || ''} ${selectedLead.city ? `, ${selectedLead.city}` : ''} ${selectedLead.state || ''} ${selectedLead.zipCode || ''}`.trim()} 
+                                />
+                            )}
                         </div>
 
-                        <DetailItem label="Variation Type" value={selectedLead.variationType} />
-                        <DetailItem label="Funding Type" value={selectedLead.fundingType} />
+                        <EditableDetailItem label="Variation Type" name="variationType" value={isEditing ? editFormData.variationType : selectedLead.variationType} isEditing={isEditing} onChange={handleEditChange} />
+                        <EditableDetailItem label="Funding Type" name="fundingType" value={isEditing ? editFormData.fundingType : selectedLead.fundingType} isEditing={isEditing} onChange={handleEditChange} />
                     </div>
 
                     {/* Extra Info Box */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
-                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Extra Information & Notes</h4>
-                        <div className="bg-yellow-50/50 border border-yellow-200 rounded-lg p-4 min-h-[100px] text-gray-700 whitespace-pre-wrap">
-                            {selectedLead.extraInfo || <span className="italic text-gray-400">No extra information provided.</span>}
-                        </div>
+                        <EditableDetailItem 
+                            label="Extra Information & Notes" 
+                            name="extraInfo" 
+                            value={isEditing ? editFormData.extraInfo : selectedLead.extraInfo} 
+                            isEditing={isEditing} 
+                            onChange={handleEditChange} 
+                            isTextArea 
+                        />
                     </div>
                 </div>
 
-                {/* Modal Footer (Action Buttons) */}
+                {/* 🚨 UPDATED: Modal Footer (Dynamic Action Buttons) */}
                 <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-4">
-                    <button 
-                        onClick={() => handleArchiveLead(selectedLead._id, selectedLead.companyName)}
-                        className="px-6 py-2 rounded text-red-600 hover:bg-red-50 font-bold transition"
-                    >
-                        Archive
-                    </button>
-                    <button 
-                        onClick={() => handleConvertToActive(selectedLead._id, selectedLead.companyName)}
-                        className="bg-[#FE5C00] hover:bg-orange-700 text-white px-8 py-2 rounded shadow-md font-bold transition"
-                    >
-                        Convert to Active
-                    </button>
+                    {isEditing ? (
+                        <>
+                            <button 
+                                onClick={() => setIsEditing(false)}
+                                className="px-6 py-2 rounded text-gray-600 hover:bg-gray-200 font-bold transition"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleSaveChanges}
+                                className="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded shadow-md font-bold transition flex items-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                Save Changes
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {/* Standard View Actions */}
+                            <button 
+                                onClick={() => setIsEditing(true)}
+                                className="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-bold transition flex items-center gap-2 mr-auto"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                Edit Details
+                            </button>
+                            
+                            <button 
+                                onClick={() => handleArchiveLead(selectedLead._id, selectedLead.companyName)}
+                                className="px-6 py-2 rounded text-red-600 hover:bg-red-50 font-bold transition"
+                            >
+                                Archive
+                            </button>
+                            <button 
+                                onClick={() => handleConvertToActive(selectedLead._id, selectedLead.companyName)}
+                                className="bg-[#FE5C00] hover:bg-orange-700 text-white px-8 py-2 rounded shadow-md font-bold transition"
+                            >
+                                Convert to Active
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
@@ -259,8 +377,10 @@ const StaffPotentialClients = () => {
   );
 };
 
-/* --- HELPER COMPONENT FOR MODAL DETAILS --- */
-const DetailItem = ({ label, value, isEmail = false }: { label: string, value: string, isEmail?: boolean }) => (
+/* --- HELPER COMPONENTS --- */
+
+// Read-only detail view
+const DetailItem = ({ label, value, isEmail = false }: any) => (
     <div className="flex flex-col border-b border-gray-100 pb-2">
         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{label}</span>
         {isEmail && value ? (
@@ -270,5 +390,45 @@ const DetailItem = ({ label, value, isEmail = false }: { label: string, value: s
         )}
     </div>
 );
+
+// Toggles between an input field and the read-only view
+const EditableDetailItem = ({ label, name, value, isEditing, onChange, isEmail = false, isTextArea = false }: any) => {
+    if (!isEditing) {
+        if(isTextArea) {
+            return (
+                <div>
+                    <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">{label}</h4>
+                    <div className="bg-yellow-50/50 border border-yellow-200 rounded-lg p-4 min-h-[100px] text-gray-700 whitespace-pre-wrap">
+                        {value || <span className="italic text-gray-400">No extra information provided.</span>}
+                    </div>
+                </div>
+            );
+        }
+        return <DetailItem label={label} value={value} isEmail={isEmail} />;
+    }
+
+    return (
+        <div className="flex flex-col border-b border-gray-100 pb-2">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{label}</span>
+            {isTextArea ? (
+                <textarea 
+                    name={name} 
+                    value={value || ""} 
+                    onChange={onChange} 
+                    rows={4}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-[#FE5C00] resize-y mt-1" 
+                />
+            ) : (
+                <input 
+                    type="text" 
+                    name={name} 
+                    value={value || ""} 
+                    onChange={onChange} 
+                    className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#FE5C00] mt-1" 
+                />
+            )}
+        </div>
+    );
+};
 
 export default StaffPotentialClients;
