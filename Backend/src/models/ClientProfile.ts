@@ -32,6 +32,9 @@ export interface IClientProfile extends Document {
   naturalGasTransporter: string;
   referredBy?: string;
   isArchived?: boolean;
+  position?: string;
+  linkedIn?: string;
+  facebook?: string;
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -83,7 +86,10 @@ const ClientProfileSchema: Schema = new Schema({
   isAuditConfirmed: { 
     type: Boolean, 
     default: false 
-  }
+  },
+  position: { type: String },
+  linkedIn: { type: String },
+  facebook: { type: String },
 
 }, { timestamps: true });
 

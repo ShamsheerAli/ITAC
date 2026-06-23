@@ -115,7 +115,7 @@ router.post('/convert/:id', async (req: Request, res: Response): Promise<void> =
             <p>To get started, please create your official portal account. Once logged in, you will be able to securely upload your utility documents and track your assessment progress.</p>
             
             <div style="text-align: center; margin: 30px 0;">
-                <a href="https://energyhub.okstate.edu/signup" style="background-color: #FE5C00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                <a href="http://energyhub.okstate.edu/signup" style="background-color: #FE5C00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
                     Create Your Account
                 </a>
             </div>
