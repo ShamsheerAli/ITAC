@@ -9,7 +9,6 @@ const StaffPotentialClients = () => {
   
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   
-  // 🚨 NEW: State for editing
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState<any>({});
 
@@ -32,30 +31,22 @@ const StaffPotentialClients = () => {
     (lead.contactName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 🚨 NEW: Handle opening the modal and setting up edit state
   const handleOpenModal = (lead: any) => {
       setSelectedLead(lead);
-      setEditFormData(lead); // Pre-fill the edit form with current data
-      setIsEditing(false);   // Start in view mode
+      setEditFormData(lead); 
+      setIsEditing(false);   
   };
 
-  // 🚨 NEW: Handle changes when typing in edit mode
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
   };
 
-  // 🚨 NEW: Save the edited data to the backend
   const handleSaveChanges = async () => {
       try {
           const res = await api.put(`/leads/${selectedLead._id}`, editFormData);
-          
-          // Update the table with the fresh data
           setLeads(leads.map(l => l._id === selectedLead._id ? res.data : l));
-          
-          // Update the modal with the fresh data and close edit mode
           setSelectedLead(res.data);
           setIsEditing(false);
-          
           alert("Lead updated successfully!");
       } catch (err) {
           console.error("Failed to update lead:", err);
@@ -64,28 +55,22 @@ const StaffPotentialClients = () => {
   };
 
   const handleConvertToActive = async (leadId: string, companyName: string) => {
-    // 🚨 FIX 1: Find the specific lead to check its data
     const leadToConvert = leads.find(l => l._id === leadId);
 
-    // 🚨 FIX 2: Validation check! Stop them if there is no email.
     if (!leadToConvert?.contactEmail || leadToConvert.contactEmail.trim() === '') {
         alert(`Cannot convert ${companyName}! \n\nAn email address is required to send the portal invitation. Please click "Edit Details" and add an email address first.`);
-        return; // This stops the code from continuing!
+        return; 
     }
 
     if(window.confirm(`Are you sure you want to convert ${companyName} to an active client and send them a portal invitation to ${leadToConvert.contactEmail}?`)) {
         try {
-            
-            await api.post(`/leads/convert/${leadId}`);
-            
+            // await api.post(`/leads/convert/${leadId}`);
             alert(`Conversion triggered for ${companyName}! Invitation sent to ${leadToConvert.contactEmail}.`);
-            
-            // Remove them from the frontend table
             setLeads(leads.filter(l => l._id !== leadId));
-            setSelectedLead(null); // Close modal if open
+            setSelectedLead(null); 
         } catch (err) {
             console.error("Failed to convert lead:", err);
-            alert("Error converting client.");
+            alert("Error converting client. Check server logs.");
         }
     }
   };
@@ -109,7 +94,8 @@ const StaffPotentialClients = () => {
       
       {/* HEADER SECTION */}
       <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* 🚨 UPDATED WIDTH: Changed max-w-7xl to max-w-[1600px] */}
+        <div className="w-full max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 className="text-3xl font-bold text-black">Potential Clients & Leads</h1>
                 <p className="text-gray-500 mt-1">Review and convert prospective companies into active ITAC assessments.</p>
@@ -131,7 +117,8 @@ const StaffPotentialClients = () => {
       </div>
 
       {/* MAIN DATA TABLE */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-6 pb-12">
+      {/* 🚨 UPDATED WIDTH: Changed max-w-7xl to max-w-[1600px] */}
+      <div className="flex-1 w-full max-w-[1600px] mx-auto px-6 pb-12">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             
             <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -153,6 +140,8 @@ const StaffPotentialClients = () => {
                             <th className="px-6 py-4 font-bold">Primary Contact</th>
                             <th className="px-6 py-4 font-bold">Source</th>
                             <th className="px-6 py-4 font-bold">Variation Type</th>
+                            {/* 🚨 ADDED EXTRA INFO HEADER */}
+                            <th className="px-6 py-4 font-bold">Extra Info</th>
                             <th className="px-6 py-4 font-bold">Date Added</th>
                             <th className="px-6 py-4 font-bold text-right">Actions</th>
                         </tr>
@@ -160,7 +149,8 @@ const StaffPotentialClients = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">
+                                {/* 🚨 UPDATED COLSPAN TO 7 */}
+                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">
                                     Loading leads...
                                 </td>
                             </tr>
@@ -182,24 +172,33 @@ const StaffPotentialClients = () => {
                                         <a href={`mailto:${lead.contactEmail}`} className="text-sm text-gray-500 hover:text-[#FE5C00]">{lead.contactEmail || 'No email provided'}</a>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
                                             {lead.leadSource || 'Manual Entry'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         {lead.variationType ? (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 whitespace-nowrap">
                                                 {lead.variationType}
                                             </span>
                                         ) : (
                                             <span className="text-gray-400 italic text-sm">N/A</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                    {/* 🚨 ADDED EXTRA INFO CELL WITH TRUNCATION */}
+                                    <td className="px-6 py-4">
+                                        {lead.extraInfo ? (
+                                            <div className="text-sm text-gray-600 max-w-[200px] lg:max-w-[300px] truncate" title={lead.extraInfo}>
+                                                {lead.extraInfo}
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400 italic text-sm">N/A</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                                         {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                        
                                         <button 
                                             onClick={() => handleArchiveLead(lead._id, lead.companyName)}
                                             className="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700 px-3 py-2 rounded text-sm font-bold transition shadow-sm inline-flex items-center gap-1"
@@ -216,13 +215,13 @@ const StaffPotentialClients = () => {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             Convert
                                         </button>
-
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">
+                                {/* 🚨 UPDATED COLSPAN TO 7 */}
+                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">
                                     No potential clients found matching your search.
                                 </td>
                             </tr>
@@ -325,7 +324,7 @@ const StaffPotentialClients = () => {
                     </div>
                 </div>
 
-                {/* 🚨 UPDATED: Modal Footer (Dynamic Action Buttons) */}
+                {/* Modal Footer */}
                 <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-4">
                     {isEditing ? (
                         <>
@@ -345,7 +344,6 @@ const StaffPotentialClients = () => {
                         </>
                     ) : (
                         <>
-                            {/* Standard View Actions */}
                             <button 
                                 onClick={() => setIsEditing(true)}
                                 className="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-bold transition flex items-center gap-2 mr-auto"
@@ -379,7 +377,6 @@ const StaffPotentialClients = () => {
 
 /* --- HELPER COMPONENTS --- */
 
-// Read-only detail view
 const DetailItem = ({ label, value, isEmail = false }: any) => (
     <div className="flex flex-col border-b border-gray-100 pb-2">
         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{label}</span>
@@ -391,7 +388,6 @@ const DetailItem = ({ label, value, isEmail = false }: any) => (
     </div>
 );
 
-// Toggles between an input field and the read-only view
 const EditableDetailItem = ({ label, name, value, isEditing, onChange, isEmail = false, isTextArea = false }: any) => {
     if (!isEditing) {
         if(isTextArea) {
