@@ -92,7 +92,7 @@ router.post('/convert/:id', async (req: Request, res: Response): Promise<void> =
       res.status(400).json({ message: 'Lead has no email address' });
       return;
     }
-
+    const formattedEmails = lead.contactEmail.replace(/;/g, ',').replace(/\s+/g, '');
     // 1. SETUP EMAIL TRANSPORTER (Update with your actual SMTP credentials)
     // If you are using Gmail, Outlook, or OSU's internal SMTP, plug it in here
     const transporter = nodemailer.createTransport({
@@ -106,7 +106,7 @@ router.post('/convert/:id', async (req: Request, res: Response): Promise<void> =
     // 2. SEND THE EMAIL
     await transporter.sendMail({
       from: '"OSU ITAC Portal" <noreply@energyhub.okstate.edu>',
-      to: lead.contactEmail,
+      to: formattedEmails,
       subject: "Invitation to OSU ITAC Services",
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
