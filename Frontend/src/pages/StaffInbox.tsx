@@ -20,9 +20,12 @@ const StaffInbox = () => {
       const res = await api.get('/messages/admin/conversations');
       setConversations(res.data);
       
+      // 🚨 FIX 1: Filter out invalid conversations before auto-selecting
+      const validConvs = res.data.filter((c: any) => c && c.profile && c.profile.user);
+      
       // Auto-select the first conversation if we just clicked "Inbox" with no specific ID
-      if (!selectedClientId && res.data.length > 0 && !clientId) {
-        handleSelectConversation(res.data[0].profile.user._id, res.data[0].profile.companyName);
+      if (!selectedClientId && validConvs.length > 0 && !clientId) {
+        handleSelectConversation(validConvs[0].profile.user._id, validConvs[0].profile.companyName);
       }
     } catch (err) {
       console.error("Failed to fetch conversations", err);
@@ -50,7 +53,9 @@ const StaffInbox = () => {
         
         // Instantly clear the red dot from our local sidebar list too
         setConversations(prev => prev.map(conv => 
-            conv.profile.user._id === selectedClientId ? { ...conv, unreadCount: 0 } : conv
+            (conv && conv.profile && conv.profile.user && conv.profile.user._id === selectedClientId) 
+            ? { ...conv, unreadCount: 0 } 
+            : conv
         ));
       } catch (err) {
         console.error("Failed to fetch messages", err);
@@ -126,34 +131,37 @@ const StaffInbox = () => {
                     {conversations.length === 0 ? (
                         <p className="text-center text-gray-400 mt-10 p-4 text-sm">No messages yet.</p>
                     ) : (
-                        conversations.map((conv) => {
-                            const isActive = conv.profile.user._id === selectedClientId;
-                            return (
-                                <div 
-                                    key={conv.profile.user._id}
-                                    onClick={() => handleSelectConversation(conv.profile.user._id, conv.profile.companyName)}
-                                    className={`p-4 border-b border-gray-100 cursor-pointer transition-colors flex justify-between items-center ${
-                                        isActive ? 'bg-orange-50 border-l-4 border-l-[#FE5C00]' : 'hover:bg-gray-50 border-l-4 border-l-transparent'
-                                    }`}
-                                >
-                                    <div className="min-w-0 flex-1">
-                                        <h3 className="font-bold text-gray-900 truncate text-sm">{conv.profile.companyName}</h3>
-                                        <p className={`text-xs truncate mt-1 ${conv.unreadCount > 0 ? 'font-bold text-black' : 'text-gray-500'}`}>
-                                            {conv.lastMessage ? (
-                                                conv.lastMessage.senderRole === 'staff' ? `You: ${conv.lastMessage.text}` : conv.lastMessage.text
-                                            ) : 'New Conversation'}
-                                        </p>
+                        conversations
+                            // 🚨 FIX 2: Safely filter out nulls or deleted users before mapping
+                            .filter(conv => conv && conv.profile && conv.profile.user)
+                            .map((conv) => {
+                                const isActive = conv.profile.user._id === selectedClientId;
+                                return (
+                                    <div 
+                                        key={conv.profile.user._id}
+                                        onClick={() => handleSelectConversation(conv.profile.user._id, conv.profile.companyName)}
+                                        className={`p-4 border-b border-gray-100 cursor-pointer transition-colors flex justify-between items-center ${
+                                            isActive ? 'bg-orange-50 border-l-4 border-l-[#FE5C00]' : 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                                        }`}
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="font-bold text-gray-900 truncate text-sm">{conv.profile.companyName}</h3>
+                                            <p className={`text-xs truncate mt-1 ${conv.unreadCount > 0 ? 'font-bold text-black' : 'text-gray-500'}`}>
+                                                {conv.lastMessage ? (
+                                                    conv.lastMessage.senderRole === 'staff' ? `You: ${conv.lastMessage.text}` : conv.lastMessage.text
+                                                ) : 'New Conversation'}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col items-end justify-between ml-2 h-full">
+                                            {conv.unreadCount > 0 && (
+                                                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm mt-1">
+                                                    {conv.unreadCount}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col items-end justify-between ml-2 h-full">
-                                        {conv.unreadCount > 0 && (
-                                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm mt-1">
-                                                {conv.unreadCount}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })
+                                );
+                            })
                     )}
                 </div>
             </div>
@@ -178,19 +186,22 @@ const StaffInbox = () => {
                                 Start of conversation with <span className="font-semibold text-gray-600">{clientName}</span>
                             </div>
                             
-                            {messages.map((msg) => {
-                                const isMe = msg.senderRole === 'staff';
-                                return (
-                                    <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-[75%] px-5 py-3 rounded-2xl text-[15px] shadow-sm ${
-                                            isMe 
-                                            ? 'bg-[#FE5C00] text-white rounded-br-sm' 
-                                            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
-                                        }`}>
-                                            {msg.text}
+                            {messages
+                                // 🚨 FIX 3: Safely filter out null messages before mapping
+                                .filter(msg => msg !== null)
+                                .map((msg) => {
+                                    const isMe = msg.senderRole === 'staff';
+                                    return (
+                                        <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[75%] px-5 py-3 rounded-2xl text-[15px] shadow-sm ${
+                                                isMe 
+                                                ? 'bg-[#FE5C00] text-white rounded-br-sm' 
+                                                : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
+                                            }`}>
+                                                {msg.text}
+                                            </div>
                                         </div>
-                                    </div>
-                                );
+                                    );
                             })}
                             <div ref={messagesEndRef} />
                         </div>

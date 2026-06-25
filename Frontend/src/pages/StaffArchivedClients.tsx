@@ -14,8 +14,8 @@ const StaffArchivedClients = () => {
         
         // 1. Filter to ONLY show archived clients
         const archivedProfiles = res.data.filter((profile: any) => {
-        const role = profile.user?.role;
-        return profile.isArchived === true && role !== 'staff' && role !== 'admin';
+          const role = profile.user?.role;
+          return profile.isArchived === true && role !== 'staff' && role !== 'admin';
         });
 
         // 2. Format exactly like the dashboard
@@ -63,6 +63,21 @@ const StaffArchivedClients = () => {
     } catch (err) {
       console.error("Failed to restore client", err);
       alert("Failed to restore client.");
+    }
+  };
+
+  // --- PERMANENT DELETE FUNCTION ---
+  const handleDelete = async (clientId: string, companyName: string) => {
+    if (!window.confirm(`⚠️ WARNING: Are you sure you want to PERMANENTLY delete ${companyName}? \n\nThis will erase all their data from the database and cannot be undone.`)) return;
+    
+    try {
+      await api.delete(`/profile/${clientId}`);
+      // Remove from this screen dynamically
+      setArchivedClients(prev => prev.filter(c => c.id !== clientId)); 
+      alert(`${companyName} has been permanently deleted.`);
+    } catch (err) {
+      console.error("Failed to delete client", err);
+      alert("Failed to delete client. Please check server logs.");
     }
   };
 
@@ -125,12 +140,20 @@ const StaffArchivedClients = () => {
                                 <td className="px-6 py-4 text-gray-500">{client.visitDate}</td>
                                 
                                 <td className="px-6 py-4 text-center">
-                                    <button 
-                                        onClick={() => handleRestore(client.id)}
-                                        className="bg-green-50 text-green-600 border border-green-200 hover:bg-green-600 hover:text-white font-bold py-1.5 px-4 rounded transition text-sm shadow-sm"
-                                    >
-                                        Restore
-                                    </button>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <button 
+                                            onClick={() => handleRestore(client.id)}
+                                            className="bg-green-50 text-green-600 border border-green-200 hover:bg-green-600 hover:text-white font-bold py-1.5 px-4 rounded transition text-sm shadow-sm"
+                                        >
+                                            Restore
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(client.id, client.companyName)}
+                                            className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white font-bold py-1.5 px-4 rounded transition text-sm shadow-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

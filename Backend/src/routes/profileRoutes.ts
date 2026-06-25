@@ -479,4 +479,25 @@ router.put('/staff/:userId', async (req, res) => {
   }
 });
 
+// @route   DELETE /api/profile/:id  <-- Adjust this path if your archived clients are stored elsewhere
+// @desc    PERMANENTLY delete a client from the database
+router.delete('/:id', async (req, res) => {
+  try {
+    // findByIdAndDelete completely wipes the record from your MongoDB collection
+    const deletedClient = await ClientProfile.findByIdAndDelete(req.params.id); 
+    
+    if (!deletedClient) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Optional: If you also want to delete the actual User account attached to this profile
+    // await User.findByIdAndDelete(deletedClient.userId); 
+
+    res.json({ message: 'Client permanently deleted' });
+  } catch (err) {
+    console.error("Error permanently deleting client:", err);
+    res.status(500).json({ message: "Server error deleting client" });
+  }
+});
+
 export default router;
