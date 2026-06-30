@@ -120,7 +120,7 @@ const Dashboard = () => {
       {/* BOTTOM SECTION: Tracking System */}
       <div className="bg-white pt-8 w-full">
         <div className="mb-10">
-            <h2 className="text-3xl font-bold text-center text-black">Tracking system(Steps to do)</h2>
+            <h2 className="text-3xl font-bold text-center text-black">Tracking system(Steps to complete)</h2>
             <div className="h-1.5 bg-[#FE5C00] w-full mt-4" />
         </div>
 
@@ -276,14 +276,6 @@ const Dashboard = () => {
           
           {/* Content */}
           <div className="p-8 flex flex-col sm:flex-row items-center justify-center gap-8 flex-grow">
-            {/* Profile Image */}
-            <div className="flex-shrink-0">
-               <img
-                src={profile?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"} 
-                alt="Profile" 
-                className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
-              />
-            </div>
 
             {/* Details - Centered and Large */}
             <div className="text-center w-full space-y-2 text-xl text-gray-800 font-medium">

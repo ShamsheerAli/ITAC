@@ -170,15 +170,11 @@ const UpdateDetails = () => {
 
         {/* RIGHT COLUMN */}
         <div className="space-y-4">
-            <div>
-                <label className="block text-sm font-bold mb-1">Annual Energy Consumption:</label>
-                <input required type="text" name="energyConsumption" value={formData.energyConsumption} onChange={handleChange} className="w-full border p-2 rounded" />
-            </div>
 
             {/* ✅ UPDATED: Yes/No Radio Buttons & Conditional Amount Field */}
             <div className="bg-gray-50 p-4 rounded border border-gray-100">
                 <label className="block text-sm font-bold mb-2">
-                    Your Annual Gross sales are less than $250 million?
+                    Are your Annual Gross sales than $250 million?
                 </label>
                 
                 {/* Radio Options */}
@@ -228,7 +224,7 @@ const UpdateDetails = () => {
                 <input required type="text" name="buildingSize" value={formData.buildingSize} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-1">Total Annual utility expenses(Gas & Electricity):$<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Total Annual utility expenses (Gas & Electricity):$<RequiredStar /></label>
                 <input required type="text" name="utilityExpenses" value={formData.utilityExpenses} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
 
@@ -239,14 +235,15 @@ const UpdateDetails = () => {
             </div>
 
             <div>
+                <label className="block text-sm font-bold mb-1">Natural Gas Transporter (If Applicable):</label>
+                <input type="text" name="naturalGasTransporter" value={formData.naturalGasTransporter} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. ONG" />
+            </div>
+
+            <div>
                 <label className="block text-sm font-bold mb-1">Electricity Provider:</label>
                 <input type="text" name="electricityProvider" value={formData.electricityProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/>
             </div>
 
-            <div>
-                <label className="block text-sm font-bold mb-1">Natural Gas Transporter (If Applicable):</label>
-                <input type="text" name="naturalGasTransporter" value={formData.naturalGasTransporter} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. ONG" />
-            </div>
             <div>
                 <label className="block text-sm font-bold mb-1">Referred By?</label>
                 <input type="text" name="referredBy" value={formData.referredBy} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. LinkedIn, Friend, Event" />

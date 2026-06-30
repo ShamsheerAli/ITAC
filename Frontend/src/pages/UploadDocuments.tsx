@@ -91,8 +91,7 @@ const UploadDocuments = () => {
         {/* DOWNLOAD SECTION */}
         <SectionTitle title="Download documents" />
         <div className="border border-black p-8 text-center text-xl font-medium mb-12 text-gray-800 leading-relaxed bg-gray-50">
-          Please download the documents. Go through the documents and fill the
-          data. <br /> Upload the documents in the below section!
+          Please download the documents. Enter the requested information or signature. <br /> Upload the documents in the below section!
         </div>
         <div className="space-y-8 mb-16">
           <DownloadRow label="Confidentiality Statement" fileName="confidentiality_statement.pdf" />
@@ -167,7 +166,6 @@ const UploadDocuments = () => {
             handleDeleteDocument={handleDeleteDocument}
           />
 
-          {/* ✅ ADDED: OGE Consent Upload */}
           <UploadRow 
             label="OGE Consent for Electric Bill data" 
             docName="OGE Consent Form" 
@@ -177,7 +175,6 @@ const UploadDocuments = () => {
             handleDeleteDocument={handleDeleteDocument}
           />
 
-          {/* ✅ ADDED: PSO Consent Upload */}
           <UploadRow 
             label="PSO Consent for Electric Bill data" 
             docName="PSO Consent Form" 
@@ -218,11 +215,11 @@ const SectionTitle = ({ title }: { title: string }) => (
 const DownloadRow = ({ label, fileName }: { label: string; fileName: string }) => (
   <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-16">
     <span className="w-full md:w-96 text-center md:text-right text-xl font-bold text-gray-700">{label}:</span>
-    <div className="w-full md:w-56 flex justify-center md:justify-start">
+    <div className="w-full md:w-64 flex justify-center md:justify-start">
         <a 
           href={`/docs/${fileName}`} 
           download
-          className="bg-[#4a5568] text-white w-56 py-3 rounded shadow hover:bg-gray-700 transition text-lg font-semibold block text-center"
+          className="bg-[#4a5568] text-white w-full py-3 rounded shadow hover:bg-gray-700 transition text-lg font-semibold block text-center"
         >
           Download
         </a>
@@ -239,31 +236,39 @@ const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUploa
     <div className="flex flex-col md:flex-row items-start justify-center gap-4 md:gap-16">
       <span className="w-full md:w-96 text-center md:text-right text-xl font-bold text-gray-700 mt-3">{label}:</span>
 
-      <div className="w-full md:w-56 flex flex-col gap-3 items-center md:items-start">
+      {/* 🚨 WIDENED WRAPPER: Changed md:w-56 to md:w-64 */}
+      <div className="w-full md:w-64 flex flex-col gap-3 items-center md:items-start">
+          
           {uploadedFilesForThisRow.map((file: any, index: number) => (
-             <div key={index} className="w-56 flex items-center justify-between bg-green-50 border-2 border-green-500 py-2.5 px-4 rounded shadow-sm text-green-700">
-                 <span 
-                    className="font-bold text-sm flex items-center gap-2 truncate" 
-                    title={file.originalName || `File ${index + 1}`}
-                 >
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+             /* 🚨 FLEX FIX: w-full, flex layout for proper truncation */
+             <div key={index} className="w-full flex items-center justify-between bg-green-50 border-2 border-green-500 py-2.5 px-3 rounded shadow-sm text-green-700">
+                 
+                 {/* 🚨 TEXT WRAPPER: flex-1 and min-w-0 force proper truncation */}
+                 <div className="flex items-center flex-1 min-w-0 gap-2 pr-2" title={file.originalName || `File ${index + 1}`}>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                     </svg>
                      
-                     <span className="truncate max-w-[110px]">
+                     <span className="font-bold text-sm truncate block">
                          {file.originalName || `File ${index + 1}`}
                      </span>
-                 </span>
+                 </div>
+
+                 {/* 🚨 DELETE BUTTON: flex-shrink-0 ensures it never gets squished */}
                  <button 
                     onClick={() => handleDeleteDocument(file.path, docName)}
-                    className="text-red-400 hover:text-red-600 bg-white rounded-full p-0.5 shadow-sm hover:shadow transition flex-shrink-0 ml-2"
+                    className="text-red-400 hover:text-red-600 bg-white rounded-full p-0.5 shadow-sm hover:shadow transition flex-shrink-0"
                     title="Remove Document"
                  >
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                     </svg>
                  </button>
              </div>
           ))}
 
           <label 
-            className={`w-56 py-3 rounded shadow transition text-lg font-semibold block text-center cursor-pointer text-white
+            className={`w-full py-3 rounded shadow transition text-lg font-semibold block text-center cursor-pointer text-white
               ${isUploading ? 'bg-orange-500 cursor-wait' : 'bg-[#4a5568] hover:bg-gray-700'}`}
           >
             {isUploading ? 'Uploading...' : (uploadedFilesForThisRow.length > 0 ? 'Upload Another' : 'Upload')}
