@@ -20,7 +20,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const StaffDashboard = () => {
   const navigate = useNavigate();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-  const [clients, setClients] = useState<any[]>([]); // State for Real Data
+  const [clients, setClients] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState<any[]>([]);
 
@@ -30,7 +30,6 @@ const StaffDashboard = () => {
   
     try {
       await api.put(`/profile/${clientId}/archive`);
-      // Remove the archived client from the current screen without refreshing
       setClients(prevClients => prevClients.filter(c => c.id !== clientId)); 
     } catch (err) {
       console.error("Failed to archive client", err);
@@ -40,32 +39,32 @@ const StaffDashboard = () => {
 
   // --- FETCH REAL DATA & GEOCODE ---
   useEffect(() => {
-    // Helper function to turn an address into Lat/Lng coordinates
     const getCoordinates = async (fullAddress: string) => {
         if (!fullAddress || fullAddress.trim() === '') return null;
 
-        // 1. Check if we already found and saved these coordinates in the browser cache
         const cachedCoords = localStorage.getItem(`geo_${fullAddress}`);
         if (cachedCoords) return JSON.parse(cachedCoords);
 
-        // 2. If not cached, fetch from the free OpenStreetMap API
         try {
-            // Added a small delay to respect the free API's rate limit rules
             await new Promise(resolve => setTimeout(resolve, 600)); 
             
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(fullAddress)}`);
+            // 🚨 FIX 1: Added User-Agent header so OpenStreetMap doesn't block the request!
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(fullAddress)}`,
+                { headers: { 'User-Agent': 'ITAC-Dashboard-App/1.0' } }
+            );
+            
             const data = await response.json();
 
             if (data && data.length > 0) {
                 const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                // Save it to cache so it loads instantly next time!
                 localStorage.setItem(`geo_${fullAddress}`, JSON.stringify(coords));
                 return coords;
             }
         } catch (error) {
             console.error("Geocoding failed for:", fullAddress);
         }
-        return null; // Return null if address is invalid or not found
+        return null; 
     };
 
     const fetchUnread = async () => {
@@ -89,18 +88,24 @@ const StaffDashboard = () => {
 
         const clientsWithLocations = [];
 
-        // Loop through clients to get their addresses
         for (let i = 0; i < activeProfiles.length; i++) {
             const profile = activeProfiles[i];
             
-            // Construct the full address string from your database fields
             const addressParts = [profile.streetAddress, profile.city, profile.state, profile.zipCode].filter(Boolean);
             const fullAddress = addressParts.join(', ');
 
-            // Try to get real coordinates, otherwise default to Oklahoma State University
-            const realLocation = await getCoordinates(fullAddress);
+            // 1. Try to find the exact address
+            let realLocation = await getCoordinates(fullAddress);
+
+            // 🚨 FIX 2: If the exact street fails, try just the City and State!
+            if (!realLocation && profile.city) {
+                const cityFallback = [profile.city, profile.state].filter(Boolean).join(', ');
+                realLocation = await getCoordinates(cityFallback);
+            }
+
+            // 3. If it STILL fails (blank address), drop them in Stillwater
             const finalLocation = realLocation || { 
-                lat: 36.1156 + (Math.random() - 0.5) * 0.1, // OSU Stillwater Area
+                lat: 36.1156 + (Math.random() - 0.5) * 0.1, 
                 lng: -97.0584 + (Math.random() - 0.5) * 0.1 
             };
 
@@ -127,12 +132,10 @@ const StaffDashboard = () => {
 
     fetchClients();
     
-    // Check for unread messages every 5 seconds
     const interval = setInterval(fetchUnread, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Helper: Generate Ref ID (MMDDYYYY + Index)
   const generateRefId = (dateString: string, index: number) => {
     const date = new Date(dateString);
     const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -158,10 +161,10 @@ const StaffDashboard = () => {
         {/* LEFT CARD: MAP */}
         <div className="bg-white rounded-lg overflow-hidden shadow-sm flex flex-col h-full min-h-[380px] border border-gray-200 relative z-0">
            <MapContainer 
-                center={[35.5, -97.5]} // Oklahoma Center
-                zoom={7} 
-                scrollWheelZoom={false}
-                className="w-full h-full min-h-[380px]"
+               center={[35.5, -97.5]} // Oklahoma Center
+               zoom={7} 
+               scrollWheelZoom={false}
+               className="w-full h-full min-h-[380px]"
            >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -176,7 +179,6 @@ const StaffDashboard = () => {
                                     <strong className="block text-sm">{client.companyName}</strong>
                                     <span className="text-xs text-gray-500">{client.status}</span>
                                     
-                                    {/* MAP POPUP: Add a tiny red dot to the Message link if unread! */}
                                     <Link to={`/staff-inbox/${client.id}`} className="text-[#FE5C00] text-xs underline mt-1 flex items-center justify-center gap-1">
                                         Message
                                         {hasUnread && <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>}
@@ -265,14 +267,12 @@ const StaffDashboard = () => {
                         return (
                         <tr key={client.id} className="hover:bg-gray-50 transition relative">
                             
-                            {/* REF ID */}
                             <td className="px-6 py-4">
                                 <span className="font-mono font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded">
                                     {client.refId}
                                 </span>
                             </td>
 
-                            {/* COMPANY NAME + NOTIFICATION BADGE */}
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     <img src={client.image} alt="" className="w-10 h-10 rounded-full object-cover" />
@@ -281,7 +281,6 @@ const StaffDashboard = () => {
                                             {client.companyName}
                                         </Link>
                                         
-                                        {/* TABLE NOTIFICATION: Pulsing Red Dot */}
                                         {hasUnread && (
                                             <span className="relative flex h-3 w-3" title="New Unread Message!">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -296,7 +295,6 @@ const StaffDashboard = () => {
                             <td className="px-6 py-4 text-gray-700 font-medium">{client.contactName}</td>
                             <td className="px-6 py-4 text-gray-600">{client.visitDate}</td>
                             
-                            {/* STATUS */}
                             <td className="px-6 py-4">
                                 <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide 
                                     ${client.status === 'New Inquiry' ? 'bg-blue-100 text-blue-700' : 
@@ -305,7 +303,6 @@ const StaffDashboard = () => {
                                 </span>
                             </td>
                             
-                            {/* ACTION COLUMN */}
                             <td className="px-6 py-4 text-center relative">
                                 <button 
                                     onClick={(e) => {
@@ -314,7 +311,6 @@ const StaffDashboard = () => {
                                     }}
                                     className="text-gray-400 hover:text-[#FE5C00] p-2 rounded-full hover:bg-orange-50 transition outline-none"
                                 >
-                                    {/* Three Dots Icon */}
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
                                 </button>
 
