@@ -46,6 +46,7 @@ function App() {
         <Route path="/TemporaryDashboard" element={<TemporaryDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/setup-details" element={<UpdateDetails />} />
         
 
         {/* ================= CLIENT ROUTES (Sidebar Layout) ================= */}

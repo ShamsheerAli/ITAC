@@ -6,19 +6,10 @@ const UpdateDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const isFromMainDashboard = location.state?.fromMainDashboard;
-  useEffect(() => {
-    if (!isFromMainDashboard) {
-      // Attach a class to the body when this component mounts
-      document.body.classList.add('hide-sidebar-layout');
-    }
-
-    // Clean up: Remove the class when the user leaves this page
-    return () => {
-      document.body.classList.remove('hide-sidebar-layout');
-    };
-  }, [isFromMainDashboard]);
   
+  // ✅ NEW: Simply check the URL to see which route they are on
+  const isFromMainDashboard = location.pathname === '/update-details';
+
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -31,8 +22,8 @@ const UpdateDetails = () => {
     businessDescription: '', 
     naics: '',
     energyConsumption: '',
-    isGrossSalesLessThan250M: '', // ✅ NEW: Tracks the Yes/No radio button
-    grossSales: '',               // ✅ The actual amount text box
+    isGrossSalesLessThan250M: '', 
+    grossSales: '',               
     buildingSize: '',
     utilityExpenses: '',
     naturalGasProvider: '', 
@@ -67,7 +58,7 @@ const UpdateDetails = () => {
             businessDescription: res.data.businessDescription || res.data.sicCode || '',
             naics: res.data.naics || '',
             energyConsumption: res.data.energyConsumption || '',
-            isGrossSalesLessThan250M: res.data.isGrossSalesLessThan250M || '', // ✅ Fetch saved Yes/No
+            isGrossSalesLessThan250M: res.data.isGrossSalesLessThan250M || '', 
             grossSales: res.data.grossSales || '',
             buildingSize: res.data.buildingSize || '',
             utilityExpenses: res.data.utilityExpenses || '',
@@ -108,8 +99,8 @@ const UpdateDetails = () => {
       
       alert('Details Updated Successfully!');
 
-      // SMART REDIRECT LOGIC
-      if (location.pathname.includes('/dashboard')) {
+      // ✅ NEW: Uses the URL check to return to the right dashboard
+      if (isFromMainDashboard) {
           navigate('/dashboard');
       } else {
           navigate('/TemporaryDashboard');
@@ -123,7 +114,6 @@ const UpdateDetails = () => {
 
   if (loading) return <div className="p-10 text-center">Loading your details...</div>;
 
-  // Helper for Required Star
   const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
   return (
@@ -182,14 +172,11 @@ const UpdateDetails = () => {
 
         {/* RIGHT COLUMN */}
         <div className="space-y-4">
-
-            {/* ✅ UPDATED: Yes/No Radio Buttons & Conditional Amount Field */}
             <div className="bg-gray-50 p-4 rounded border border-gray-100">
                 <label className="block text-sm font-bold mb-2">
                     Are your Annual Gross sales than $250 million?
                 </label>
                 
-                {/* Radio Options */}
                 <div className="flex items-center gap-6 mb-3">
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input 
@@ -215,7 +202,6 @@ const UpdateDetails = () => {
                     </label>
                 </div>
 
-                {/* Conditional Text Box (Shows up if either Yes or No is selected) */}
                 {formData.isGrossSalesLessThan250M !== '' && (
                     <div className="animate-fade-in-down mt-2">
                         <label className="block text-xs font-bold text-gray-600 mb-1">Please provide the amount: $</label>
@@ -240,7 +226,6 @@ const UpdateDetails = () => {
                 <input required type="text" name="utilityExpenses" value={formData.utilityExpenses} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
 
-            {/* Questions Section */}
             <div>
                 <label className="block text-sm font-bold mb-1">Natural Gas Provider:</label>
                 <input type="text" name="naturalGasProvider" value={formData.naturalGasProvider} onChange={handleChange} className="w-full border p-2 rounded bg-white"/> 
@@ -261,14 +246,12 @@ const UpdateDetails = () => {
                 <input type="text" name="referredBy" value={formData.referredBy} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. LinkedIn, Friend, Event" />
             </div>
 
-            {/* Additional Details */}
             <div>
                 <label className="block text-sm font-bold mb-1">Additional details</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} className="w-full border p-2 rounded h-24"></textarea>
             </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
         <div className="col-span-1 md:col-span-2 flex justify-center mt-6">
             <button type="submit" className="bg-[#FE5C00] hover:bg-orange-700 text-white font-bold py-3 px-12 rounded shadow-lg transition uppercase">
                 Save Updates

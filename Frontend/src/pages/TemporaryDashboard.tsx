@@ -129,7 +129,7 @@ const TemporaryDashboard = () => {
                              Resources
                          </button>
                      </Link>
-                     <Link to="/update-details" className="w-full sm:w-1/2">
+                     <Link to="/setup-details">
                          <button className="w-full h-full bg-[#FE5C00] text-white py-5 rounded shadow-md hover:shadow-lg hover:bg-orange-700 transition transform active:scale-95 font-bold text-xl text-center uppercase tracking-wide">
                              Update Information
                          </button>
