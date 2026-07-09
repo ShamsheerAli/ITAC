@@ -298,7 +298,7 @@ const Dashboard = () => {
               </p>
 
               <div className="pt-6 flex justify-center">
-                <Link to="/update-details">
+                <Link to="/update-details" state={{ fromMainDashboard: true }}>
                     <button className="bg-[#FE5C00] text-white px-10 py-3 rounded shadow hover:bg-orange-700 transition font-bold uppercase text-base tracking-wider">
                     Update
                     </button>

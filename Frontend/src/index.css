@@ -70,3 +70,8 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+/* Hides the sidebar when the temporary dashboard triggers this class */
+body.hide-sidebar-layout .sidebar {
+    display: none !important;
+}

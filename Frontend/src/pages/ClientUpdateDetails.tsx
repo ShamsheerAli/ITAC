@@ -6,6 +6,18 @@ const UpdateDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const isFromMainDashboard = location.state?.fromMainDashboard;
+  useEffect(() => {
+    if (!isFromMainDashboard) {
+      // Attach a class to the body when this component mounts
+      document.body.classList.add('hide-sidebar-layout');
+    }
+
+    // Clean up: Remove the class when the user leaves this page
+    return () => {
+      document.body.classList.remove('hide-sidebar-layout');
+    };
+  }, [isFromMainDashboard]);
   
   const [formData, setFormData] = useState({
     companyName: '',
