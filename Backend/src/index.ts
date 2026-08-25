@@ -23,7 +23,8 @@ app.use(cors({
         'http://energyhub.okstate.edu', 
         'https://energyhub.okstate.edu',
         'http://localhost:5173', // Include this if you ever test locally
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'https://didactic-space-winner-jpxjjrrpg93pvwj-5173.app.github.dev'
     ],
     credentials: true, // Crucial for login tokens and sessions!
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']

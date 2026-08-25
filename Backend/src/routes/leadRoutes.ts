@@ -78,54 +78,52 @@ router.put('/:id/archive', async (req: Request, res: Response): Promise<void> =>
 });
 
 // @route   POST /api/leads/convert/:id
-// @desc    Send invitation email and archive the lead
-router.post('/convert/:id', async (req: Request, res: Response): Promise<void> => {
+// @desc    Send an invitation email to the lead to create an account
+router.post('/convert/:id', async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
     
     if (!lead) {
-      res.status(404).json({ message: 'Lead not found' });
-      return;
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+    if (!lead.contactEmail) {
+      return res.status(400).json({ message: 'Lead has no email address' });
     }
 
-    if (!lead.contactEmail) {
-      res.status(400).json({ message: 'Lead has no email address' });
-      return;
-    }
+    // Clean up the email string in case they entered multiple emails with semicolons
     const formattedEmails = lead.contactEmail.replace(/;/g, ',').replace(/\s+/g, '');
-    // 1. SETUP EMAIL TRANSPORTER (Update with your actual SMTP credentials)
-    // If you are using Gmail, Outlook, or OSU's internal SMTP, plug it in here
+
+    // Configure Nodemailer (Ensure you have your SMTP setup here)
     const transporter = nodemailer.createTransport({
-      service: 'gmail', 
+      service: 'gmail', // Or your specific provider
       auth: {
-        user: "doeosuitac@gmail.com",
-        pass: "unmfksjvznjcrvpd",
-      },
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
     });
 
-    // 2. SEND THE EMAIL
+    // The link to your signup page
+    const signupLink = 'http://energyhub.okstate.edu/signup'; 
+
     await transporter.sendMail({
-      from: '"OSU ITAC Portal" <noreply@energyhub.okstate.edu>',
+      from: '"OSU ITAC" <noreply@energyhub.okstate.edu>',
       to: formattedEmails,
       subject: "Invitation to OSU ITAC Services",
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-            <h2 style="color: #FE5C00;">Hello ${lead.contactName || lead.companyName},</h2>
-            <p>You have been selected to proceed with the Oklahoma State University ITAC energy assessment process!</p>
-            <p>To get started, please create your official portal account. Once logged in, you will be able to securely upload your utility documents and track your assessment progress.</p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="http://energyhub.okstate.edu/signup" style="background-color: #FE5C00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
-                    Create Your Account
-                </a>
-            </div>
-            
-            <p style="color: #666; font-size: 12px;">If you have any questions, please reply to this email.</p>
+        <div style="font-family: Arial, sans-serif; max-w: 600px; margin: 0 auto;">
+            <h2>Welcome to OSU ITAC!</h2>
+            <p>Hello ${lead.contactName || lead.companyName},</p>
+            <p>You have been invited to join the ITAC portal to begin your energy assessment process.</p>
+            <p>Please click the button below to create your account and access your dashboard:</p>
+            <a href="${signupLink}" style="display: inline-block; padding: 12px 24px; background-color: #FE5C00; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
+                Create Your Account
+            </a>
+            <p style="margin-top: 30px; font-size: 12px; color: #666;">If the button doesn't work, copy and paste this link into your browser: ${signupLink}</p>
         </div>
-      `,
+      `
     });
 
-    // 3. ARCHIVE THE LEAD SO IT LEAVES THE TABLE
+    // Mark the lead as archived so it leaves the active pipeline
     lead.isArchived = true;
     await lead.save();
 

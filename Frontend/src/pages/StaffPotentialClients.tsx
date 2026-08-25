@@ -64,8 +64,12 @@ const StaffPotentialClients = () => {
 
     if(window.confirm(`Are you sure you want to convert ${companyName} to an active client and send them a portal invitation to ${leadToConvert.contactEmail}?`)) {
         try {
-            // await api.post(`/leads/convert/${leadId}`);
+            // 🚨 UNCOMMENTED: Now actively hits the backend route to send the email
+            await api.post(`/leads/convert/${leadId}`);
+            
             alert(`Conversion triggered for ${companyName}! Invitation sent to ${leadToConvert.contactEmail}.`);
+            
+            // Instantly remove from the frontend UI
             setLeads(leads.filter(l => l._id !== leadId));
             setSelectedLead(null); 
         } catch (err) {
@@ -94,7 +98,6 @@ const StaffPotentialClients = () => {
       
       {/* HEADER SECTION */}
       <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 shadow-sm">
-        {/* 🚨 UPDATED WIDTH: Changed max-w-7xl to max-w-[1600px] */}
         <div className="w-full max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 className="text-3xl font-bold text-black">Potential Clients & Leads</h1>
@@ -117,7 +120,6 @@ const StaffPotentialClients = () => {
       </div>
 
       {/* MAIN DATA TABLE */}
-      {/* 🚨 UPDATED WIDTH: Changed max-w-7xl to max-w-[1600px] */}
       <div className="flex-1 w-full max-w-[1600px] mx-auto px-6 pb-12">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             
@@ -140,7 +142,6 @@ const StaffPotentialClients = () => {
                             <th className="px-6 py-4 font-bold">Primary Contact</th>
                             <th className="px-6 py-4 font-bold">Source</th>
                             <th className="px-6 py-4 font-bold">Variation Type</th>
-                            {/* 🚨 ADDED EXTRA INFO HEADER */}
                             <th className="px-6 py-4 font-bold">Extra Info</th>
                             <th className="px-6 py-4 font-bold">Date Added</th>
                             <th className="px-6 py-4 font-bold text-right">Actions</th>
@@ -149,7 +150,6 @@ const StaffPotentialClients = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <tr>
-                                {/* 🚨 UPDATED COLSPAN TO 7 */}
                                 <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">
                                     Loading leads...
                                 </td>
@@ -185,7 +185,6 @@ const StaffPotentialClients = () => {
                                             <span className="text-gray-400 italic text-sm">N/A</span>
                                         )}
                                     </td>
-                                    {/* 🚨 ADDED EXTRA INFO CELL WITH TRUNCATION */}
                                     <td className="px-6 py-4">
                                         {lead.extraInfo ? (
                                             <div className="text-sm text-gray-600 max-w-[200px] lg:max-w-[300px] truncate" title={lead.extraInfo}>
@@ -220,7 +219,6 @@ const StaffPotentialClients = () => {
                             ))
                         ) : (
                             <tr>
-                                {/* 🚨 UPDATED COLSPAN TO 7 */}
                                 <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">
                                     No potential clients found matching your search.
                                 </td>
