@@ -60,25 +60,19 @@ const StaffDocumentReview = () => {
   // Determine Tracking Status
   const isAllUploaded = missingDocs.length === 0;
 
-  // 🚨 FIX 2: Bulletproof URL generator to ensure there are no double slashes or missing domain names
+  // 🚨 FIX 1: Hardcode the server URL to guarantee it points to Port 5000 and skips the /api prefix
   const getDownloadUrl = (path: string) => {
     if (!path) return '';
     
-    // Find the base URL from axios config (e.g., http://energyhub.okstate.edu:5000/api)
-    let baseUrl = api.defaults.baseURL || 'http://localhost:5000/api';
-    
-    // Strip off the '/api' at the end to get the root server URL
-    baseUrl = baseUrl.replace(/\/api\/?$/, '');
-
     // Normalize the path (change Windows backslashes to forward slashes)
     let cleanPath = path.replace(/\\/g, '/');
     
-    // Ensure there's no double slash like "http://...//uploads/..."
+    // Ensure there's no double slash
     if (cleanPath.startsWith('/')) {
        cleanPath = cleanPath.substring(1);
     }
 
-    return `${baseUrl}/${cleanPath}`;
+    return `http://energyhub.okstate.edu:5000/${cleanPath}`;
   };
 
   return (
@@ -230,11 +224,18 @@ const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) =>
         setIsDownloading(true);
         
         try {
-            // 🚨 FIX 3: Fetch as a Blob to force the browser to apply the original file extension!
-            const response = await api.get(downloadUrl, { responseType: 'blob' });
+            // 🚨 FIX 2: Use native 'fetch' instead of 'api.get' so Axios doesn't sneak '/api' into our URL!
+            const response = await fetch(downloadUrl);
+            
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+
+            // Convert the raw data to a blob
+            const blob = await response.blob();
             
             // Create a secure URL for the raw file data
-            const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+            const blobUrl = window.URL.createObjectURL(blob);
             
             // Generate a hidden anchor tag to trigger the local download
             const link = document.createElement('a');
@@ -243,7 +244,7 @@ const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) =>
             document.body.appendChild(link);
             link.click();
             
-            // Clean up
+            // Clean up memory
             link.parentNode?.removeChild(link);
             window.URL.revokeObjectURL(blobUrl);
         } catch (error) {
