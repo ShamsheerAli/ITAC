@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
-// 🚨 FIX 1: Updated the required documents to match the exact new names the clients are uploading!
 const REQUIRED_DOCUMENTS = [
   "Electricity Bills",
   "Confidentiality Statement",
@@ -19,7 +18,6 @@ const StaffDocumentReview = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Because the Kanban board passes the _id, we fetch using details/:id
         const res = await api.get(`/profile/details/${clientId}`);
         setProfile(res.data);
       } catch (err) {
@@ -35,7 +33,7 @@ const StaffDocumentReview = () => {
     try {
       await api.put(`/profile/status/${clientId}`, { status: 'Ready for audit' });
       alert("Client approved! Moving to 'Ready for audit'.");
-      navigate('/staff-kanban'); // Send staff back to board
+      navigate('/staff-kanban'); 
     } catch (err) {
       alert("Failed to approve client.");
     }
@@ -44,41 +42,31 @@ const StaffDocumentReview = () => {
   if (loading) return <div className="p-10 text-center">Loading Document Status...</div>;
   if (!profile) return <div className="p-10 text-center text-red-500">Client not found.</div>;
 
-  // --- DOCUMENT SORTING LOGIC ---
   const uploadedDocs = profile.documents || [];
   
-  // Convert all uploaded names to lowercase and remove extra spaces for a bulletproof comparison
   const uploadedDocNames = uploadedDocs.map((doc: any) => 
       (doc.name || "").trim().toLowerCase()
   );
   
-  // Find which required documents are missing by checking against the lowercase list
   const missingDocs = REQUIRED_DOCUMENTS.filter(reqDoc => 
       !uploadedDocNames.includes(reqDoc.trim().toLowerCase())
   );
   
-  // Determine Tracking Status
   const isAllUploaded = missingDocs.length === 0;
 
-  // 🚨 FIX 1: Hardcode the server URL to guarantee it points to Port 5000 and skips the /api prefix
+  // 🚨 FIX 1: Only return the clean path. Axios will automatically attach your safe baseURL!
   const getDownloadUrl = (path: string) => {
     if (!path) return '';
-    
-    // Normalize the path (change Windows backslashes to forward slashes)
     let cleanPath = path.replace(/\\/g, '/');
-    
-    // Ensure there's no double slash
     if (cleanPath.startsWith('/')) {
        cleanPath = cleanPath.substring(1);
     }
-
-    return `http://energyhub.okstate.edu:5000/${cleanPath}`;
+    return cleanPath;
   };
 
   return (
     <div className="w-full min-h-screen flex flex-col relative bg-gray-50">
       
-      {/* 1. HEADER & BREADCRUMBS */}
       <div className="bg-white border-b border-gray-200 px-8 py-4 mb-8 flex items-center gap-3 shadow-sm">
         <Link to="/staff-kanban" className="text-gray-500 hover:text-[#FE5C00] transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -91,10 +79,8 @@ const StaffDocumentReview = () => {
         <span className="text-sm font-bold text-black">Document Status</span>
       </div>
 
-      {/* 2. MAIN CONTENT WRAPPER */}
       <div className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
         
-        {/* PAGE TITLE */}
         <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-black mb-2">
                 {profile.companyName} <span className="text-gray-400 font-medium text-2xl">({clientId?.substring(clientId.length - 6)})</span>
@@ -102,44 +88,20 @@ const StaffDocumentReview = () => {
             <div className="h-1.5 bg-[#FE5C00] w-24 mx-auto rounded-full" />
         </div>
 
-        {/* 4. TRACKING SYSTEM */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-10">
             <h3 className="text-xl font-bold text-black mb-8 text-center">Current Status</h3>
             
             <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative">
-                
-                {/* Step 1: Missing Docs */}
-                <StepItem 
-                    icon={<IconFileCross />} 
-                    label="Missing Documents" 
-                    status={isAllUploaded ? 'success' : 'error'} 
-                />
-
+                <StepItem icon={<IconFileCross />} label="Missing Documents" status={isAllUploaded ? 'success' : 'error'} />
                 <StepConnector status={isAllUploaded ? 'active' : 'pending'} />
-
-                {/* Step 2: Waiting for approval */}
-                <StepItem 
-                    icon={<IconFileClock />} 
-                    label="Waiting for approval" 
-                    status={isAllUploaded ? 'active' : 'pending'} 
-                />
-
+                <StepItem icon={<IconFileClock />} label="Waiting for approval" status={isAllUploaded ? 'active' : 'pending'} />
                 <StepConnector status="pending" />
-
-                {/* Step 3: Ready */}
-                <StepItem 
-                    icon={<IconCheckCircle />} 
-                    label="Ready to schedule" 
-                    status="pending" 
-                />
-
+                <StepItem icon={<IconCheckCircle />} label="Ready to schedule" status="pending" />
             </div>
         </div>
 
-        {/* 3. DOCUMENT STATUS CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             
-            {/* LEFT: UPLOADED DOCUMENTS */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                     <h2 className="font-bold text-gray-800 text-lg">Uploaded Documents</h2>
@@ -160,7 +122,6 @@ const StaffDocumentReview = () => {
                 </div>
             </div>
 
-            {/* RIGHT: MISSING DOCUMENTS */}
             <div className="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden">
                 <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center justify-between">
                     <h2 className="font-bold text-red-700 text-lg">Missing Documents</h2>
@@ -186,12 +147,10 @@ const StaffDocumentReview = () => {
 
         </div>
 
-        {/* 5. ACTION BUTTONS */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-             {/* Approve Button */}
              <button 
                 onClick={handleApprove}
-                disabled={!isAllUploaded} // Disable if docs are missing!
+                disabled={!isAllUploaded} 
                 className={`w-full sm:w-auto min-w-[200px] px-8 py-3 rounded-lg shadow-md transition font-bold text-lg flex items-center justify-center gap-2
                     ${isAllUploaded ? 'bg-[#FE5C00] hover:bg-orange-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
              >
@@ -199,7 +158,6 @@ const StaffDocumentReview = () => {
                 Approve
             </button>
 
-            {/* Send Message Button (Links to Inbox with ClientID) */}
             <Link to={`/staff-inbox/${clientId}`} className="w-full sm:w-auto">
                 <button className="w-full min-w-[200px] bg-white hover:bg-gray-50 text-[#FE5C00] border-2 border-[#FE5C00] px-8 py-3 rounded-lg shadow-sm transition font-bold text-lg flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
@@ -214,8 +172,6 @@ const StaffDocumentReview = () => {
   );
 };
 
-/* --- SUB-COMPONENTS --- */
-
 const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) => {
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -224,27 +180,21 @@ const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) =>
         setIsDownloading(true);
         
         try {
-            // 🚨 FIX 2: Use native 'fetch' instead of 'api.get' so Axios doesn't sneak '/api' into our URL!
-            const response = await fetch(downloadUrl);
+            // 🚨 FIX 2: Use Axios to inherit the safe proxy baseURL
+            const response = await api.get(downloadUrl, { responseType: 'blob' });
             
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}`);
+            // Strictly prevent saving a 404 HTML error page as a PDF
+            if (response.data.type && response.data.type.includes('text/html')) {
+                throw new Error("Received HTML instead of file data. The file is missing from the server.");
             }
 
-            // Convert the raw data to a blob
-            const blob = await response.blob();
-            
-            // Create a secure URL for the raw file data
-            const blobUrl = window.URL.createObjectURL(blob);
-            
-            // Generate a hidden anchor tag to trigger the local download
+            const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = blobUrl;
             link.setAttribute('download', doc.originalName || doc.name || 'document.pdf');
             document.body.appendChild(link);
             link.click();
             
-            // Clean up memory
             link.parentNode?.removeChild(link);
             window.URL.revokeObjectURL(blobUrl);
         } catch (error) {
@@ -280,7 +230,7 @@ const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) =>
 };
 
 const StepItem = ({ icon, label, status }: { icon: React.ReactNode, label: string, status: 'active' | 'pending' | 'error' | 'success' }) => {
-    let circleColor = "bg-gray-200 text-gray-400"; // pending
+    let circleColor = "bg-gray-200 text-gray-400";
     let textColor = "text-gray-400";
 
     if (status === 'active') {
@@ -308,7 +258,6 @@ const StepConnector = ({ status }: { status: 'active' | 'pending' }) => (
     <div className={`hidden md:block flex-1 h-1 mx-2 -mt-8 rounded-full ${status === 'active' ? 'bg-black' : 'bg-gray-200'}`} />
 );
 
-/* --- ICONS --- */
 const IconFileCross = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

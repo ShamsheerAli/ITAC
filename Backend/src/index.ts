@@ -44,6 +44,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/leads', leadRoutes);
+// Add these near your other app.use() middleware
+app.use('/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads'));
 
 // 1. Test Route
 app.get('/', (req: Request, res: Response) => {
