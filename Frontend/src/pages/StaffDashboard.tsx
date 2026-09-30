@@ -202,7 +202,7 @@ const StaffDashboard = () => {
             <div className="grid grid-cols-2 gap-6 w-full px-4">
                 <StatBox label="New Inquiries" count={clients.filter(c => c.status === 'New Inquiry').length} color="bg-blue-100" />
                 <StatBox label="Awaiting documents" count={clients.filter(c => c.status === 'Awaiting Documents').length} color="bg-red-100" />
-                <StatBox label="Approved" count={clients.filter(c => c.status === 'Approved').length} color="bg-green-100" />
+                <StatBox label="Ready for audit" count={clients.filter(c => c.status === 'Ready for audit').length} color="bg-green-100" />
                 <StatBox label="Total" count={clients.length} color="bg-gray-100" />
             </div>
 
