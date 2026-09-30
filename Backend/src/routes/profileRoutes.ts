@@ -144,7 +144,11 @@ router.put('/status/:id', async (req: Request, res: Response): Promise<void> => 
 
     // 4. THE MAGIC: Check if we just moved them to the approval/document phase!
     // We check `existingProfile.status !== status` so we don't spam them if the staff just updates the service type later!
-    const isNewlyApproved = (status === 'Awaiting Documents' || status === 'Ready for audit') && existingProfile.status !== status;
+    const isNewlyApproved = (
+      status === 'Approved' ||
+      status === 'Awaiting Documents' ||
+      status === 'Ready for audit'
+    ) && existingProfile.status !== status;
 
     if (isNewlyApproved && updatedProfile && updatedProfile.user) {
         // Extract the user's data safely
@@ -454,9 +458,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
 // @desc    Get staff profile
 router.get('/staff/:userId', async (req, res) => {
   try {
-    // Assuming your profile links to the user via a 'userId' or 'user' field. 
-    // If your DB uses _id for this, change it to findById(req.params.userId)
-    const profile = await ClientProfile.findById(req.params.userId);
+    const profile = await ClientProfile.findOne({ user: req.params.userId });
     res.json(profile);
   } catch (err) {
     res.status(500).json({ message: "Server error fetching staff profile" });
@@ -467,10 +469,10 @@ router.get('/staff/:userId', async (req, res) => {
 // @desc    Update staff profile (Bypasses email triggers and forces creation)
 router.put('/staff/:userId', async (req, res) => {
   try {
-    const updatedProfile = await ClientProfile.findByIdAndUpdate(
-      req.params.userId,
-      { $set: req.body },
-      { new: true, upsert: true }
+    const updatedProfile = await ClientProfile.findOneAndUpdate(
+      { user: req.params.userId },
+      { $set: { ...req.body, user: req.params.userId } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
     );
     res.json(updatedProfile);
   } catch (err) {
@@ -483,8 +485,11 @@ router.put('/staff/:userId', async (req, res) => {
 // @desc    PERMANENTLY delete a client from the database
 router.delete('/:id', async (req, res) => {
   try {
-    // findByIdAndDelete completely wipes the record from your MongoDB collection
-    const deletedClient = await ClientProfile.findByIdAndDelete(req.params.id); 
+    let deletedClient = await ClientProfile.findByIdAndDelete(req.params.id);
+
+    if (!deletedClient) {
+      deletedClient = await ClientProfile.findOneAndDelete({ user: req.params.id });
+    }
     
     if (!deletedClient) {
       return res.status(404).json({ message: 'Client not found' });
