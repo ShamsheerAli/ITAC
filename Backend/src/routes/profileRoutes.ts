@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import ClientProfile from '../models/ClientProfile';
 import { upload } from '../middleware/uploadMiddleware'; // Ensure this path is correct
@@ -6,6 +6,31 @@ import User from '../models/User';
 import { sendNewInquiryEmail, sendClientApprovalEmail, sendDocumentUploadEmail, sendAuditDatesProposedEmail, sendAuditDateSelectedEmail, sendAuditConfirmedEmail } from '../utils/mailer';
 
 const router = express.Router();
+
+// Lightweight in-memory limiter for sensitive profile mutation/read routes.
+const routeRateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const withSimpleRateLimit = (routeKey: string, limit: number, windowMs: number) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const key = `${routeKey}:${req.ip || 'unknown'}`;
+    const now = Date.now();
+    const existing = routeRateLimitStore.get(key);
+
+    if (!existing || now > existing.resetAt) {
+      routeRateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+      next();
+      return;
+    }
+
+    if (existing.count >= limit) {
+      res.status(429).json({ message: 'Too many requests. Please try again shortly.' });
+      return;
+    }
+
+    existing.count += 1;
+    routeRateLimitStore.set(key, existing);
+    next();
+  };
+};
 
 // =========================================================================
 // 1. SPECIFIC ROUTES (MUST BE AT THE TOP)
@@ -456,9 +481,17 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
 
 // @route   GET /api/profile/staff/:userId
 // @desc    Get staff profile
-router.get('/staff/:userId', async (req, res) => {
+router.get('/staff/:userId', withSimpleRateLimit('profile_staff_get', 60, 60_000), async (req, res) => {
   try {
-    const profile = await ClientProfile.findOne({ user: req.params.userId });
+    const rawUserId = req.params.userId;
+    const userId = typeof rawUserId === 'string' ? rawUserId : '';
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const profile = await ClientProfile.findOne({ user: userObjectId });
     res.json(profile);
   } catch (err) {
     res.status(500).json({ message: "Server error fetching staff profile" });
@@ -467,11 +500,27 @@ router.get('/staff/:userId', async (req, res) => {
 
 // @route   PUT /api/profile/staff/:userId
 // @desc    Update staff profile (Bypasses email triggers and forces creation)
-router.put('/staff/:userId', async (req, res) => {
+router.put('/staff/:userId', withSimpleRateLimit('profile_staff_put', 30, 60_000), async (req, res) => {
   try {
+    const rawUserId = req.params.userId;
+    const userId = typeof rawUserId === 'string' ? rawUserId : '';
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const allowedUpdates = ['contactName', 'position', 'contactPhone', 'linkedIn', 'facebook'];
+    const sanitizedUpdates = allowedUpdates.reduce((acc: Record<string, any>, key) => {
+      if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+        acc[key] = req.body[key];
+      }
+      return acc;
+    }, {});
+
     const updatedProfile = await ClientProfile.findOneAndUpdate(
-      { user: req.params.userId },
-      { $set: { ...req.body, user: req.params.userId } },
+      { user: userObjectId },
+      { $set: { ...sanitizedUpdates, user: userObjectId } },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
     res.json(updatedProfile);
@@ -483,12 +532,20 @@ router.put('/staff/:userId', async (req, res) => {
 
 // @route   DELETE /api/profile/:id  <-- Adjust this path if your archived clients are stored elsewhere
 // @desc    PERMANENTLY delete a client from the database
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', withSimpleRateLimit('profile_delete', 20, 60_000), async (req, res) => {
   try {
-    let deletedClient = await ClientProfile.findByIdAndDelete(req.params.id);
+    const rawId = req.params.id;
+    const id = typeof rawId === 'string' ? rawId : '';
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid id" });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(id);
+    let deletedClient = await ClientProfile.findByIdAndDelete(objectId);
 
     if (!deletedClient) {
-      deletedClient = await ClientProfile.findOneAndDelete({ user: req.params.id });
+      deletedClient = await ClientProfile.findOneAndDelete({ user: objectId });
     }
     
     if (!deletedClient) {
