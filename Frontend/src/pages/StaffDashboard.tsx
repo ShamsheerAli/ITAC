@@ -48,7 +48,6 @@ const StaffDashboard = () => {
         try {
             await new Promise(resolve => setTimeout(resolve, 600)); 
             
-            // 🚨 FIX 1: Added User-Agent header so OpenStreetMap doesn't block the request!
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(fullAddress)}`,
                 { headers: { 'User-Agent': 'ITAC-Dashboard-App/1.0' } }
@@ -94,16 +93,13 @@ const StaffDashboard = () => {
             const addressParts = [profile.streetAddress, profile.city, profile.state, profile.zipCode].filter(Boolean);
             const fullAddress = addressParts.join(', ');
 
-            // 1. Try to find the exact address
             let realLocation = await getCoordinates(fullAddress);
 
-            // 🚨 FIX 2: If the exact street fails, try just the City and State!
             if (!realLocation && profile.city) {
                 const cityFallback = [profile.city, profile.state].filter(Boolean).join(', ');
                 realLocation = await getCoordinates(cityFallback);
             }
 
-            // 3. If it STILL fails (blank address), drop them in Stillwater
             const finalLocation = realLocation || { 
                 lat: 36.1156 + (Math.random() - 0.5) * 0.1, 
                 lng: -97.0584 + (Math.random() - 0.5) * 0.1 
@@ -166,9 +162,10 @@ const StaffDashboard = () => {
                scrollWheelZoom={false}
                className="w-full h-full min-h-[380px]"
            >
+                {/* 🚨 FIX: Switched to Esri World Street Map - No API key needed, never blocks! */}
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
                 />
                 {clients.map((client) => {
                     const hasUnread = unreadMessages.some(msg => msg.clientUserId === client.id);

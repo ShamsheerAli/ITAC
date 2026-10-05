@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "../api/axios"; // 🚨 Ensure this import path is correct!
+import api from "../api/axios";
 
 // --- ICONS ---
 const IconDashboard = () => (
@@ -13,7 +13,6 @@ const IconKanban = () => (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
     </svg>
 );
-// 🚨 NEW ICON: Users group representing Leads
 const IconLeads = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -22,11 +21,6 @@ const IconLeads = () => (
 const IconInbox = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-);
-const IconInfo = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
 );
 const IconAddClient = () => (
@@ -45,6 +39,16 @@ const StaffLayout = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("/staff-dashboard");
   const [unreadCount, setUnreadCount] = useState(0); 
+  const [staffEmail, setStaffEmail] = useState("");
+
+  // Retrieve user email on load
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setStaffEmail(user.email || "Staff Member");
+    }
+  }, []);
 
   // Track active tab
   useEffect(() => {
@@ -79,8 +83,7 @@ const StaffLayout = () => {
     const path = location.pathname;
     if (path.includes('/staff-dashboard')) return 'Dashboard';
     if (path.includes('/staff-kanban')) return 'Client Progress Board';
-    if (path.includes('/staff-leads')) return 'Potential Clients & Leads'; // 🚨 NEW TITLE LOGIC
-    if (path.includes('/staff-info')) return 'My Information';
+    if (path.includes('/staff-leads')) return 'Potential Clients & Leads';
     if (path.includes('/add-new-client')) return 'Add New Client';
     if (path.includes('/staff-client-review')) return 'Client Review';
     if (path.includes('/staff-document-review')) return 'Document Review';
@@ -111,28 +114,18 @@ const StaffLayout = () => {
                 icon={<IconKanban />} 
                 active={activeTab === "/staff-kanban"} 
             />
-
-            {/* 🚨 THE NEW LEADS TAB */}
             <SidebarItem 
                 to="/staff-leads" 
                 label="Potential Leads" 
                 icon={<IconLeads />} 
                 active={activeTab.includes("/staff-leads")} 
             />
-            
             <SidebarItem 
                 to="/staff-inbox" 
                 label="Inbox" 
                 icon={<IconInbox />} 
                 active={activeTab.includes("/staff-inbox")} 
                 badge={unreadCount} 
-            />
-
-            <SidebarItem 
-                to="/staff-info" 
-                label="My Information" 
-                icon={<IconInfo />} 
-                active={activeTab === "/staff-info"} 
             />
              <SidebarItem 
                 to="/add-new-client" 
@@ -146,21 +139,26 @@ const StaffLayout = () => {
       {/* ================= MAIN CONTENT AREA ================= */}
       <div className="flex-1 flex flex-col">
         
-        {/* ⭐ TOP BAR (Page Title + Logout) ⭐ */}
+        {/* ⭐ TOP BAR (Page Title + Staff Email + Logout) ⭐ */}
         <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 shadow-sm">
             {/* Page Title */}
             <h2 className="text-xl font-bold text-gray-800">
                 {getPageTitle()}
             </h2>
 
-            {/* Logout Button */}
-            <button 
-                onClick={handleLogout}
-                className="flex items-center text-gray-500 hover:text-red-600 font-medium transition duration-200"
-            >
-                <IconLogout />
-                Logout
-            </button>
+            {/* User Info & Logout Button */}
+            <div className="flex items-center gap-6">
+                <span className="text-sm font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                    {staffEmail}
+                </span>
+                <button 
+                    onClick={handleLogout}
+                    className="flex items-center text-gray-500 hover:text-red-600 font-medium transition duration-200"
+                >
+                    <IconLogout />
+                    Logout
+                </button>
+            </div>
         </header>
 
         {/* PAGE CONTENT */}

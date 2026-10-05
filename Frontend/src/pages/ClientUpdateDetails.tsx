@@ -14,6 +14,7 @@ const UpdateDetails = () => {
     companyName: '',
     contactName: '',
     contactEmail: '',
+    secondaryEmail: '',
     contactPhone: '',
     streetAddress: '',
     city: '',
@@ -50,6 +51,7 @@ const UpdateDetails = () => {
             companyName: res.data.companyName || '',
             contactName: res.data.contactName || user.name, 
             contactEmail: res.data.contactEmail || user.email,
+            secondaryEmail: res.data.secondaryEmail || '',
             contactPhone: res.data.contactPhone || '',
             streetAddress: res.data.streetAddress || '',
             city: res.data.city || '',
@@ -137,6 +139,10 @@ const UpdateDetails = () => {
             <div>
                 <label className="block text-sm font-bold mb-1">Contact Email:<RequiredStar /></label>
                 <input required type="email" name="contactEmail" value={formData.contactEmail} onChange={handleChange} className="w-full border p-2 rounded bg-gray-100" readOnly />
+            </div>
+            <div>
+                <label className="block text-sm font-bold mb-1">Secondary Email:</label>
+                <input type="email" name="secondaryEmail" value={formData.secondaryEmail} onChange={handleChange} className="w-full border p-2 rounded" placeholder="Optional backup email" />
             </div>
             <div>
                 <label className="block text-sm font-bold mb-1">Contact Phone:<RequiredStar /></label>

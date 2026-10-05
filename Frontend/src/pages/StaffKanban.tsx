@@ -30,6 +30,11 @@ const IconReject = () => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
     </svg>
 );
+const IconPlus = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+);
 
 // --- COLUMN CONFIGURATION ---
 const columnsFromBackend = {
@@ -46,13 +51,21 @@ const StaffKanban = () => {
   const [loading, setLoading] = useState(true);
   const [totalClients, setTotalClients] = useState(0);
 
+  // --- NEW CLIENT MODAL STATE ---
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newClientData, setNewClientData] = useState({
+      name: '',
+      email: '',
+      companyName: ''
+  });
+
   // --- HELPER: Calculate Days in Stage ---
   const getDaysInStage = (dateString: string) => {
       if (!dateString) return 'Today';
       const updatedDate = new Date(dateString);
       const today = new Date();
       
-      // Reset times to midnight to get accurate full-day differences
       updatedDate.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
       
@@ -65,57 +78,56 @@ const StaffKanban = () => {
   };
 
   // --- 1. Fetch Clients and Sort ---
+  const fetchData = async () => {
+    try {
+      const res = await api.get('/profile/admin/all');
+      const allClients = res.data;
+      
+      // FILTER OUT ARCHIVED CLIENTS
+      const activeClients = allClients.filter((client: any) => {
+       const role = client.user?.role;
+       return !client.isArchived && role !== 'staff' && role !== 'admin';
+      });
+      
+      setTotalClients(activeClients.length);
+      
+      const newColumns: any = JSON.parse(JSON.stringify(columnsFromBackend));
+
+      activeClients.forEach((client: any) => {
+         let status = client.status || 'New Inquiry';
+         if (status === 'Approved' || status === 'Documents Submitted' || status === 'Documents Uploaded') {
+             status = 'Awaiting Documents';
+         }
+         if (!newColumns[status]) status = 'New Inquiry';
+         newColumns[status].items.push(client);
+      });
+
+      setColumns(newColumns);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to load Progress data", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get('/profile/admin/all');
-        const allClients = res.data;
-        
-        // FILTER OUT ARCHIVED CLIENTS
-        const activeClients = allClients.filter((client: any) => {
-         const role = client.user?.role;
-        return !client.isArchived && role !== 'staff' && role !== 'admin';
-        });
-        
-        setTotalClients(activeClients.length);
-        
-        const newColumns: any = JSON.parse(JSON.stringify(columnsFromBackend));
-
-        activeClients.forEach((client: any) => {
-           let status = client.status || 'New Inquiry';
-           if (status === 'Approved' || status === 'Documents Submitted' || status === 'Documents Uploaded') {
-               status = 'Awaiting Documents';
-           }
-           if (!newColumns[status]) status = 'New Inquiry';
-           newColumns[status].items.push(client);
-        });
-
-        setColumns(newColumns);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to load Progress data", err);
-      }
-    };
     fetchData();
   }, []);
 
   // --- 2. Reject & Archive Logic ---
   const handleReject = async (e: React.MouseEvent, profile: any, columnId: string, index: number) => {
-      e.stopPropagation(); // Prevents clicking the card from navigating to the review page
+      e.stopPropagation(); 
       
       if (!window.confirm(`Are you sure you want to reject and archive ${profile.companyName}?`)) return;
 
       try {
-          // Pass the User ID to match our backend route { user: id }
           const userId = profile.user?._id || profile.user;
           await api.put(`/profile/${userId}/archive`);
 
-          // Remove the card from the board locally
           const newColumns: any = { ...columns };
           newColumns[columnId].items.splice(index, 1);
           
           setColumns(newColumns);
-          setTotalClients(prev => prev - 1); // Decrease the total count
+          setTotalClients(prev => prev - 1); 
       } catch (err) {
           console.error("Failed to reject client", err);
           alert("Failed to reject and archive client.");
@@ -164,10 +176,34 @@ const StaffKanban = () => {
     }
   };
 
+  // --- 4. Handle Add New Client Submission ---
+  const handleAddClientSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+
+      try {
+          // 🚨 Calling the new backend route to handle user creation & email
+          await api.post('/profile/admin/manual-create', newClientData);
+          
+          alert(`Client created successfully! An invitation email has been sent to ${newClientData.email}.`);
+          
+          setIsAddModalOpen(false);
+          setNewClientData({ name: '', email: '', companyName: '' });
+          
+          // Refresh the board to show the new client in "New Inquiry"
+          fetchData();
+      } catch (err: any) {
+          console.error("Failed to add client", err);
+          alert(err.response?.data?.message || "Failed to create client. Please check the server logs.");
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
   if(loading) return <div className="p-10 text-center">Loading Board...</div>;
 
   return (
-    <div className="min-h-screen bg-white p-6 font-sans">
+    <div className="min-h-screen bg-white p-6 font-sans relative">
       
       {/* HEADER */}
       <div className="text-center mb-6">
@@ -189,19 +225,13 @@ const StaffKanban = () => {
             </div>
 
             <div className="flex items-center gap-3 w-full md:w-auto">
-                <div className="relative flex-1 md:w-64">
-                    <span className="absolute left-3 top-2.5"><IconSearch /></span>
-                    <input 
-                        type="text" 
-                        placeholder="Search Company name or Id" 
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-[#FE5C00]"
-                    />
-                </div>
-                <button className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 text-sm font-medium text-gray-700">
-                    <IconFilter /> Filter
-                </button>
-                <button className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 text-sm font-medium text-gray-700">
-                    <IconSort /> Sort
+                
+                {/* 🚨 ADD CLIENT BUTTON */}
+                <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="flex items-center px-4 py-2 bg-[#FE5C00] text-white rounded-md hover:bg-orange-700 text-sm font-bold shadow-sm transition whitespace-nowrap"
+                >
+                    <IconPlus /> Add Client
                 </button>
             </div>
         </div>
@@ -211,7 +241,6 @@ const StaffKanban = () => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="grid grid-cols-5 min-w-[1000px] divide-x divide-gray-200">
                     
-                    {/* COLUMNS */}
                     {Object.entries(columns).map(([columnId, column]) => (
                         <div key={columnId} className="flex flex-col min-h-[600px]">
                             
@@ -234,15 +263,15 @@ const StaffKanban = () => {
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         onClick={() => {
-                                                            // Check if the current column is "Awaiting Documents"
                                                             if (column.name === 'Awaiting Documents') {
                                                                 navigate(`/staff-document-review/${item._id}`);
                                                             } else if (column.name === 'Ready for audit') {
-                                                                 navigate(`/staff-audit-scheduling/${item._id}`); // <-- NEW ROUTE
+                                                                 navigate(`/staff-audit-scheduling/${item._id}`);
                                                             } else if (column.name === 'Audit Scheduled') {
-                                                                navigate(`/staff-audit-confirmation/${item._id}`); // <-- NEW ROUTE
-                                                            } 
-                                                             else {
+                                                                navigate(`/staff-audit-confirmation/${item._id}`);
+                                                            } else if (column.name === 'Report writing') {          
+                                                                navigate(`/staff-report-writing/${item._id}`);
+                                                            } else {
                                                                 navigate(`/staff-client-review/${item._id}`);
                                                             }
                                                         }}
@@ -254,49 +283,39 @@ const StaffKanban = () => {
                                                         <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 ${column.color}`}></div>
                                                         
                                                         {/* Content */}
-        <div className="flex-1 min-w-0 pr-6">
-            <p className="text-xs font-bold text-gray-700 truncate">
-                {item.companyName}
-            </p>
-            <div className="flex items-center text-[10px] text-gray-400 mt-1 gap-2">
-                <span className="flex items-center gap-1 font-medium" title="Time spent in this stage">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {/* Fallback to createdAt if statusUpdatedAt doesn't exist yet */}
-                {getDaysInStage(item.statusUpdatedAt || item.createdAt)}
-            </span>
-                
-                {/* --- UX FIX: INLINE RED NOTIFICATION BADGE --- */}
-                {(
-                    // Condition 1: New Inquiry AND no service assigned yet (NEEDS STAFF REVIEW)
-                    (item.status === 'New Inquiry' && !item.serviceType) ||
+                                                        <div className="flex-1 min-w-0 pr-6">
+                                                            <p className="text-xs font-bold text-gray-700 truncate">
+                                                                {item.companyName}
+                                                            </p>
+                                                            <div className="flex items-center text-[10px] text-gray-400 mt-1 gap-2">
+                                                                <span className="flex items-center gap-1 font-medium" title="Time spent in this stage">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    {getDaysInStage(item.statusUpdatedAt || item.createdAt)}
+                                                                </span>
+                                                                
+                                                                {/* Alerts */}
+                                                                {(
+                                                                    (item.status === 'New Inquiry' && !item.serviceType) ||
+                                                                    (item.status === 'Awaiting Documents' && item.documents?.length > 0) ||
+                                                                    (item.status === 'Ready for audit' && (!item.proposedAuditDates || item.proposedAuditDates.filter((d: string) => d && d.trim() !== '').length === 0)) ||
+                                                                    (item.status === 'Audit Scheduled' && !item.isAuditConfirmed)
+                                                                ) && (
+                                                                    <span className="relative flex h-2.5 w-2.5 ml-2" title="Action Required">
+                                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                                                    </span>
+                                                                )}
 
-                    // Condition 2: Awaiting Documents AND client uploaded files
-                    (item.status === 'Awaiting Documents' && item.documents?.length > 0) ||
-                    
-                    // Condition 3: Ready for Audit AND no valid dates have been proposed
-                    (item.status === 'Ready for audit' && (!item.proposedAuditDates || item.proposedAuditDates.filter((d: string) => d && d.trim() !== '').length === 0)) ||
-                    
-                    // Condition 4: Audit Scheduled AND staff hasn't officially confirmed the date yet
-                    (item.status === 'Audit Scheduled' && !item.isAuditConfirmed)
-                ) && (
-                    <span className="relative flex h-2.5 w-2.5 ml-2" title="Action Required">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                    </span>
-                )}
+                                                                {item.status === 'Audit Scheduled' && item.confirmedAuditDate && (
+                                                                    <span className="text-[#FE5C00] font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
+                                                                        {item.confirmedAuditDate.replace('Client Proposed: ', '').replace('Staff Proposed: ', '')}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
 
-                {/* SHOW DATE IF AUDIT IS SCHEDULED */}
-                {item.status === 'Audit Scheduled' && item.confirmedAuditDate && (
-                    <span className="text-[#FE5C00] font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
-                        {item.confirmedAuditDate.replace('Client Proposed: ', '').replace('Staff Proposed: ', '')}
-                    </span>
-                )}
-            </div>
-        </div>
-
-                                                        {/* REJECT/ARCHIVE BUTTON */}
                                                         <button
                                                             onClick={(e) => handleReject(e, item, columnId, index)}
                                                             className="absolute top-2 right-2 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
@@ -328,8 +347,83 @@ const StaffKanban = () => {
                 Save
             </button>
         </div>
-
       </div>
+
+      {/* 🚨 NEW CLIENT MODAL OVERLAY */}
+      {isAddModalOpen && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+                  
+                  <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                      <h2 className="text-xl font-bold text-gray-800">Add New Active Client</h2>
+                      <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:text-red-500 transition">
+                          <IconReject />
+                      </button>
+                  </div>
+
+                  <form onSubmit={handleAddClientSubmit} className="p-6 space-y-4">
+                      <p className="text-sm text-gray-500 mb-4">
+                          Creating a client here will immediately place them on the progress board and send an email inviting them to set up their portal password.
+                      </p>
+
+                      <div>
+                          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Company Name *</label>
+                          <input 
+                              type="text" 
+                              required
+                              value={newClientData.companyName}
+                              onChange={(e) => setNewClientData({...newClientData, companyName: e.target.value})}
+                              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#FE5C00] focus:ring-1 focus:ring-[#FE5C00]"
+                              placeholder="e.g. Acme Industries"
+                          />
+                      </div>
+
+                      <div>
+                          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Primary Contact Name *</label>
+                          <input 
+                              type="text" 
+                              required
+                              value={newClientData.name}
+                              onChange={(e) => setNewClientData({...newClientData, name: e.target.value})}
+                              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#FE5C00] focus:ring-1 focus:ring-[#FE5C00]"
+                              placeholder="e.g. Jane Doe"
+                          />
+                      </div>
+
+                      <div>
+                          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Contact Email *</label>
+                          <input 
+                              type="email" 
+                              required
+                              value={newClientData.email}
+                              onChange={(e) => setNewClientData({...newClientData, email: e.target.value})}
+                              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#FE5C00] focus:ring-1 focus:ring-[#FE5C00]"
+                              placeholder="jane.doe@acme.com"
+                          />
+                      </div>
+
+                      <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                          <button 
+                              type="button" 
+                              onClick={() => setIsAddModalOpen(false)}
+                              className="px-6 py-2 rounded text-gray-600 hover:bg-gray-100 font-bold transition"
+                          >
+                              Cancel
+                          </button>
+                          <button 
+                              type="submit" 
+                              disabled={isSubmitting}
+                              className={`px-8 py-2 rounded text-white font-bold transition flex items-center gap-2 shadow-sm
+                                  ${isSubmitting ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#FE5C00] hover:bg-orange-700'}`}
+                          >
+                              {isSubmitting ? 'Creating...' : 'Create Client'}
+                          </button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      )}
+
     </div>
   );
 };

@@ -31,6 +31,7 @@ import StaffAuditConfirmation from './pages/StaffAuditConfirmation';
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
 import StaffPotentialClients from './pages/StaffPotentialClients'
+import StaffReportWriting from './pages/StaffReportWriting'
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
           <Route path="/staff-audit-scheduling/:clientId" element={<StaffAuditScheduling />} />
           <Route path="/staff-audit-confirmation/:clientId" element={<StaffAuditConfirmation />} />
           <Route path="/staff-leads" element={<StaffPotentialClients />} />
+          <Route path="/staff-report-writing/:clientId" element={<StaffReportWriting />}  />
         </Route>
 
       </Routes>

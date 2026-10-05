@@ -1,5 +1,7 @@
 import express from 'express';
 import Message from '../models/Message';
+import User from '../models/User';
+import nodemailer from 'nodemailer';
 import ClientProfile from '../models/ClientProfile'; // Added this to fetch company names
 
 const router = express.Router();
@@ -132,6 +134,62 @@ router.post('/:clientUserId', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Error sending message" });
   }
+});
+
+// @route   POST /api/messages/admin/broadcast
+// @desc    Email all client users via BCC
+router.post('/admin/broadcast', async (req, res) => {
+    try {
+        const { subject, message } = req.body;
+
+        if (!subject || !message) {
+            return res.status(400).json({ message: "Subject and message are required." });
+        }
+
+        // 1. Fetch all users who have the 'client' role
+        const clients = await User.find({ role: 'client' });
+        
+        // Extract their emails into a flat array
+        const clientEmails = clients.map(client => client.email).filter(Boolean);
+
+        if (clientEmails.length === 0) {
+            return res.status(404).json({ message: "No clients found to broadcast to." });
+        }
+
+        // 2. Configure Nodemailer transport
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', 
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS // The app password you generated earlier!
+            }
+        });
+
+        // 3. Send the Broadcast Email
+        await transporter.sendMail({
+            from: '"OSU ITAC" <noreply@energyhub.okstate.edu>',
+            bcc: clientEmails, // 🚨 CRITICAL: Use BCC so clients don't see each other's emails
+            subject: subject,
+            text: message, // Fallback plain text
+            html: `
+                <div style="font-family: Arial, sans-serif; max-w: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #FE5C00;">ITAC Portal Announcement</h2>
+                    <p style="white-space: pre-wrap;">${message}</p>
+                    <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+                    <p style="font-size: 12px; color: #888;">
+                        This is an automated message from the OSU Industrial Training and Assessment Center. 
+                        Please log in to your <a href="http://energyhub.okstate.edu/login" style="color: #FE5C00;">dashboard</a> for more details.
+                    </p>
+                </div>
+            `
+        });
+
+        res.status(200).json({ message: "Broadcast sent successfully!" });
+
+    } catch (error) {
+        console.error("Broadcast error:", error);
+        res.status(500).json({ message: "Failed to send broadcast email." });
+    }
 });
 
 export default router;

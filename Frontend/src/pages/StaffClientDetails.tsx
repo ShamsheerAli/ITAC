@@ -82,6 +82,10 @@ const StaffClientDetails = () => {
               <p className="font-medium text-gray-800">{clientData.contactEmail || 'N/A'}</p>
             </div>
             <div>
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Secondary Email</p>
+              <p className="font-medium text-gray-800">{clientData.secondaryEmail || 'Not Provided'}</p>
+            </div>
+            <div>
               <p className="text-xs text-gray-400 font-bold uppercase mb-1">Phone</p>
               <p className="font-medium text-gray-800">{clientData.contactPhone || 'N/A'}</p>
             </div>

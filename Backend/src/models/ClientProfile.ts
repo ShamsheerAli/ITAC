@@ -5,6 +5,7 @@ export interface IClientProfile extends Document {
   companyName: string;
   contactName: string;
   contactEmail: string;
+  secondaryEmail: string;
   contactPhone: string;
   streetAddress: string;
   city: string;
@@ -26,6 +27,12 @@ export interface IClientProfile extends Document {
     path: string;
     uploadedAt: Date;
   }[];
+  auditFiles?: Array<{
+      name: string;
+      originalName: string;
+      path: string;
+      uploadedAt: Date;
+  }>;
   serviceType: string;
   naturalGasProvider: string;
   electricityProvider: string;
@@ -42,6 +49,7 @@ const ClientProfileSchema: Schema = new Schema({
   companyName: { type: String },
   contactName: { type: String },
   contactEmail: { type: String },
+  secondaryEmail: { type: String },
   contactPhone: { type: String },
   streetAddress: { type: String },
   city: { type: String },
@@ -65,6 +73,12 @@ const ClientProfileSchema: Schema = new Schema({
       uploadedAt: { type: Date, default: Date.now }
     }
   ],
+  auditFiles: [{
+    name: { type: String },
+    originalName: { type: String },
+    path: { type: String },
+    uploadedAt: { type: Date, default: Date.now }
+  }],
   serviceType: { type: String, default: "" },
   naturalGasProvider: { type: String },
   electricityProvider: { type: String },

@@ -12,20 +12,46 @@ const StaffInbox = () => {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(clientId || null);
   const [clientName, setClientName] = useState("Select a Conversation");
   
+  // 🚨 NEW: Broadcast Modal State
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [broadcastSubject, setBroadcastSubject] = useState("");
+  const [broadcastText, setBroadcastText] = useState("");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 1. Fetch Conversations List (For the Left Panel)
+  // 1. Fetch Master List & Conversations
   const fetchConversations = async () => {
     try {
-      const res = await api.get('/messages/admin/conversations');
-      setConversations(res.data);
+      // 🚨 FIX 1: Fetch ALL profiles (for the list) AND Conversations (for unread counts) concurrently
+      const [profilesRes, convsRes] = await Promise.all([
+          api.get('/profile/admin/all'),
+          api.get('/messages/admin/conversations')
+      ]);
+
+      const allProfiles = profilesRes.data.filter((p: any) => p.user && p.user.role !== 'staff' && p.user.role !== 'admin');
+      const activeConvs = convsRes.data;
+
+      // Merge the data: Show all clients, but attach unread counts if they exist
+      const mergedList = allProfiles.map((profile: any) => {
+          const chatHistory = activeConvs.find((c: any) => c.profile && c.profile.user && c.profile.user._id === profile.user._id);
+          return {
+              profile: profile,
+              unreadCount: chatHistory ? chatHistory.unreadCount : 0,
+              lastMessage: chatHistory ? chatHistory.lastMessage : null
+          };
+      });
+
+      // Sort: Unread messages at the top, then alphabetically
+      mergedList.sort((a: any, b: any) => {
+          if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
+          return a.profile.companyName.localeCompare(b.profile.companyName);
+      });
+
+      setConversations(mergedList);
       
-      // 🚨 FIX 1: Filter out invalid conversations before auto-selecting
-      const validConvs = res.data.filter((c: any) => c && c.profile && c.profile.user);
-      
-      // Auto-select the first conversation if we just clicked "Inbox" with no specific ID
-      if (!selectedClientId && validConvs.length > 0 && !clientId) {
-        handleSelectConversation(validConvs[0].profile.user._id, validConvs[0].profile.companyName);
+      if (!selectedClientId && mergedList.length > 0 && !clientId) {
+        handleSelectConversation(mergedList[0].profile.user._id, mergedList[0].profile.companyName);
       }
     } catch (err) {
       console.error("Failed to fetch conversations", err);
@@ -34,7 +60,6 @@ const StaffInbox = () => {
 
   useEffect(() => {
     fetchConversations();
-    // Poll the inbox list every 15 seconds for new clients messaging us
     const interval = setInterval(fetchConversations, 15000);
     return () => clearInterval(interval);
   }, []);
@@ -48,12 +73,10 @@ const StaffInbox = () => {
         const res = await api.get(`/messages/${selectedClientId}`);
         setMessages(res.data);
         
-        // Clear the red dot!
         await api.put(`/messages/admin/mark-read/${selectedClientId}`);
         
-        // Instantly clear the red dot from our local sidebar list too
         setConversations(prev => prev.map(conv => 
-            (conv && conv.profile && conv.profile.user && conv.profile.user._id === selectedClientId) 
+            (conv.profile.user._id === selectedClientId) 
             ? { ...conv, unreadCount: 0 } 
             : conv
         ));
@@ -76,10 +99,10 @@ const StaffInbox = () => {
   const handleSelectConversation = (id: string, name: string) => {
     setSelectedClientId(id);
     setClientName(name);
-    navigate(`/staff-inbox/${id}`, { replace: true }); // Updates URL silently
+    navigate(`/staff-inbox/${id}`, { replace: true }); 
   };
 
-  // 5. Send Message Function
+  // 5. Send Direct Message Function
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!message.trim() || !selectedClientId) return;
@@ -94,17 +117,42 @@ const StaffInbox = () => {
         text: optimisticMessage.text
       });
       
-      fetchConversations(); // Refresh left panel to show our newest message
+      fetchConversations();
     } catch (err) {
       console.error("Failed to send", err);
       alert("Failed to send message. Please try again.");
     }
   };
 
+  // 🚨 NEW: 6. Broadcast Submit Function
+  const handleBroadcast = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if(!broadcastSubject.trim() || !broadcastText.trim()) return;
+      
+      if (!window.confirm(`Are you sure you want to email this to ALL ${conversations.length} clients?`)) return;
+
+      setIsBroadcasting(true);
+      try {
+          await api.post('/messages/admin/broadcast', {
+              subject: broadcastSubject,
+              message: broadcastText
+          });
+          alert("Broadcast sent successfully to all clients!");
+          setIsBroadcastOpen(false);
+          setBroadcastSubject("");
+          setBroadcastText("");
+      } catch(err) {
+          console.error("Broadcast failed", err);
+          alert("Failed to send broadcast.");
+      } finally {
+          setIsBroadcasting(false);
+      }
+  };
+
   return (
     <div className="w-full h-full flex flex-col relative bg-gray-50 min-h-[calc(100vh-100px)]">
       
-      {/* 1. HEADER & BREADCRUMBS */}
+      {/* HEADER & BREADCRUMBS */}
       <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center gap-3 shadow-sm">
         <Link to="/staff-dashboard" className="text-gray-500 hover:text-[#FE5C00] transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -117,51 +165,65 @@ const StaffInbox = () => {
         <span className="text-sm font-bold text-black">Inbox</span>
       </div>
 
-      {/* 2. INBOX CONTAINER (Split Layout) */}
-      <div className="flex-1 max-w-6xl w-full mx-auto px-6 py-8">
-        <div className="w-full h-[600px] flex bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* INBOX CONTAINER */}
+      <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+        <div className="w-full h-[600px] flex bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
         
-            {/* LEFT PANEL: Conversation List */}
+            {/* LEFT PANEL: Master Client List */}
             <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
-                <div className="p-4 border-b border-gray-200 bg-gray-50">
-                    <h2 className="text-lg font-bold text-black tracking-wide">Conversations</h2>
+                <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <h2 className="text-lg font-bold text-black tracking-wide">Client Directory</h2>
+                    {/* 🚨 NEW: Broadcast Button */}
+                    <button 
+                        onClick={() => setIsBroadcastOpen(true)}
+                        className="bg-[#FE5C00] text-white p-2 rounded-md hover:bg-orange-700 transition shadow-sm flex items-center gap-2 text-xs font-bold"
+                        title="Email All Clients"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                        Broadcast
+                    </button>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto">
                     {conversations.length === 0 ? (
-                        <p className="text-center text-gray-400 mt-10 p-4 text-sm">No messages yet.</p>
+                        <p className="text-center text-gray-400 mt-10 p-4 text-sm">No clients found.</p>
                     ) : (
-                        conversations
-                            // 🚨 FIX 2: Safely filter out nulls or deleted users before mapping
-                            .filter(conv => conv && conv.profile && conv.profile.user)
-                            .map((conv) => {
-                                const isActive = conv.profile.user._id === selectedClientId;
-                                return (
-                                    <div 
-                                        key={conv.profile.user._id}
-                                        onClick={() => handleSelectConversation(conv.profile.user._id, conv.profile.companyName)}
-                                        className={`p-4 border-b border-gray-100 cursor-pointer transition-colors flex justify-between items-center ${
-                                            isActive ? 'bg-orange-50 border-l-4 border-l-[#FE5C00]' : 'hover:bg-gray-50 border-l-4 border-l-transparent'
-                                        }`}
-                                    >
-                                        <div className="min-w-0 flex-1">
-                                            <h3 className="font-bold text-gray-900 truncate text-sm">{conv.profile.companyName}</h3>
-                                            <p className={`text-xs truncate mt-1 ${conv.unreadCount > 0 ? 'font-bold text-black' : 'text-gray-500'}`}>
-                                                {conv.lastMessage ? (
-                                                    conv.lastMessage.senderRole === 'staff' ? `You: ${conv.lastMessage.text}` : conv.lastMessage.text
-                                                ) : 'New Conversation'}
-                                            </p>
-                                        </div>
-                                        <div className="flex flex-col items-end justify-between ml-2 h-full">
-                                            {conv.unreadCount > 0 && (
-                                                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm mt-1">
-                                                    {conv.unreadCount}
-                                                </span>
-                                            )}
-                                        </div>
+                        conversations.map((conv) => {
+                            const isActive = conv.profile.user._id === selectedClientId;
+                            return (
+                                <div 
+                                    key={conv.profile.user._id}
+                                    onClick={() => handleSelectConversation(conv.profile.user._id, conv.profile.companyName)}
+                                    className={`p-4 border-b border-gray-100 cursor-pointer transition-colors flex justify-between items-center ${
+                                        isActive ? 'bg-orange-50 border-l-4 border-l-[#FE5C00]' : 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                                    }`}
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-bold text-gray-900 truncate text-sm flex items-center gap-2">
+                                            {conv.profile.companyName}
+                                            {conv.profile.isArchived && <span className="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">Archived</span>}
+                                        </h3>
+                                        {/* 🚨 NEW: Display Client Email */}
+                                        <p className="text-xs text-blue-600 truncate mb-1">{conv.profile.contactEmail}</p>
+                                        
+                                        <p className={`text-xs truncate ${conv.unreadCount > 0 ? 'font-bold text-black' : 'text-gray-500'}`}>
+                                            {conv.lastMessage ? (
+                                                conv.lastMessage.senderRole === 'staff' ? `You: ${conv.lastMessage.text}` : conv.lastMessage.text
+                                            ) : <span className="italic">No chat history</span>}
+                                        </p>
                                     </div>
-                                );
-                            })
+                                    <div className="flex flex-col items-end justify-between ml-2 h-full">
+                                        {conv.unreadCount > 0 && (
+                                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm mt-1">
+                                                {conv.unreadCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })
                     )}
                 </div>
             </div>
@@ -170,7 +232,6 @@ const StaffInbox = () => {
             <div className="w-2/3 flex flex-col">
                 {selectedClientId ? (
                     <>
-                        {/* CHAT HEADER */}
                         <div className="bg-[#FE5C00] px-6 py-4 flex items-center gap-4 shadow-sm z-10">
                             <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white flex items-center justify-center text-white font-bold overflow-hidden">
                                 <span>#</span>
@@ -180,33 +241,26 @@ const StaffInbox = () => {
                             </h2>
                         </div>
 
-                        {/* MESSAGES AREA */}
                         <div className="flex-1 bg-gray-50 p-6 overflow-y-auto space-y-4 flex flex-col">
                             <div className="text-center text-gray-400 text-sm mt-4 mb-6">
                                 Start of conversation with <span className="font-semibold text-gray-600">{clientName}</span>
                             </div>
                             
-                            {messages
-                                // 🚨 FIX 3: Safely filter out null messages before mapping
-                                .filter(msg => msg !== null)
-                                .map((msg) => {
-                                    const isMe = msg.senderRole === 'staff';
-                                    return (
-                                        <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                            <div className={`max-w-[75%] px-5 py-3 rounded-2xl text-[15px] shadow-sm ${
-                                                isMe 
-                                                ? 'bg-[#FE5C00] text-white rounded-br-sm' 
-                                                : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
-                                            }`}>
-                                                {msg.text}
-                                            </div>
+                            {messages.filter(msg => msg !== null).map((msg) => {
+                                const isMe = msg.senderRole === 'staff';
+                                return (
+                                    <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[75%] px-5 py-3 rounded-2xl text-[15px] shadow-sm ${
+                                            isMe ? 'bg-[#FE5C00] text-white rounded-br-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
+                                        }`}>
+                                            {msg.text}
                                         </div>
-                                    );
+                                    </div>
+                                );
                             })}
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* INPUT AREA */}
                         <div className="p-4 border-t border-gray-200 bg-white">
                             <form onSubmit={handleSend} className="relative">
                                 <input
@@ -236,6 +290,68 @@ const StaffInbox = () => {
                     </div>
                 )}
             </div>
+            
+            {/* 🚨 NEW: BROADCAST MODAL OVERLAY */}
+            {isBroadcastOpen && (
+                <div className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in rounded-xl">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+                        <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-[#FE5C00]">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                </svg>
+                                Broadcast Email
+                            </h2>
+                            <button onClick={() => setIsBroadcastOpen(false)} className="text-gray-400 hover:text-red-500 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        <form onSubmit={handleBroadcast} className="p-6 space-y-4">
+                            <p className="text-sm text-gray-500 mb-2">
+                                This message will be sent as an email via <strong>BCC</strong> to all {conversations.length} clients in the directory. Clients will not see each other's emails.
+                            </p>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Subject Line</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    value={broadcastSubject}
+                                    onChange={(e) => setBroadcastSubject(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#FE5C00] focus:ring-1 focus:ring-[#FE5C00]"
+                                    placeholder="e.g. Upcoming ITAC Assessment Event"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Message Body</label>
+                                <textarea 
+                                    required
+                                    value={broadcastText}
+                                    onChange={(e) => setBroadcastText(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#FE5C00] focus:ring-1 focus:ring-[#FE5C00] h-32 resize-none"
+                                    placeholder="Type the announcement here..."
+                                />
+                            </div>
+                            <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                                <button 
+                                    type="button" 
+                                    onClick={() => setIsBroadcastOpen(false)}
+                                    className="px-6 py-2 rounded text-gray-600 hover:bg-gray-100 font-bold transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={isBroadcasting}
+                                    className={`px-8 py-2 rounded text-white font-bold transition flex items-center gap-2 shadow-sm
+                                        ${isBroadcasting ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#FE5C00] hover:bg-orange-700'}`}
+                                >
+                                    {isBroadcasting ? 'Sending...' : 'Send Broadcast'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
         </div>
       </div>

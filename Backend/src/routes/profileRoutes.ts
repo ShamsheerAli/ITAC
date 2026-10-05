@@ -1,4 +1,7 @@
 import express, { Request, Response } from 'express';
+import bcrypt from 'bcryptjs'; // (or 'bcrypt' depending on what you used in your backend)
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import mongoose from 'mongoose';
 import ClientProfile from '../models/ClientProfile';
 import { upload } from '../middleware/uploadMiddleware'; // Ensure this path is correct
@@ -498,6 +501,165 @@ router.delete('/:id', async (req, res) => {
     console.error("Error permanently deleting client:", err);
     res.status(500).json({ message: "Server error deleting client" });
   }
+});
+
+
+// @route   POST /api/profile/admin/manual-create
+// @desc    Manually create a client from the Kanban board and send invite email
+router.post('/admin/manual-create', async (req, res) => {
+    try {
+        const { companyName, name, email } = req.body;
+
+        // 1. Validate inputs
+        if (!companyName || !name || !email) {
+            return res.status(400).json({ message: 'Company name, contact name, and email are required.' });
+        }
+
+        // 2. Check if this email is already registered
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'An account with this email address already exists.' });
+        }
+
+        // 3. Generate a random 8-character temporary password
+        const tempPassword = crypto.randomBytes(4).toString('hex');
+
+        // 4. Hash the password before saving (IMPORTANT: If your User model has a pre('save') 
+        // hook that automatically hashes passwords, you can skip this bcrypt step!)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(tempPassword, salt);
+
+        // 5. Create the new User document
+        const newUser = new User({
+            name,
+            email,
+            passwordHash: hashedPassword, // Use 'tempPassword' here instead if your model auto-hashes
+            role: 'client'
+        });
+        await newUser.save();
+
+        // 6. Create the empty Client Profile linked to this User
+        const newProfile = new ClientProfile({
+            user: newUser._id,
+            companyName: companyName,
+            contactName: name, // Carry over the contact name
+            contactEmail: email,
+            status: 'New Inquiry' // Drops them right into the first Kanban column
+        });
+        await newProfile.save();
+
+        // 7. Send the Welcome Email with Nodemailer
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // Or your SMTP provider
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const loginLink = 'http://energyhub.okstate.edu/login';
+
+        await transporter.sendMail({
+            from: '"OSU ITAC" <noreply@energyhub.okstate.edu>',
+            to: email,
+            subject: "Welcome to OSU ITAC - Your Account is Ready",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-w: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #FE5C00;">Welcome to the OSU ITAC Portal!</h2>
+                    <p>Hello ${name},</p>
+                    <p>An ITAC staff member has set up a portal account for <strong>${companyName}</strong>.</p>
+                    <p>You can log in to your dashboard to track your assessment progress, upload required utility bills, and securely communicate with our team.</p>
+                    
+                    <div style="background-color: #f9fafb; border-left: 4px solid #FE5C00; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                        <p style="margin: 0 0 8px 0;"><strong>Login Email:</strong> ${email}</p>
+                        <p style="margin: 0;"><strong>Temporary Password:</strong> <span style="font-family: monospace; font-size: 16px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tempPassword}</span></p>
+                    </div>
+                    
+                    <p style="font-size: 14px; color: #666;"><em>Note: For your security, please update your password on your profile page immediately after logging in.</em></p>
+                    
+                    <a href="${loginLink}" style="display: inline-block; padding: 12px 24px; background-color: #FE5C00; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px;">
+                        Log In to Your Dashboard
+                    </a>
+                </div>
+            `
+        });
+
+        res.status(201).json({ message: 'Client created and email sent successfully!' });
+
+    } catch (error) {
+        console.error("Manual client creation error:", error);
+        res.status(500).json({ message: 'Server error while creating the client.' });
+    }
+});
+
+// @route   POST /api/profile/audit-files/:id
+// @desc    Upload staff field notes and images to a client profile
+// Make sure you have 'upload' configured via Multer (e.g., upload.array('auditFiles', 10))
+router.post('/audit-files/:id', upload.array('auditFiles', 10), async (req, res) => {
+    try {
+        const clientProfile = await ClientProfile.findById(req.params.id);
+        
+        if (!clientProfile) {
+            return res.status(404).json({ message: 'Client profile not found' });
+        }
+
+        // Check if files were uploaded
+        if (req.files && Array.isArray(req.files)) {
+            const newFiles = req.files.map(file => ({
+                name: file.filename,
+                originalName: file.originalname,
+                path: file.path,
+                uploadedAt: new Date()
+            }));
+
+            // Initialize array if it doesn't exist in schema yet
+            if (!clientProfile.auditFiles) {
+                clientProfile.auditFiles = [];
+            }
+
+            // Append new files to the array
+            clientProfile.auditFiles.push(...newFiles);
+            await clientProfile.save();
+        }
+
+        res.json({ message: 'Files uploaded successfully', profile: clientProfile });
+    } catch (error) {
+        console.error("Error uploading audit files:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// @route   POST /api/profile/admin/upload-documents/:id
+// @desc    Staff manual upload to the client's documents array
+router.post('/admin/upload-documents/:id', upload.array('documents', 10), async (req, res) => {
+    try {
+        const clientProfile = await ClientProfile.findById(req.params.id);
+        
+        if (!clientProfile) {
+            return res.status(404).json({ message: 'Client profile not found' });
+        }
+
+        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+            const newFiles = req.files.map(file => ({
+                name: file.filename, 
+                originalName: file.originalname,
+                path: file.path,
+                uploadedAt: new Date()
+            }));
+
+            if (!clientProfile.documents) {
+                clientProfile.documents = [];
+            }
+
+            clientProfile.documents.push(...newFiles);
+            await clientProfile.save();
+        }
+
+        res.json({ message: 'Documents uploaded successfully', profile: clientProfile });
+    } catch (error) {
+        console.error("Error with staff document upload:", error);
+        res.status(500).json({ message: 'Server error during upload.' });
+    }
 });
 
 export default router;

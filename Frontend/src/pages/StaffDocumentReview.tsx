@@ -14,18 +14,23 @@ const StaffDocumentReview = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
+  // 🚨 NEW: State for staff manual file uploads
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get(`/profile/details/${clientId}`);
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch client details", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await api.get(`/profile/details/${clientId}`);
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Failed to fetch client details", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (clientId) fetchProfile();
   }, [clientId]);
 
@@ -37,6 +42,46 @@ const StaffDocumentReview = () => {
     } catch (err) {
       alert("Failed to approve client.");
     }
+  };
+
+  // 🚨 NEW: Handlers for Staff Upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+          setSelectedFiles(e.target.files);
+      }
+  };
+
+  const handleStaffUpload = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!selectedFiles) return alert("Please select files to upload.");
+
+      setIsUploading(true);
+      const formData = new FormData();
+      Array.from(selectedFiles).forEach(file => {
+          formData.append('documents', file); 
+      });
+
+      try {
+          // Sending to a new admin route we will create
+          await api.post(`/profile/admin/upload-documents/${clientId}`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          
+          alert("Documents uploaded successfully on behalf of the client!");
+          setSelectedFiles(null);
+          
+          // Reset the visual file input
+          const fileInput = document.getElementById('staff-doc-upload') as HTMLInputElement;
+          if (fileInput) fileInput.value = '';
+
+          // Refresh the profile so the "Missing Documents" tracker updates immediately!
+          await fetchProfile();
+      } catch (err) {
+          console.error("Upload failed", err);
+          alert("Failed to upload files. Please try again.");
+      } finally {
+          setIsUploading(false);
+      }
   };
 
   if (loading) return <div className="p-10 text-center">Loading Document Status...</div>;
@@ -54,7 +99,6 @@ const StaffDocumentReview = () => {
   
   const isAllUploaded = missingDocs.length === 0;
 
-  // 🚨 FIX 1: Only return the clean path. Axios will automatically attach your safe baseURL!
   const getDownloadUrl = (path: string) => {
     if (!path) return '';
     let cleanPath = path.replace(/\\/g, '/');
@@ -102,12 +146,34 @@ const StaffDocumentReview = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                     <h2 className="font-bold text-gray-800 text-lg">Uploaded Documents</h2>
                     <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">{uploadedDocs.length} Files</span>
                 </div>
-                <div className="p-6 space-y-4 min-h-[200px]">
+                
+                {/* 🚨 NEW: Staff Manual Upload Bar */}
+                <div className="p-4 border-b border-gray-100 bg-orange-50/50">
+                    <form onSubmit={handleStaffUpload} className="flex flex-col sm:flex-row items-center gap-3">
+                        <input 
+                            id="staff-doc-upload"
+                            type="file" 
+                            multiple 
+                            onChange={handleFileChange}
+                            className="flex-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-orange-100 file:text-[#FE5C00] hover:file:bg-orange-200 transition cursor-pointer border border-gray-200 rounded-md p-1.5 bg-white shadow-sm"
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={isUploading || !selectedFiles}
+                            className={`px-4 py-2 rounded-md font-bold text-white transition shadow-sm whitespace-nowrap text-sm
+                                ${isUploading || !selectedFiles ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FE5C00] hover:bg-orange-700'}`}
+                        >
+                            {isUploading ? 'Uploading...' : 'Staff Upload'}
+                        </button>
+                    </form>
+                </div>
+
+                <div className="p-6 space-y-4 flex-1 overflow-y-auto">
                     {uploadedDocs.length === 0 ? (
                         <p className="text-gray-400 italic text-center mt-10">No documents uploaded yet.</p>
                     ) : (
@@ -180,10 +246,8 @@ const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) =>
         setIsDownloading(true);
         
         try {
-            // 🚨 FIX 2: Use Axios to inherit the safe proxy baseURL
             const response = await api.get(downloadUrl, { responseType: 'blob' });
             
-            // Strictly prevent saving a 404 HTML error page as a PDF
             if (response.data.type && response.data.type.includes('text/html')) {
                 throw new Error("Received HTML instead of file data. The file is missing from the server.");
             }
