@@ -629,37 +629,5 @@ router.post('/audit-files/:id', upload.array('auditFiles', 10), async (req, res)
     }
 });
 
-// @route   POST /api/profile/admin/upload-documents/:id
-// @desc    Staff manual upload to the client's documents array
-router.post('/admin/upload-documents/:id', upload.array('documents', 10), async (req, res) => {
-    try {
-        const clientProfile = await ClientProfile.findById(req.params.id);
-        
-        if (!clientProfile) {
-            return res.status(404).json({ message: 'Client profile not found' });
-        }
-
-        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-            const newFiles = req.files.map(file => ({
-                name: file.filename, 
-                originalName: file.originalname,
-                path: file.path,
-                uploadedAt: new Date()
-            }));
-
-            if (!clientProfile.documents) {
-                clientProfile.documents = [];
-            }
-
-            clientProfile.documents.push(...newFiles);
-            await clientProfile.save();
-        }
-
-        res.json({ message: 'Documents uploaded successfully', profile: clientProfile });
-    } catch (error) {
-        console.error("Error with staff document upload:", error);
-        res.status(500).json({ message: 'Server error during upload.' });
-    }
-});
 
 export default router;

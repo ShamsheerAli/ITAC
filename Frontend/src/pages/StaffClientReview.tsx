@@ -35,10 +35,10 @@ const StaffClientReview = () => {
     if (!confirm(`Are you sure you want to approve ${client?.companyName}?`)) return;
     try {
       await api.put(`/profile/status/${client._id}`, { 
-        status: 'Approved',
+        status: 'Awaiting Documents',
         serviceType: selectedService 
       });
-      alert("Client Approved & Service Assigned!");
+      alert("Client approved, moved to Awaiting Documents, and service assigned!");
       navigate('/staff-kanban');
     } catch (err) {
       alert("Failed to approve client.");
