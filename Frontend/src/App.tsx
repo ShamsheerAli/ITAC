@@ -33,6 +33,11 @@ import ForgotPassword from './pages/ForgotPassword'
 import StaffPotentialClients from './pages/StaffPotentialClients'
 import StaffReportWriting from './pages/StaffReportWriting'
 
+import StudentLayout from './pages/StudentLayout';
+import StudentKanban from './pages/StudentKanban';
+import StudentReportWriting from './pages/StudentReportWriting';
+import StudentDashboard from './pages/StudentDashboard';
+
 function App() {
   return (
     <>
@@ -80,6 +85,12 @@ function App() {
           <Route path="/staff-leads" element={<StaffPotentialClients />} />
           <Route path="/staff-report-writing/:clientId" element={<StaffReportWriting />}  />
         </Route>
+        <Route element={<StudentLayout />}>
+    
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/student-kanban" element={<StudentKanban />} />
+          <Route path="/student-report/:clientId" element={<StudentReportWriting />} />
+        </Route>  
 
       </Routes>
     </>

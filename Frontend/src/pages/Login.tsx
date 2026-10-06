@@ -26,6 +26,8 @@ const Login = () => {
       // 2. Redirect based on Role
       if (res.data.user.role === 'staff') {
         navigate('/staff-dashboard');
+      } else if (res.data.user.role === 'student') {
+        navigate('/student-dashboard'); // 🚨 Direct students here
       } else {
         // CHANGED: Redirect clients to Temporary Dashboard
         navigate('/TemporaryDashboard'); 
