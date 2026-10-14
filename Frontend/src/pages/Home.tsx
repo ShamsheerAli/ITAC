@@ -73,9 +73,8 @@ const Home = () => {
           <div>
             <h2 className="text-3xl font-bold text-white mb-6">How ITAC Saves You Money</h2>
             <p className="text-gray-400 mb-8 leading-relaxed">
-              We utilize a comprehensive, 3-tiered industrial assessment model to uncover hidden waste. 
-              Starting with a Tier 1 data analysis of your utility bills, moving to a Tier 2 remote/hybrid evaluation, 
-              and culminating in a full Tier 3 onsite physical audit conducted by our engineering faculty and student researchers.
+              We utilize a comprehensive, assessment model to uncover hidden waste. 
+              Starting with data analysis of your utility bills, moving to onsite physical audit conducted by our engineering faculty and student researchers.
             </p>
             
             <div className="bg-white/10 border border-white/20 rounded-xl p-6 backdrop-blur-sm">
@@ -83,17 +82,20 @@ const Home = () => {
                     <IconChart /> Real-World Impact
                 </h3>
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                    Our targeted recommendations yield immediate financial returns. For example, a recent assessment of a facility's 
-                    <strong> compressed air systems</strong> identified massive leakages and pressure drops. 
+                    Our targeted recommendations yield immediate financial returns, Saves Enegry and also train students
                 </p>
                 <div className="flex gap-6 border-t border-white/10 pt-4">
                     <div>
-                        <div className="text-2xl font-black text-white">$14,200</div>
-                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Annual Savings</div>
+                        <div className="text-2xl font-black text-white">10.71+ Tbtu</div>
+                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Recommended Energy saving</div>
                     </div>
                     <div>
-                        <div className="text-2xl font-black text-white">4 Mo.</div>
-                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">ROI Payback</div>
+                        <div className="text-2xl font-black text-white">$140+ </div>
+                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Million Cost Savings</div>
+                    </div>
+                    <div>
+                        <div className="text-2xl font-black text-white">275+</div>
+                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Students Trained</div>
                     </div>
                 </div>
             </div>
