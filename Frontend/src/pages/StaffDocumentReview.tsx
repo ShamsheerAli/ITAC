@@ -15,9 +15,11 @@ const StaffDocumentReview = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
-  // 🚨 NEW: State for staff manual file uploads
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // 🚨 NEW: State to track if "Download All" is in progress
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
 
   const fetchProfile = async () => {
     try {
@@ -44,7 +46,6 @@ const StaffDocumentReview = () => {
     }
   };
 
-  // 🚨 NEW: Handlers for Staff Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
           setSelectedFiles(e.target.files);
@@ -62,7 +63,6 @@ const StaffDocumentReview = () => {
       });
 
       try {
-          // Sending to a new admin route we will create
           await api.post(`/profile/admin/upload-documents/${clientId}`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' }
           });
@@ -70,11 +70,9 @@ const StaffDocumentReview = () => {
           alert("Documents uploaded successfully on behalf of the client!");
           setSelectedFiles(null);
           
-          // Reset the visual file input
           const fileInput = document.getElementById('staff-doc-upload') as HTMLInputElement;
           if (fileInput) fileInput.value = '';
 
-          // Refresh the profile so the "Missing Documents" tracker updates immediately!
           await fetchProfile();
       } catch (err) {
           console.error("Upload failed", err);
@@ -106,6 +104,50 @@ const StaffDocumentReview = () => {
        cleanPath = cleanPath.substring(1);
     }
     return cleanPath;
+  };
+
+  // 🚨 NEW: Download All Functionality
+  // 🚨 NEW: Download All Functionality (Updated to skip missing files gracefully)
+  const handleDownloadAll = async () => {
+    if (uploadedDocs.length === 0) return;
+    
+    setIsDownloadingAll(true);
+    let missingCount = 0;
+    
+    for (const doc of uploadedDocs) {
+        try {
+            const downloadUrl = getDownloadUrl(doc.path);
+            const response = await api.get(downloadUrl, { responseType: 'blob' });
+            
+            if (response.data.type && response.data.type.includes('text/html')) {
+                console.warn(`Skipping missing file: ${doc.originalName || doc.name}`);
+                missingCount++;
+                continue; 
+            }
+
+            const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.setAttribute('download', doc.originalName || doc.name || 'document.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode?.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+            
+            // Pause for 500ms between downloads to prevent browser pop-up blockers
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+            console.error(`Error downloading file ${doc.originalName || doc.name}:`, error);
+            missingCount++; // Log the failure, but let the loop continue to the next file
+        }
+    }
+
+    setIsDownloadingAll(false);
+
+    // Notify the staff if any files were missing from the server
+    if (missingCount > 0) {
+        alert(`Finished. However, ${missingCount} file(s) could not be downloaded because they no longer exist on the server.`);
+    }
   };
 
   return (
@@ -147,12 +189,28 @@ const StaffDocumentReview = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                
+                {/* 🚨 NEW: Added Download All Button inside the header block */}
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                    <h2 className="font-bold text-gray-800 text-lg">Uploaded Documents</h2>
-                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">{uploadedDocs.length} Files</span>
+                    <div className="flex items-center gap-3">
+                        <h2 className="font-bold text-gray-800 text-lg">Uploaded Documents</h2>
+                        <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">{uploadedDocs.length} Files</span>
+                    </div>
+                    {uploadedDocs.length > 1 && (
+                        <button 
+                            onClick={handleDownloadAll}
+                            disabled={isDownloadingAll}
+                            className={`text-xs font-bold px-3 py-1.5 rounded transition flex items-center gap-1 shadow-sm border
+                                ${isDownloadingAll 
+                                    ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-wait' 
+                                    : 'bg-white text-[#FE5C00] border-gray-200 hover:bg-orange-50 hover:border-[#FE5C00]'}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            {isDownloadingAll ? 'Downloading...' : 'Download All'}
+                        </button>
+                    )}
                 </div>
                 
-                {/* 🚨 NEW: Staff Manual Upload Bar */}
                 <div className="p-4 border-b border-gray-100 bg-orange-50/50">
                     <form onSubmit={handleStaffUpload} className="flex flex-col sm:flex-row items-center gap-3">
                         <input 
