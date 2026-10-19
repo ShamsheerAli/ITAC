@@ -41,8 +41,6 @@ const StaffAuditScheduling = () => {
       // Create an array of only the dates that were actually filled out
       const proposedDates = [date1, date2, date3].filter(d => d !== "");
 
-      // NOTE: You will need to make sure your backend ClientProfile model 
-      // can accept 'proposedAuditDates' and 'auditNotes' fields!
       await api.put(`/profile/${clientId}/schedule`, { 
           proposedAuditDates: proposedDates,
           auditNotes: notes
@@ -60,6 +58,8 @@ const StaffAuditScheduling = () => {
 
   if (loading) return <div className="p-10 text-center">Loading Scheduling Dashboard...</div>;
   if (!profile) return <div className="p-10 text-center text-red-500">Client not found.</div>;
+
+  const hasClientCounterProposal = profile.auditNotes && profile.auditNotes.includes("CLIENT REQUESTED NEW DATES:");
 
   return (
     <div className="w-full min-h-screen flex flex-col relative bg-gray-50 font-sans">
@@ -87,6 +87,22 @@ const StaffAuditScheduling = () => {
             <div className="h-1.5 bg-[#FE5C00] w-24 mx-auto rounded-full" />
             <p className="mt-4 text-gray-600 font-medium">Propose available dates for the on-site energy audit.</p>
         </div>
+
+        {/* 🚨 NEW: CLIENT MESSAGE / COUNTER-PROPOSAL ALERT BOX */}
+        {profile.auditNotes && (
+            <div className={`mb-8 p-6 rounded-r-lg shadow-sm border-l-4 ${hasClientCounterProposal ? 'bg-orange-50 border-[#FE5C00]' : 'bg-blue-50 border-blue-500'}`}>
+                <h3 className={`font-bold text-lg mb-2 flex items-center gap-2 ${hasClientCounterProposal ? 'text-[#FE5C00]' : 'text-blue-700'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {hasClientCounterProposal ? 'Client Requested Reschedule' : 'Previous Notes'}
+                </h3>
+                <p className="text-gray-800 whitespace-pre-wrap font-medium">
+                    {/* Clean the system prefix out before showing to staff */}
+                    {profile.auditNotes.replace("CLIENT REQUESTED NEW DATES:", "").trim()}
+                </p>
+            </div>
+        )}
 
         {/* SCHEDULING FORM CARD */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

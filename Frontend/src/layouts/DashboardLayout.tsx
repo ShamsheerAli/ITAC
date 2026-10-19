@@ -117,12 +117,6 @@ const DashboardLayout = () => {
                 active={activeTab === "/inbox"} 
                 badge={unreadCount} 
             />
-            <SidebarItem 
-                to="/upload-documents" 
-                label="Upload Documents" 
-                icon={<IconUpload />} 
-                active={activeTab === "/upload-documents"} 
-            />
         </nav>
       </aside>
 

@@ -63,7 +63,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/client/facility/:facilityId/edit" element={<UpdateDetails />} />
             <Route path="/inbox" element={<Inbox />} />
-            <Route path="/schedule-audit" element={<ClientAuditScheduling />} />
+            <Route path="/client/facility/:facilityId/schedule" element={<ClientAuditScheduling />} />
             <Route path="/resources" element={<Resources />} />
             
             {/* 🚨 NEW & UPDATED MULTI-FACILITY ROUTES */}

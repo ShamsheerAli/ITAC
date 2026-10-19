@@ -17,12 +17,12 @@ const ClientNewFacility = () => {
     state: '',
     zipCode: '',
     businessDescription: '', 
-    naicsCode: '', // 🚨 Mapped for Staff View
-    annualEnergyCons: '', // 🚨 Mapped for Staff View
-    grossSalesUnder250M: '', // 🚨 Mapped for Staff View
-    annualGrossSales: '', // 🚨 Mapped for Staff View               
+    naics: '', // 🚨 Reverted to match DB
+    energyConsumption: '', // 🚨 Reverted to match DB
+    isGrossSalesLessThan250M: '', // 🚨 Reverted to match DB
+    grossSales: '', // 🚨 Reverted to match DB               
     buildingSize: '',
-    annualUtilityExp: '', // 🚨 Mapped for Staff View
+    utilityExpenses: '', // 🚨 Reverted to match DB
     naturalGasProvider: '', 
     electricityProvider: '', 
     naturalGasTransporter: '', 
@@ -54,7 +54,6 @@ const ClientNewFacility = () => {
     const user = JSON.parse(storedUser);
 
     try {
-      // POST to create a brand new facility
       await api.post(`/profile/new-facility`, {
           userId: user.id || user._id,
           ...formData
@@ -126,7 +125,7 @@ const ClientNewFacility = () => {
             </div>
              <div>
                 <label className="block text-sm font-bold mb-1">NAICS Code:</label>
-                <input type="text" name="naicsCode" value={formData.naicsCode} onChange={handleChange} className="w-full border p-2 rounded" />
+                <input type="text" name="naics" value={formData.naics} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
         </div>
 
@@ -141,9 +140,9 @@ const ClientNewFacility = () => {
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input 
                             type="radio" 
-                            name="grossSalesUnder250M" 
-                            value="Yes" 
-                            checked={formData.grossSalesUnder250M === 'Yes'} 
+                            name="isGrossSalesLessThan250M" 
+                            value="yes" 
+                            checked={formData.isGrossSalesLessThan250M === 'yes'} 
                             onChange={handleChange} 
                             className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
                         /> 
@@ -152,9 +151,9 @@ const ClientNewFacility = () => {
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input 
                             type="radio" 
-                            name="grossSalesUnder250M" 
-                            value="No" 
-                            checked={formData.grossSalesUnder250M === 'No'} 
+                            name="isGrossSalesLessThan250M" 
+                            value="no" 
+                            checked={formData.isGrossSalesLessThan250M === 'no'} 
                             onChange={handleChange} 
                             className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
                         /> 
@@ -162,13 +161,13 @@ const ClientNewFacility = () => {
                     </label>
                 </div>
 
-                {formData.grossSalesUnder250M !== '' && (
+                {formData.isGrossSalesLessThan250M !== '' && (
                     <div className="animate-fade-in-down mt-2">
                         <label className="block text-xs font-bold text-gray-600 mb-1">Please provide the amount: $</label>
                         <input 
                             type="text" 
-                            name="annualGrossSales" 
-                            value={formData.annualGrossSales} 
+                            name="grossSales" 
+                            value={formData.grossSales} 
                             onChange={handleChange} 
                             className="w-full border p-2 rounded focus:ring-2 focus:ring-[#FE5C00]/20 outline-none transition" 
                             placeholder="e.g. 1500000"
@@ -183,11 +182,11 @@ const ClientNewFacility = () => {
             </div>
             <div>
                 <label className="block text-sm font-bold mb-1">Total Annual Utility Expenses (Gas & Electricity):$<RequiredStar /></label>
-                <input required type="text" name="annualUtilityExp" value={formData.annualUtilityExp} onChange={handleChange} className="w-full border p-2 rounded" />
+                <input required type="text" name="utilityExpenses" value={formData.utilityExpenses} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
                 <label className="block text-sm font-bold mb-1">Total Annual Energy Consumption:</label>
-                <input type="text" name="annualEnergyCons" value={formData.annualEnergyCons} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. 500,000 kWh" />
+                <input type="text" name="energyConsumption" value={formData.energyConsumption} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. 500,000 kWh" />
             </div>
 
             <div>

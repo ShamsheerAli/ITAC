@@ -236,19 +236,29 @@ router.put('/:id/unarchive', async (req, res) => {
 });
 
 // @route   PUT /api/profile/:id/confirm-schedule
-// @desc    Client confirms their final audit date for a specific facility
+// @desc    Client confirms their final audit date OR requests new dates
 router.put('/:id/confirm-schedule', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { confirmedAuditDate } = req.body;
+    const { confirmedAuditDate, isRescheduling, alternativeDates } = req.body;
     
-    // 🚨 UPDATED: Target the specific facility using findByIdAndUpdate
+    // Default payload: what happens if they confirm normally
+    let updatePayload: any = {
+        confirmedAuditDate: confirmedAuditDate,
+        status: 'Audit Scheduled', 
+        statusUpdatedAt: Date.now() 
+    };
+
+    // 🚨 NEW: If they reject the dates, keep them in the "Ready for audit" column 
+    // and overwrite the staff notes with their counter-proposal
+    if (isRescheduling) {
+        updatePayload.status = 'Ready for audit';
+        updatePayload.auditNotes = `CLIENT REQUESTED NEW DATES: ${alternativeDates}`;
+        updatePayload.confirmedAuditDate = ""; // Clear any old confirmed date
+    }
+
     const profile = await ClientProfile.findByIdAndUpdate(
       req.params.id, 
-      { 
-          confirmedAuditDate,
-          status: 'Audit Scheduled', 
-          statusUpdatedAt: Date.now() 
-      },
+      updatePayload,
       { new: true }
     );
     
@@ -260,12 +270,12 @@ router.put('/:id/confirm-schedule', async (req: Request, res: Response): Promise
     const clientName = profile.contactName || 'A Client';
     const companyName = profile.companyName || 'Unknown Company';
     
-    console.log(`✉️ Sending audit date selection email to staff for: ${companyName}`);
-    
+    // We pass their counter-proposal text directly to the emailer as the "confirmedDate" string
+    // so the staff email will literally say: "Client selected: Client requested new dates: Nov 5th"
     sendAuditDateSelectedEmail(companyName, clientName, confirmedAuditDate)
         .catch(err => console.error("❌ Date selection email failed:", err));
     
-    res.json({ message: "Audit scheduled successfully", profile });
+    res.json({ message: "Schedule updated successfully", profile });
   } catch (error) {
     console.error("Schedule Confirmation Error:", error);
     res.status(500).json({ message: "Server error" });
