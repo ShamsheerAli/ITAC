@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
 
-const UpdateDetails = () => {
+const ClientUpdateDetails = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // 🚨 Extracts the specific facility ID from the URL
+  const { facilityId } = useParams(); 
   const [loading, setLoading] = useState(true);
-  
-  // ✅ NEW: Simply check the URL to see which route they are on
-  const isFromMainDashboard = location.pathname === '/update-details';
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -21,12 +19,12 @@ const UpdateDetails = () => {
     state: '',
     zipCode: '',
     businessDescription: '', 
-    naics: '',
-    energyConsumption: '',
-    isGrossSalesLessThan250M: '', 
-    grossSales: '',               
+    naicsCode: '', 
+    annualEnergyCons: '', 
+    grossSalesUnder250M: '', 
+    annualGrossSales: '',                
     buildingSize: '',
-    utilityExpenses: '',
+    annualUtilityExp: '', 
     naturalGasProvider: '', 
     electricityProvider: '', 
     naturalGasTransporter: '', 
@@ -37,14 +35,15 @@ const UpdateDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       const storedUser = localStorage.getItem('user');
-      if (!storedUser) {
+      if (!storedUser || !facilityId) {
         navigate('/login');
         return;
       }
       const user = JSON.parse(storedUser);
 
       try {
-        const res = await api.get(`/profile/${user.id}`);
+        // 🚨 Fetch the specific facility details
+        const res = await api.get(`/profile/details/${facilityId}`);
         
         if (res.data) {
           setFormData({
@@ -58,12 +57,12 @@ const UpdateDetails = () => {
             state: res.data.state || '',
             zipCode: res.data.zipCode || '',
             businessDescription: res.data.businessDescription || res.data.sicCode || '',
-            naics: res.data.naics || '',
-            energyConsumption: res.data.energyConsumption || '',
-            isGrossSalesLessThan250M: res.data.isGrossSalesLessThan250M || '', 
-            grossSales: res.data.grossSales || '',
+            naicsCode: res.data.naicsCode || res.data.naics || '',
+            annualEnergyCons: res.data.annualEnergyCons || res.data.energyConsumption || '',
+            grossSalesUnder250M: res.data.grossSalesUnder250M || res.data.isGrossSalesLessThan250M || '', 
+            annualGrossSales: res.data.annualGrossSales || res.data.grossSales || '',
             buildingSize: res.data.buildingSize || '',
-            utilityExpenses: res.data.utilityExpenses || '',
+            annualUtilityExp: res.data.annualUtilityExp || res.data.utilityExpenses || '',
             naturalGasProvider: res.data.naturalGasProvider || '', 
             electricityProvider: res.data.electricityProvider || '',
             naturalGasTransporter: res.data.naturalGasTransporter || '',
@@ -73,18 +72,13 @@ const UpdateDetails = () => {
         }
       } catch (err) {
         console.error("Error fetching profile data", err);
-        setFormData(prev => ({
-            ...prev,
-            contactName: user.name,
-            contactEmail: user.email
-        }));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate, facilityId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -92,22 +86,11 @@ const UpdateDetails = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) return;
-    const user = JSON.parse(storedUser);
-
     try {
-      await api.put(`/profile/${user.id}`, formData);
-      
+      // 🚨 Update the specific facility
+      await api.put(`/profile/${facilityId}`, formData);
       alert('Details Updated Successfully!');
-
-      // ✅ NEW: Uses the URL check to return to the right dashboard
-      if (isFromMainDashboard) {
-          navigate('/dashboard');
-      } else {
-          navigate('/TemporaryDashboard');
-      }
-
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
       alert('Failed to update details.');
@@ -121,7 +104,7 @@ const UpdateDetails = () => {
   return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded shadow mt-10 mb-10">
       <h2 className="text-2xl font-bold mb-6 text-center border-b-2 border-[#FE5C00] pb-2 inline-block">
-        My Information
+        Update Facility Information
       </h2>
       
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,7 +112,7 @@ const UpdateDetails = () => {
         {/* LEFT COLUMN */}
         <div className="space-y-4">
             <div>
-                <label className="block text-sm font-bold mb-1">Company Name:<RequiredStar /></label>
+                <label className="block text-sm font-bold mb-1">Company / Facility Name:<RequiredStar /></label>
                 <input required type="text" name="companyName" value={formData.companyName} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
@@ -172,7 +155,7 @@ const UpdateDetails = () => {
             </div>
              <div>
                 <label className="block text-sm font-bold mb-1">NAICS Code:</label>
-                <input required type="text" name="naics" value={formData.naics} onChange={handleChange} className="w-full border p-2 rounded" />
+                <input type="text" name="naicsCode" value={formData.naicsCode} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
         </div>
 
@@ -180,16 +163,16 @@ const UpdateDetails = () => {
         <div className="space-y-4">
             <div className="bg-gray-50 p-4 rounded border border-gray-100">
                 <label className="block text-sm font-bold mb-2">
-                    Are your Annual Gross sales than $250 million?
+                    Are your Annual Gross sales less than $250 million?
                 </label>
                 
                 <div className="flex items-center gap-6 mb-3">
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input 
                             type="radio" 
-                            name="isGrossSalesLessThan250M" 
-                            value="yes" 
-                            checked={formData.isGrossSalesLessThan250M === 'yes'} 
+                            name="grossSalesUnder250M" 
+                            value="Yes" 
+                            checked={formData.grossSalesUnder250M === 'Yes' || formData.grossSalesUnder250M === 'yes'} 
                             onChange={handleChange} 
                             className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
                         /> 
@@ -198,9 +181,9 @@ const UpdateDetails = () => {
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input 
                             type="radio" 
-                            name="isGrossSalesLessThan250M" 
-                            value="no" 
-                            checked={formData.isGrossSalesLessThan250M === 'no'} 
+                            name="grossSalesUnder250M" 
+                            value="No" 
+                            checked={formData.grossSalesUnder250M === 'No' || formData.grossSalesUnder250M === 'no'} 
                             onChange={handleChange} 
                             className="accent-[#FE5C00] w-4 h-4 cursor-pointer"
                         /> 
@@ -208,13 +191,13 @@ const UpdateDetails = () => {
                     </label>
                 </div>
 
-                {formData.isGrossSalesLessThan250M !== '' && (
+                {formData.grossSalesUnder250M !== '' && (
                     <div className="animate-fade-in-down mt-2">
                         <label className="block text-xs font-bold text-gray-600 mb-1">Please provide the amount: $</label>
                         <input 
                             type="text" 
-                            name="grossSales" 
-                            value={formData.grossSales} 
+                            name="annualGrossSales" 
+                            value={formData.annualGrossSales} 
                             onChange={handleChange} 
                             className="w-full border p-2 rounded focus:ring-2 focus:ring-[#FE5C00]/20 outline-none transition" 
                             placeholder="e.g. 1500000"
@@ -228,8 +211,12 @@ const UpdateDetails = () => {
                 <input required type="text" name="buildingSize" value={formData.buildingSize} onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-1">Total Annual utility expenses (Gas & Electricity):$<RequiredStar /></label>
-                <input required type="text" name="utilityExpenses" value={formData.utilityExpenses} onChange={handleChange} className="w-full border p-2 rounded" />
+                <label className="block text-sm font-bold mb-1">Total Annual Utility Expenses (Gas & Electricity):$<RequiredStar /></label>
+                <input required type="text" name="annualUtilityExp" value={formData.annualUtilityExp} onChange={handleChange} className="w-full border p-2 rounded" />
+            </div>
+            <div>
+                <label className="block text-sm font-bold mb-1">Total Annual Energy Consumption:</label>
+                <input type="text" name="annualEnergyCons" value={formData.annualEnergyCons} onChange={handleChange} className="w-full border p-2 rounded" placeholder="e.g. 500,000 kWh" />
             </div>
 
             <div>
@@ -269,4 +256,4 @@ const UpdateDetails = () => {
   );
 };
 
-export default UpdateDetails;
+export default ClientUpdateDetails;

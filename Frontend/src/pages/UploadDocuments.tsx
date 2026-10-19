@@ -1,31 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
 
 const UploadDocuments = () => {
   const navigate = useNavigate();
-  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+  // 🚨 NEW: Grab the specific facility ID from the URL!
+  const { facilityId } = useParams(); 
   
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const handleSaveAndReturn = async () => {
     try {
-      // Notify the backend that we are done uploading!
-      await api.post(`/profile/${currentUserId}/submit-documents`);
-      
-      // Send them back to the dashboard
+      // 🚨 UPDATED: Submitting documents for this SPECIFIC facility
+      await api.post(`/profile/${facilityId}/submit-documents`);
       navigate('/dashboard');
     } catch (err) {
       console.error("Error notifying staff:", err);
-      // Even if the email fails, we still want to let them return to the dashboard
       navigate('/dashboard'); 
     }
   };
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (id: string) => {
     try {
-      const res = await api.get(`/profile/${userId}`);
+      // 🚨 UPDATED: Hit the 'details' route which specifically looks up a Facility by its ID
+      const res = await api.get(`/profile/details/${id}`);
       setProfile(res.data);
     } catch (err) {
       console.error("Failed to fetch profile documents", err);
@@ -34,23 +33,26 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      const userId = user._id || user.id;
-      setCurrentUserId(userId);
-      fetchProfile(userId);
-    } else {
+    if (!storedUser) {
       navigate('/login');
+      return;
     }
-  }, [navigate, fetchProfile]);
+    
+    if (facilityId) {
+        fetchProfile(facilityId);
+    } else {
+        navigate('/dashboard'); // Failsafe if they somehow load this without an ID
+    }
+  }, [navigate, fetchProfile, facilityId]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, docName: string) => {
     const file = e.target.files?.[0];
-    if (!file || !currentUserId) return;
+    if (!file || !facilityId) return;
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('userId', currentUserId);
+    // 🚨 UPDATED: Send the facilityId instead of the userId
+    formData.append('facilityId', facilityId);
     formData.append('docName', docName);
 
     setUploadingDoc(docName);
@@ -58,7 +60,7 @@ const UploadDocuments = () => {
       await api.post('/profile/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      fetchProfile(currentUserId); 
+      fetchProfile(facilityId); 
     } catch (err) {
       console.error(err);
       alert(`Failed to upload ${docName}. Please try again.`);
@@ -69,13 +71,14 @@ const UploadDocuments = () => {
   };
 
   const handleDeleteDocument = async (path: string, docName: string) => {
-    if (!currentUserId) return;
+    if (!facilityId) return;
     
     if(!window.confirm(`Are you sure you want to remove this file from ${docName}?`)) return;
 
     try {
-      await api.put(`/profile/${currentUserId}/remove-document`, { path });
-      fetchProfile(currentUserId);
+      // 🚨 UPDATED: Target the specific facility
+      await api.put(`/profile/${facilityId}/remove-document`, { path });
+      fetchProfile(facilityId);
     } catch (err) {
       console.error(err);
       alert("Failed to remove document. Please try again.");
@@ -88,7 +91,6 @@ const UploadDocuments = () => {
     <div className="w-full h-full font-sans">
       <div className="w-full bg-white rounded-xl px-12 py-10 shadow-sm border border-gray-100 relative">
 
-        {/* DOWNLOAD SECTION */}
         <SectionTitle title="Download documents" />
         <div className="border border-black p-8 text-center text-xl font-medium mb-12 text-gray-800 leading-relaxed bg-gray-50">
           Please download the documents. Enter the requested information or signature. <br /> Upload the documents in the below section!
@@ -101,11 +103,6 @@ const UploadDocuments = () => {
           <DownloadRow label="PSO Consent for Electric Bill data" fileName="pso_consent.pdf" />
         </div>
 
-        {/* ======================= */}
-        {/* UPLOAD SECTION      */}
-        {/* ======================= */}
-        
-        {/* SAVE BUTTON - TUCKED NEATLY ABOVE THE SECTION ON THE RIGHT */}
         <div className="flex justify-end mb-4">
             <button 
               onClick={handleSaveAndReturn}
@@ -118,88 +115,23 @@ const UploadDocuments = () => {
             </button>
         </div>
 
-        {/* RESTORED CENTERED HEADER */}
         <SectionTitle title="Upload documents" />
 
-        {/* UPLOAD ROWS */}
         <div className="space-y-8 pb-10">
-          <UploadRow 
-            label="Most Recent Electricity Bills (Last 12 months)" 
-            docName="Electricity Bills" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-
-          <UploadRow 
-            label="Most Recent Natural Gas Bills (Last 12 months)" 
-            docName="Natural Gas Bills" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-
-          <UploadRow 
-            label="Confidentiality Statement" 
-            docName="Confidentiality Statement" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-          <UploadRow 
-            label="Media Release form" 
-            docName="Media Release Form" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-          <UploadRow 
-            label="Energy Assessment Application" 
-            docName="Energy Assessment Application" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-
-          <UploadRow 
-            label="OGE Consent for Electric Bill data" 
-            docName="OGE Consent Form" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-
-          <UploadRow 
-            label="PSO Consent for Electric Bill data" 
-            docName="PSO Consent Form" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
-
-          <UploadRow 
-            label="Other Documents" 
-            docName="Other Documents" 
-            uploadingDoc={uploadingDoc} 
-            allDocuments={allDocuments}
-            handleFileUpload={handleFileUpload} 
-            handleDeleteDocument={handleDeleteDocument}
-          />
+          <UploadRow label="Most Recent Electricity Bills (Last 12 months)" docName="Electricity Bills" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="Most Recent Natural Gas Bills (Last 12 months)" docName="Natural Gas Bills" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="Confidentiality Statement" docName="Confidentiality Statement" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="Media Release form" docName="Media Release Form" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="Energy Assessment Application" docName="Energy Assessment Application" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="OGE Consent for Electric Bill data" docName="OGE Consent Form" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="PSO Consent for Electric Bill data" docName="PSO Consent Form" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
+          <UploadRow label="Other Documents" docName="Other Documents" uploadingDoc={uploadingDoc} allDocuments={allDocuments} handleFileUpload={handleFileUpload} handleDeleteDocument={handleDeleteDocument} />
         </div>
 
       </div>
     </div>
   );
 };
-
-export default UploadDocuments;
 
 /* ===========================
    REUSABLE COMPONENTS
@@ -229,32 +161,23 @@ const DownloadRow = ({ label, fileName }: { label: string; fileName: string }) =
 
 const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUpload, handleDeleteDocument }: any) => {
   const isUploading = uploadingDoc === docName;
-  
   const uploadedFilesForThisRow = allDocuments.filter((doc: any) => doc.name === docName);
 
   return (
     <div className="flex flex-col md:flex-row items-start justify-center gap-4 md:gap-16">
       <span className="w-full md:w-96 text-center md:text-right text-xl font-bold text-gray-700 mt-3">{label}:</span>
 
-      {/* 🚨 WIDENED WRAPPER: Changed md:w-56 to md:w-64 */}
       <div className="w-full md:w-64 flex flex-col gap-3 items-center md:items-start">
-          
           {uploadedFilesForThisRow.map((file: any, index: number) => (
-             /* 🚨 FLEX FIX: w-full, flex layout for proper truncation */
              <div key={index} className="w-full flex items-center justify-between bg-green-50 border-2 border-green-500 py-2.5 px-3 rounded shadow-sm text-green-700">
-                 
-                 {/* 🚨 TEXT WRAPPER: flex-1 and min-w-0 force proper truncation */}
                  <div className="flex items-center flex-1 min-w-0 gap-2 pr-2" title={file.originalName || `File ${index + 1}`}>
                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                      </svg>
-                     
                      <span className="font-bold text-sm truncate block">
                          {file.originalName || `File ${index + 1}`}
                      </span>
                  </div>
-
-                 {/* 🚨 DELETE BUTTON: flex-shrink-0 ensures it never gets squished */}
                  <button 
                     onClick={() => handleDeleteDocument(file.path, docName)}
                     className="text-red-400 hover:text-red-600 bg-white rounded-full p-0.5 shadow-sm hover:shadow transition flex-shrink-0"
@@ -284,3 +207,5 @@ const UploadRow = ({ label, docName, uploadingDoc, allDocuments, handleFileUploa
     </div>
   );
 };
+
+export default UploadDocuments;

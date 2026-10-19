@@ -118,12 +118,6 @@ const DashboardLayout = () => {
                 badge={unreadCount} 
             />
             <SidebarItem 
-                to="/update-details"  
-                label="My Information" 
-                icon={<IconInfo />} 
-                active={activeTab === "/update-details"} 
-            />
-            <SidebarItem 
                 to="/upload-documents" 
                 label="Upload Documents" 
                 icon={<IconUpload />} 

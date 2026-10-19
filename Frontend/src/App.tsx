@@ -6,7 +6,6 @@ import Signup from './pages/Signup'
 import TemporaryDashboard from './pages/TemporaryDashboard'
 import StaffAuditScheduling from './pages/StaffAuditScheduling';
 
-
 // --- CLIENT PAGES ---
 import Dashboard from './pages/Dashboard'
 import Inbox from './pages/Inbox'
@@ -15,6 +14,8 @@ import UploadDocuments from './pages/UploadDocuments'
 import DashboardLayout from './layouts/DashboardLayout' 
 import ClientAuditScheduling from './pages/ClientAuditScheduling';
 import Resources from './pages/Resources';
+// 🚨 NEW IMPORT FOR MULTI-FACILITY SUPPORT
+import ClientNewFacility from './pages/ClientNewFacility'; 
 
 // --- STAFF PAGES ---
 import StaffDashboard from './pages/StaffDashboard';
@@ -33,6 +34,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import StaffPotentialClients from './pages/StaffPotentialClients'
 import StaffReportWriting from './pages/StaffReportWriting'
 
+// --- STUDENT PAGES ---
 import StudentLayout from './pages/StudentLayout';
 import StudentKanban from './pages/StudentKanban';
 import StudentReportWriting from './pages/StudentReportWriting';
@@ -59,12 +61,14 @@ function App() {
         {/* These pages get the Sidebar + The Global Header from above */}
         <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/update-details" element={<UpdateDetails />} />
-            <Route path="/upload-documents" element={<UploadDocuments />} />
+            <Route path="/client/facility/:facilityId/edit" element={<UpdateDetails />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/schedule-audit" element={<ClientAuditScheduling />} />
             <Route path="/resources" element={<Resources />} />
             
+            {/* 🚨 NEW & UPDATED MULTI-FACILITY ROUTES */}
+            <Route path="/client/new-facility" element={<ClientNewFacility />} />
+            <Route path="/client/facility/:facilityId" element={<UploadDocuments />} />
         </Route>
 
         {/* ================= STAFF ROUTES (Staff Sidebar Layout) ================= */}
@@ -85,8 +89,9 @@ function App() {
           <Route path="/staff-leads" element={<StaffPotentialClients />} />
           <Route path="/staff-report-writing/:clientId" element={<StaffReportWriting />}  />
         </Route>
+        
+        {/* ================= STUDENT ROUTES ================= */}
         <Route element={<StudentLayout />}>
-    
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/student-kanban" element={<StudentKanban />} />
           <Route path="/student-report/:clientId" element={<StudentReportWriting />} />
