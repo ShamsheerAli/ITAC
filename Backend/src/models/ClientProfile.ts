@@ -42,6 +42,13 @@ export interface IClientProfile extends Document {
   position?: string;
   linkedIn?: string;
   facebook?: string;
+  proposedAuditDates?: string[];
+  auditNotes?: string;
+  confirmedAuditDate?: string;
+  assignedLeadStudent?: mongoose.Types.ObjectId;
+  assignedTeam?: mongoose.Types.ObjectId[];
+  reportProgressStatus?: string;
+  isAuditConfirmed?: boolean;
 }
 
 const ClientProfileSchema: Schema = new Schema({
@@ -96,6 +103,21 @@ const ClientProfileSchema: Schema = new Schema({
   confirmedAuditDate: { 
     type: String, 
     default: "" 
+  },
+
+  assignedLeadStudent: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User',
+    default: null
+  },
+  assignedTeam: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
+  }],
+  reportProgressStatus: { 
+    type: String, 
+    enum: ['Pending Assignment', 'Assigned to Lead', 'Writing in Progress', 'Lead Review', 'Submitted to Staff'],
+    default: 'Pending Assignment' 
   },
   isAuditConfirmed: { 
     type: Boolean, 

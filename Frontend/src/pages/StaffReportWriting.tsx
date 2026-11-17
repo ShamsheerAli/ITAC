@@ -5,29 +5,44 @@ import api from "../api/axios";
 const StaffReportWriting = () => {
     const { clientId } = useParams();
     const [profile, setProfile] = useState<any>(null);
+    const [students, setStudents] = useState<any[]>([]); // New state for student dropdown
+    const [selectedLead, setSelectedLead] = useState("");
     const [loading, setLoading] = useState(true);
+    
+    // File upload states
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [assigning, setAssigning] = useState(false);
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
-                const res = await api.get(`/profile/details/${clientId}`);
-                setProfile(res.data);
+                // Fetch the client facility details
+                const profileRes = await api.get(`/profile/details/${clientId}`);
+                setProfile(profileRes.data);
+                
+                // Fetch all users to populate the student dropdown
+                // (Make sure you have an endpoint for this!)
+                const usersRes = await api.get('/auth/users');
+                const studentUsers = usersRes.data.filter((u: any) => u.role === 'student');
+                setStudents(studentUsers);
+                
+                if (profileRes.data.assignedLeadStudent) {
+                    setSelectedLead(profileRes.data.assignedLeadStudent);
+                }
             } catch (err) {
-                console.error("Failed to fetch client details", err);
+                console.error("Failed to fetch data", err);
             } finally {
                 setLoading(false);
             }
         };
-        if (clientId) fetchProfile();
+        if (clientId) fetchData();
     }, [clientId]);
 
     const getDownloadUrl = (path: string) => {
         if (!path) return '';
         let cleanPath = path.replace(/\\/g, '/');
         if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
-        // Using relative path so Axios handles the base URL automatically
         return cleanPath; 
     };
 
@@ -52,10 +67,9 @@ const StaffReportWriting = () => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             alert("Audit files uploaded successfully!");
-            setProfile(res.data.profile); // Update the UI with the new files
+            setProfile(res.data.profile);
             setSelectedFiles(null);
             
-            // Reset the file input visually
             const fileInput = document.getElementById('file-upload') as HTMLInputElement;
             if (fileInput) fileInput.value = '';
         } catch (err) {
@@ -66,14 +80,34 @@ const StaffReportWriting = () => {
         }
     };
 
-    if (loading) return <div className="p-10 text-center">Loading Report Dashboard...</div>;
+    const handleAssignLead = async () => {
+        if (!selectedLead) return alert("Please select a Lead Student first.");
+        
+        setAssigning(true);
+        try {
+            await api.put(`/profile/${clientId}`, {
+                assignedLeadStudent: selectedLead,
+                reportProgressStatus: 'Assigned to Lead'
+            });
+            alert("Lead Student assigned successfully!");
+            // Update local UI immediately
+            setProfile({ ...profile, assignedLeadStudent: selectedLead, reportProgressStatus: 'Assigned to Lead' });
+        } catch (err) {
+            console.error("Error assigning lead", err);
+            alert("Failed to assign lead student. Make sure schema fields exist in database.");
+        } finally {
+            setAssigning(false);
+        }
+    };
+
+    if (loading) return <div className="p-10 text-center font-bold text-gray-500">Loading Report Dashboard...</div>;
     if (!profile) return <div className="p-10 text-center text-red-500">Client not found.</div>;
 
     const uploadedDocs = profile.documents || [];
-    const auditFiles = profile.auditFiles || []; // New array we will add to the backend schema
+    const auditFiles = profile.auditFiles || []; 
 
     return (
-        <div className="w-full min-h-screen bg-gray-50 flex flex-col relative">
+        <div className="w-full min-h-screen bg-gray-50 flex flex-col relative font-sans">
             
             {/* 1. BREADCRUMBS */}
             <div className="bg-white border-b border-gray-200 px-8 py-4 mb-8 flex items-center gap-3 shadow-sm">
@@ -85,12 +119,12 @@ const StaffReportWriting = () => {
                 <span className="text-gray-300">|</span>
                 <span className="text-sm font-medium text-gray-500">Staff Dashboard</span>
                 <span className="text-gray-300">/</span>
-                <span className="text-sm font-bold text-black">Report Writing</span>
+                <span className="text-sm font-bold text-black">Report Delegation</span>
             </div>
 
             <div className="flex-1 max-w-7xl w-full mx-auto px-6 pb-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                {/* LEFT COLUMN: Client Details & Date */}
+                {/* LEFT COLUMN: Client Details & Team Assignment */}
                 <div className="lg:col-span-1 space-y-6">
                     
                     {/* Header */}
@@ -101,23 +135,77 @@ const StaffReportWriting = () => {
                         </span>
                     </div>
 
-                    {/* Audit Date Card */}
-                    <div className="bg-orange-50 border border-orange-200 rounded-xl shadow-sm p-6 text-center">
-                        <h3 className="text-sm font-bold text-orange-800 uppercase tracking-wider mb-2">Confirmed Audit Date</h3>
-                        <div className="text-2xl font-black text-black">
-                            {profile.confirmedAuditDate ? profile.confirmedAuditDate.replace('Client Proposed: ', '').replace('Staff Proposed: ', '') : 'Date Not Found'}
+                    {/* NEW: Lead Assignment Panel */}
+                    <div className="bg-white rounded-xl shadow-sm border border-[#FE5C00] overflow-hidden">
+                        <div className="bg-[#FE5C00] text-white px-6 py-4 border-b border-orange-600 font-bold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                            Delegate Report to Team
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-4 flex items-center justify-between">
+                                <span className="text-sm font-bold text-gray-600">Report Status:</span>
+                                <span className="text-xs bg-orange-100 text-[#FE5C00] font-bold px-3 py-1 rounded-full uppercase">
+                                    {profile.reportProgressStatus || 'Pending Assignment'}
+                                </span>
+                            </div>
+                            
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Select Lead Student:</label>
+                            <select 
+                                value={selectedLead}
+                                onChange={(e) => setSelectedLead(e.target.value)}
+                                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#FE5C00] outline-none mb-4 bg-white"
+                            >
+                                <option value="">-- Choose a student --</option>
+                                {students.map(student => (
+                                    <option key={student._id} value={student._id}>
+                                        {student.name} ({student.email})
+                                    </option>
+                                ))}
+                            </select>
+
+                            <button 
+                                onClick={handleAssignLead}
+                                disabled={assigning || !selectedLead}
+                                className={`w-full font-bold text-white py-3 rounded-lg transition shadow-sm
+                                    ${assigning ? 'bg-orange-300' : 'bg-[#FE5C00] hover:bg-orange-700'}`}
+                            >
+                                {assigning ? 'Assigning...' : 'Assign Lead & Notify'}
+                            </button>
+
+                            {/* Show currently assigned team members */}
+                            {profile.assignedLeadStudent && (
+                                <div className="mt-6 pt-4 border-t border-gray-100">
+                                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Current Team</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-[#FE5C00] font-bold text-xs">L</div>
+                                            <span className="text-sm font-bold text-gray-800">
+                                                {students.find(s => s._id === profile.assignedLeadStudent)?.name || 'Unknown'}
+                                            </span>
+                                        </div>
+                                        {profile.assignedTeam?.map((id: string) => (
+                                            <div key={id} className="flex items-center gap-3 pl-4">
+                                                <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold text-[10px]">S</div>
+                                                <span className="text-sm text-gray-600">
+                                                    {students.find(s => s._id === id)?.name || 'Unknown'}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
                     {/* Client Info Card */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3 mb-4">Client Details</h3>
+                        <h3 className="font-bold text-gray-800 text-lg border-b border-gray-100 pb-3 mb-4">Facility Details</h3>
                         <div className="space-y-4">
                             <DetailItem label="Contact Name" value={profile.contactName} />
                             <DetailItem label="Email" value={profile.contactEmail} isEmail />
                             <DetailItem label="Phone" value={profile.contactPhone} />
                             <DetailItem label="Address" value={`${profile.streetAddress || ''} ${profile.city || ''}, ${profile.state || ''} ${profile.zipCode || ''}`} />
-                            <DetailItem label="Facility Size" value={profile.facilitySize ? `${profile.facilitySize} sq ft` : null} />
+                            <DetailItem label="Building Size" value={profile.buildingSize ? `${profile.buildingSize} sq ft` : null} />
                         </div>
                     </div>
                 </div>
@@ -127,9 +215,11 @@ const StaffReportWriting = () => {
                     
                     {/* Upload Field Notes Section */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
-                            <h2 className="font-bold text-gray-800 text-lg">Upload Field Notes & Images</h2>
-                            <p className="text-xs text-gray-500 mt-1">Upload photos, calculations, and notes taken during the physical audit.</p>
+                        <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <div>
+                                <h2 className="font-bold text-gray-800 text-lg">Staff Field Notes & Images</h2>
+                                <p className="text-xs text-gray-500 mt-1">Upload audit photos and base calculations for the student team to use.</p>
+                            </div>
                         </div>
                         <div className="p-6">
                             <form onSubmit={handleUploadFiles} className="flex flex-col sm:flex-row items-center gap-4">
@@ -146,14 +236,14 @@ const StaffReportWriting = () => {
                                     className={`px-6 py-3 rounded-md font-bold text-white transition shadow-sm whitespace-nowrap
                                         ${isUploading || !selectedFiles ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FE5C00] hover:bg-orange-700'}`}
                                 >
-                                    {isUploading ? 'Uploading...' : 'Upload Files'}
+                                    {isUploading ? 'Uploading...' : 'Upload Notes'}
                                 </button>
                             </form>
 
                             {/* Show uploaded staff files */}
                             {auditFiles.length > 0 && (
                                 <div className="mt-6 space-y-3">
-                                    <h4 className="text-sm font-bold text-gray-700 mb-3">Saved Field Documents:</h4>
+                                    <h4 className="text-sm font-bold text-gray-700 mb-3 border-b pb-2">Available Field Documents:</h4>
                                     {auditFiles.map((doc: any, i: number) => (
                                         <DocumentRow key={`audit-${i}`} doc={doc} downloadUrl={getDownloadUrl(doc.path)} />
                                     ))}
@@ -165,11 +255,11 @@ const StaffReportWriting = () => {
                     {/* Client Submitted Documents */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
-                            <h2 className="font-bold text-gray-800 text-lg">Client Submitted Documents</h2>
+                            <h2 className="font-bold text-gray-800 text-lg">Client Submitted Utility Documents</h2>
                         </div>
                         <div className="p-6 space-y-3">
                             {uploadedDocs.length === 0 ? (
-                                <p className="text-gray-400 italic text-center py-4">No documents submitted by client.</p>
+                                <p className="text-gray-400 italic text-center py-4">No utility documents found.</p>
                             ) : (
                                 uploadedDocs.map((doc: any, i: number) => (
                                     <DocumentRow key={`client-${i}`} doc={doc} downloadUrl={getDownloadUrl(doc.path)} />
@@ -196,7 +286,7 @@ const DetailItem = ({ label, value, isEmail = false }: any) => (
     </div>
 );
 
-// Secure Downloader Component (Reused)
+// Secure Downloader Component
 const DocumentRow = ({ doc, downloadUrl }: { doc: any, downloadUrl: string }) => {
     const [isDownloading, setIsDownloading] = useState(false);
 

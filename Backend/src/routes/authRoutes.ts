@@ -180,5 +180,18 @@ router.put('/reset-password/:token', async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/users
+// @desc    Get all users (useful for populating staff/student dropdowns)
+router.get('/users', async (req: Request, res: Response) => {
+  try {
+    // Fetch all users but exclude their passwords
+    const users = await User.find().select('-passwordHash -password');
+    res.json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ message: "Server error fetching users" });
+  }
+});
+
 
 export default router;

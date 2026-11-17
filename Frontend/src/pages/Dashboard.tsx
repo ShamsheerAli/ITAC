@@ -142,7 +142,7 @@ const Dashboard = () => {
                                                 to={`/client/facility/${facility._id}`} 
                                                 className="flex-1 bg-gray-900 hover:bg-black text-white text-center font-bold py-2.5 rounded transition text-sm"
                                             >
-                                                Manage Documents
+                                                Upload Documents
                                             </Link>
                                         )}
                                     </div>
