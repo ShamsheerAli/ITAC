@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
 import messageRoutes from './routes/messageRoutes';
 import leadRoutes from './routes/leadRoutes';
+import { performBackup } from './utils/backupService';
 
 // Load environment variables
 dotenv.config();
@@ -53,6 +54,13 @@ app.get('/', (req: Request, res: Response) => {
   res.send('ITAC Staff Portal API is Running & DB Connected!');
 });
 
+
+// Run backup every 24 hours (86400000 ms)
+setInterval(() => {
+    performBackup();
+}, 86400000);
+
+//performBackup();
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

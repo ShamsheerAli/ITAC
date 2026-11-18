@@ -1,0 +1,241 @@
+[
+  {
+    "_id": "69d02e6e9dfcf11a216f1448",
+    "clientUserId": "69cee1bd781ff9c3e71c47b1",
+    "senderRole": "client",
+    "text": "Hello",
+    "createdAt": "2026-04-03T21:17:34.327Z",
+    "updatedAt": "2026-04-03T21:17:34.327Z",
+    "__v": 0
+  },
+  {
+    "_id": "69d0318243542de7fe01181b",
+    "clientUserId": "69cee1bd781ff9c3e71c47b1",
+    "senderRole": "client",
+    "text": "How are you?",
+    "isRead": true,
+    "createdAt": "2026-04-03T21:30:42.743Z",
+    "updatedAt": "2026-04-03T21:30:57.060Z",
+    "__v": 0
+  },
+  {
+    "_id": "69de8e61316ad20595867698",
+    "clientUserId": "69cee1bd781ff9c3e71c47b1",
+    "senderRole": "client",
+    "text": "Hello!!!!!",
+    "isRead": true,
+    "createdAt": "2026-04-14T18:58:41.991Z",
+    "updatedAt": "2026-04-14T18:59:09.017Z",
+    "__v": 0
+  },
+  {
+    "_id": "69e01e6e316ad20595867c2a",
+    "clientUserId": "69e01c4b316ad20595867a94",
+    "senderRole": "staff",
+    "text": "Date looks great!",
+    "isRead": false,
+    "createdAt": "2026-04-15T23:25:34.188Z",
+    "updatedAt": "2026-04-15T23:25:34.188Z",
+    "__v": 0
+  },
+  {
+    "_id": "69f269b7b0586dfb77e89109",
+    "clientUserId": "69e69d519f913333708ec9e0",
+    "senderRole": "client",
+    "text": "Hello",
+    "isRead": true,
+    "createdAt": "2026-04-29T20:27:35.277Z",
+    "updatedAt": "2026-04-29T20:34:33.746Z",
+    "__v": 0
+  },
+  {
+    "_id": "69f26b67b0586dfb77e89255",
+    "clientUserId": "69e69d519f913333708ec9e0",
+    "senderRole": "staff",
+    "text": "hi",
+    "isRead": true,
+    "createdAt": "2026-04-29T20:34:47.313Z",
+    "updatedAt": "2026-05-20T19:14:08.355Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a0cb552b614f9c726518672",
+    "clientUserId": "6a0caf9cb614f9c726518374",
+    "senderRole": "client",
+    "text": "Hello, I am from My company",
+    "isRead": true,
+    "createdAt": "2026-05-19T19:09:06.164Z",
+    "updatedAt": "2026-05-19T19:10:11.445Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a0cb5a3b614f9c7265186fe",
+    "clientUserId": "6a0caf9cb614f9c726518374",
+    "senderRole": "staff",
+    "text": "Hello My Company!",
+    "isRead": false,
+    "createdAt": "2026-05-19T19:10:27.735Z",
+    "updatedAt": "2026-05-19T19:10:27.735Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a0e0598f6f928c0bb2ed2a8",
+    "clientUserId": "69e69d519f913333708ec9e0",
+    "senderRole": "staff",
+    "text": "Helloooo",
+    "isRead": true,
+    "createdAt": "2026-05-20T19:03:52.668Z",
+    "updatedAt": "2026-05-20T19:14:08.355Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a0e08076992acf4a6eb6402",
+    "clientUserId": "69e69d519f913333708ec9e0",
+    "senderRole": "client",
+    "text": "sdsdg",
+    "isRead": true,
+    "createdAt": "2026-05-20T19:14:15.766Z",
+    "updatedAt": "2026-06-01T20:26:24.093Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1e049a161e868bb4ebc292",
+    "clientUserId": "6a1a1c15f14857d57dc2cad6",
+    "senderRole": "staff",
+    "text": "Hello Devin. Thank you for sending your documents. Don't forget we still need your gas bills uploaded (or emailed). Thanks, Kyle",
+    "isRead": true,
+    "createdAt": "2026-06-01T22:15:54.912Z",
+    "updatedAt": "2026-06-04T14:06:50.132Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a2077da1d882f9293d1b1b0",
+    "clientUserId": "6a1e0a4f68c85ab11874d794",
+    "senderRole": "staff",
+    "text": "Please upload documents",
+    "isRead": false,
+    "createdAt": "2026-06-03T18:52:10.045Z",
+    "updatedAt": "2026-06-03T18:52:10.045Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a2186daec6820473faa0465",
+    "clientUserId": "6a1a1c15f14857d57dc2cad6",
+    "senderRole": "client",
+    "text": "Kyle, the gas bills were emailed to you on 6/2 from Kaleb Smith.",
+    "isRead": true,
+    "createdAt": "2026-06-04T14:08:26.588Z",
+    "updatedAt": "2026-06-09T20:30:43.813Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a2b1dd9d62402fe8e0f45b1",
+    "clientUserId": "6a2b1ca4a58b8fd6f578536b",
+    "senderRole": "staff",
+    "text": "Hello, You need to upload all the documents!",
+    "isRead": false,
+    "createdAt": "2026-06-11T20:43:05.268Z",
+    "updatedAt": "2026-06-11T20:43:05.268Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a2b3202d62402fe8e0f4b82",
+    "clientUserId": "6a1e0a4f68c85ab11874d794",
+    "senderRole": "staff",
+    "text": "Shamsheer, this client has their bills uploaded, but it still shows the utility bills are missing. Thanks,",
+    "isRead": false,
+    "createdAt": "2026-06-11T22:09:06.190Z",
+    "updatedAt": "2026-06-11T22:09:06.190Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a2b3223d62402fe8e0f4c47",
+    "clientUserId": "6a1e0a4f68c85ab11874d794",
+    "senderRole": "staff",
+    "text": "Thanks, Kyle",
+    "isRead": false,
+    "createdAt": "2026-06-11T22:09:39.487Z",
+    "updatedAt": "2026-06-11T22:09:39.487Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a42d884f166bedcff20c68a",
+    "clientUserId": "6a42d5712eb93e6f692ecd30",
+    "senderRole": "staff",
+    "text": "Please send your natural gas usage bills for the last 12 months. Thank you!",
+    "isRead": false,
+    "createdAt": "2026-06-29T20:41:40.651Z",
+    "updatedAt": "2026-06-29T20:41:40.651Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4bda507e9cd6e5cbbc90ba",
+    "clientUserId": "6a4bcfdbad728964c0f1ab62",
+    "senderRole": "staff",
+    "text": "upload docs",
+    "isRead": false,
+    "createdAt": "2026-07-06T16:39:44.328Z",
+    "updatedAt": "2026-07-06T16:39:44.328Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4be0757e9cd6e5cbbc95af",
+    "clientUserId": "6a4bcfdbad728964c0f1ab62",
+    "senderRole": "staff",
+    "text": "Please send application form!!",
+    "isRead": false,
+    "createdAt": "2026-07-06T17:05:57.350Z",
+    "updatedAt": "2026-07-06T17:05:57.350Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a5e4fc8bc1f55613d090689",
+    "clientUserId": "6a5a6183bc1f55613d08f2eb",
+    "senderRole": "staff",
+    "text": "Hello Rob. I also sent you an email on this. Can you please verify TriStar's annual energy expense. You entered $55,000 per year, but that seems low. ",
+    "isRead": false,
+    "createdAt": "2026-07-20T16:41:44.899Z",
+    "updatedAt": "2026-07-20T16:41:44.899Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a5e4fcabc1f55613d0906ba",
+    "clientUserId": "6a5a6183bc1f55613d08f2eb",
+    "senderRole": "staff",
+    "text": "Thanks, ",
+    "isRead": false,
+    "createdAt": "2026-07-20T16:41:46.698Z",
+    "updatedAt": "2026-07-20T16:41:46.698Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a5e4fccbc1f55613d090716",
+    "clientUserId": "6a5a6183bc1f55613d08f2eb",
+    "senderRole": "staff",
+    "text": "Kyle",
+    "isRead": false,
+    "createdAt": "2026-07-20T16:41:48.364Z",
+    "updatedAt": "2026-07-20T16:41:48.364Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a625294bc1f55613d092005",
+    "clientUserId": "6a5a6183bc1f55613d08f2eb",
+    "senderRole": "staff",
+    "text": "We checked your report from 2021. The yearly usage was $783,000. So, I assume the $55,000 was for the monthly bill. $55,000/month is about $660,000 yearly. Thanks, Kyle",
+    "isRead": false,
+    "createdAt": "2026-07-23T17:42:44.294Z",
+    "updatedAt": "2026-07-23T17:42:44.294Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa9659ebc1f55613d0e6199",
+    "clientUserId": "6a8dcb5221aa26bd966aad68",
+    "senderRole": "staff",
+    "text": "We have your energy assessment scheduled for Thursday, 10/22. Thank you!",
+    "isRead": false,
+    "createdAt": "2026-09-15T15:34:54.753Z",
+    "updatedAt": "2026-09-15T15:34:54.753Z",
+    "__v": 0
+  }
+]

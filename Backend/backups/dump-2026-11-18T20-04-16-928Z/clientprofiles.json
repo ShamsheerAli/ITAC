@@ -1,0 +1,1383 @@
+[
+  {
+    "_id": "69cd87ee325cc02505dddfa6",
+    "user": "69cd876f325cc02505dddfa0",
+    "companyName": "Ok State Univ",
+    "contactName": "Kyle Robison",
+    "contactEmail": "kyle.robison@okstate.edu",
+    "contactPhone": "4058853888",
+    "streetAddress": "317 NW 1st St",
+    "city": "Perkins",
+    "state": "OK",
+    "zipCode": "74059",
+    "buildingSize": "90,000",
+    "utilityExpenses": "80000",
+    "energyConsumption": "125,000",
+    "grossSales": "4 million",
+    "sicCode": "3312",
+    "naics": "301123",
+    "description": "",
+    "status": "Audit Scheduled",
+    "serviceType": "Commercial ITAC",
+    "isSmallBusiness": "No",
+    "isRuralArea": "No",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [
+      "2026-04-29",
+      "2026-04-21",
+      "2026-03-10"
+    ],
+    "auditNotes": "Please select one of the proposed dates. ",
+    "confirmedAuditDate": "Client Proposed: 2026-04-15 at 07:43",
+    "isAuditConfirmed": true,
+    "documents": [
+      {
+        "name": "Confidentiality Statement",
+        "path": "uploads/file-1775077872755.pdf",
+        "uploadedAt": "2026-04-01T21:11:12.789Z",
+        "_id": "69cd89f0325cc02505dddfec"
+      },
+      {
+        "name": "Media Release Form",
+        "path": "uploads/file-1775078065771.pdf",
+        "uploadedAt": "2026-04-01T21:14:25.807Z",
+        "_id": "69cd8ab1325cc02505dddff0"
+      },
+      {
+        "name": "Energy Assessment Application",
+        "path": "uploads/file-1775078272904.pdf",
+        "uploadedAt": "2026-04-01T21:17:52.936Z",
+        "_id": "69cd8b80325cc02505dddff5"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1775078334378.pdf",
+        "uploadedAt": "2026-04-01T21:18:54.411Z",
+        "_id": "69cd8bbe325cc02505dddffb"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1775078345144.pdf",
+        "uploadedAt": "2026-04-01T21:19:05.177Z",
+        "_id": "69cd8bc9325cc02505dde002"
+      }
+    ],
+    "createdAt": "2026-04-01T21:02:38.916Z",
+    "updatedAt": "2026-04-01T21:43:24.223Z",
+    "__v": 5
+  },
+  {
+    "_id": "6a1dd46b68c85ab11874c52f",
+    "user": "6a1a1c15f14857d57dc2cad6",
+    "__v": 32,
+    "auditNotes": "Let us know if this works. I'll set up an Outlook meeting also so it's on our calendars. If the date needs to change (from 7/16), let us know. \nThanks, Devin\nKyle",
+    "buildingSize": "116,000",
+    "businessDescription": "Fuel Filtration",
+    "city": "Stilwell",
+    "companyName": "Facet Filtration",
+    "confirmedAuditDate": "Staff Proposed: 2026-07-16",
+    "contactEmail": "devin.caples@facetFiltration.com",
+    "contactName": "Devin Caples",
+    "contactPhone": "918.984.9226",
+    "createdAt": "2026-06-01T18:50:19.177Z",
+    "description": "Production building: 54,000 square feet\nWarehouse building: 62,000 square feet ",
+    "documents": [
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780350055330.pdf",
+        "uploadedAt": "2026-06-01T21:40:55.358Z",
+        "_id": "6a1dfc67161e868bb4ebbe93"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780350067095.pdf",
+        "uploadedAt": "2026-06-01T21:41:07.122Z",
+        "_id": "6a1dfc73161e868bb4ebbe99"
+      },
+      {
+        "name": "Confidentiality Statement",
+        "path": "uploads/file-1780350368969.pdf",
+        "uploadedAt": "2026-06-01T21:46:08.995Z",
+        "_id": "6a1dfda0161e868bb4ebbec9"
+      },
+      {
+        "name": "Media Release Form",
+        "path": "uploads/file-1780350375185.pdf",
+        "uploadedAt": "2026-06-01T21:46:15.212Z",
+        "_id": "6a1dfda7161e868bb4ebbed4"
+      },
+      {
+        "name": "Energy Assessment Application",
+        "path": "uploads/file-1780350419060.pdf",
+        "uploadedAt": "2026-06-01T21:46:59.095Z",
+        "_id": "6a1dfdd3161e868bb4ebbee7"
+      },
+      {
+        "name": "Energy Assessment Application",
+        "path": "uploads/file-1780351070171.pdf",
+        "uploadedAt": "2026-06-01T21:57:50.200Z",
+        "_id": "6a1e005e161e868bb4ebbf4c"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416321008.pdf",
+        "uploadedAt": "2026-06-02T16:05:21.039Z",
+        "_id": "6a1eff411d882f9293d19d50"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416329186.pdf",
+        "uploadedAt": "2026-06-02T16:05:29.213Z",
+        "_id": "6a1eff491d882f9293d19d65"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416422894.pdf",
+        "uploadedAt": "2026-06-02T16:07:02.924Z",
+        "_id": "6a1effa61d882f9293d19d82"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416433899.pdf",
+        "uploadedAt": "2026-06-02T16:07:13.926Z",
+        "_id": "6a1effb11d882f9293d19d99"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416453334.pdf",
+        "uploadedAt": "2026-06-02T16:07:33.363Z",
+        "_id": "6a1effc51d882f9293d19db5"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416471503.pdf",
+        "uploadedAt": "2026-06-02T16:07:51.530Z",
+        "_id": "6a1effd71d882f9293d19dd0"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416484158.pdf",
+        "uploadedAt": "2026-06-02T16:08:04.186Z",
+        "_id": "6a1effe41d882f9293d19ded"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416506572.pdf",
+        "uploadedAt": "2026-06-02T16:08:26.600Z",
+        "_id": "6a1efffa1d882f9293d19e10"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416524304.pdf",
+        "uploadedAt": "2026-06-02T16:08:44.330Z",
+        "_id": "6a1f000c1d882f9293d19e31"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416543440.pdf",
+        "uploadedAt": "2026-06-02T16:09:03.466Z",
+        "_id": "6a1f001f1d882f9293d19e54"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416572388.pdf",
+        "uploadedAt": "2026-06-02T16:09:32.417Z",
+        "_id": "6a1f003c1d882f9293d19e7d"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416601397.pdf",
+        "uploadedAt": "2026-06-02T16:10:01.425Z",
+        "_id": "6a1f00591d882f9293d19ea5"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416623104.pdf",
+        "uploadedAt": "2026-06-02T16:10:23.130Z",
+        "_id": "6a1f006f1d882f9293d19ecf"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416646570.pdf",
+        "uploadedAt": "2026-06-02T16:10:46.597Z",
+        "_id": "6a1f00861d882f9293d19efd"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416674256.pdf",
+        "uploadedAt": "2026-06-02T16:11:14.286Z",
+        "_id": "6a1f00a21d882f9293d19f2b"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416701253.pdf",
+        "uploadedAt": "2026-06-02T16:11:41.280Z",
+        "_id": "6a1f00bd1d882f9293d19f5e"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416725008.pdf",
+        "uploadedAt": "2026-06-02T16:12:05.036Z",
+        "_id": "6a1f00d51d882f9293d19f8f"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416755506.pdf",
+        "uploadedAt": "2026-06-02T16:12:35.533Z",
+        "_id": "6a1f00f31d882f9293d19fc6"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416782755.pdf",
+        "uploadedAt": "2026-06-02T16:13:02.782Z",
+        "_id": "6a1f010e1d882f9293d19ffc"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416813892.pdf",
+        "uploadedAt": "2026-06-02T16:13:33.921Z",
+        "_id": "6a1f012d1d882f9293d1a037"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416843577.pdf",
+        "uploadedAt": "2026-06-02T16:14:03.604Z",
+        "_id": "6a1f014b1d882f9293d1a071"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416892841.pdf",
+        "uploadedAt": "2026-06-02T16:14:52.870Z",
+        "_id": "6a1f017c1d882f9293d1a0b1"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416925365.pdf",
+        "uploadedAt": "2026-06-02T16:15:25.394Z",
+        "_id": "6a1f019d1d882f9293d1a0f2"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780416968870.pdf",
+        "uploadedAt": "2026-06-02T16:16:08.897Z",
+        "_id": "6a1f01c81d882f9293d1a133"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780417039326.pdf",
+        "uploadedAt": "2026-06-02T16:17:19.354Z",
+        "_id": "6a1f020f1d882f9293d1a17b"
+      },
+      {
+        "name": "Utility Bills",
+        "path": "uploads/file-1780417060259.pdf",
+        "uploadedAt": "2026-06-02T16:17:40.289Z",
+        "_id": "6a1f02241d882f9293d1a1c1"
+      }
+    ],
+    "electricityProvider": "Ozarks Electric Cooperative",
+    "energyConsumption": "111111111",
+    "grossSales": "$108,000,000",
+    "isArchived": true,
+    "isAuditConfirmed": true,
+    "isGrossSalesLessThan250M": "yes",
+    "naics": "333998",
+    "naturalGasProvider": "ONG",
+    "naturalGasTransporter": "ONG",
+    "proposedAuditDates": [
+      "2026-07-16"
+    ],
+    "referredBy": "",
+    "serviceType": "Industrial TAC",
+    "state": "OK",
+    "status": "Report writing",
+    "streetAddress": "470555 E. 868 Rd.",
+    "updatedAt": "2026-08-04T23:15:36.823Z",
+    "utilityExpenses": "479,307",
+    "zipCode": "74960",
+    "statusUpdatedAt": "2026-07-20T16:38:55.706Z"
+  },
+  {
+    "_id": "6a42d5712eb93e6f692ecd30",
+    "user": "6a42c971f166bedcff20be97",
+    "__v": 36,
+    "auditNotes": "",
+    "buildingSize": "100,000",
+    "businessDescription": "HVAC Ductwork",
+    "city": "Wagoner",
+    "companyName": "DMI Companies, Wagoner",
+    "confirmedAuditDate": "Staff Proposed: 2026-07-24",
+    "contactEmail": "test@test.com",
+    "contactName": "Nathan Chuculate, EH&S Coordinator",
+    "contactPhone": "757-392-3234 ext. 4054",
+    "createdAt": "2026-06-29T20:28:33.924Z",
+    "description": "Kyle added this information for testing and to utilize the portal for scheduling. ",
+    "documents": [
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 01-28-26.pdf",
+        "path": "uploads/file-1782765113101.pdf",
+        "uploadedAt": "2026-06-29T20:31:53.134Z",
+        "_id": "6a42d639f166bedcff20c012"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 02-26-26.pdf",
+        "path": "uploads/file-1782765121872.pdf",
+        "uploadedAt": "2026-06-29T20:32:01.900Z",
+        "_id": "6a42d641f166bedcff20c019"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 03-27-26.pdf",
+        "path": "uploads/file-1782765248189.pdf",
+        "uploadedAt": "2026-06-29T20:34:08.219Z",
+        "_id": "6a42d6c0f166bedcff20c02c"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 04-28-26.pdf",
+        "path": "uploads/file-1782765255689.pdf",
+        "uploadedAt": "2026-06-29T20:34:15.717Z",
+        "_id": "6a42d6c7f166bedcff20c036"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 05-29-26.pdf",
+        "path": "uploads/file-1782765263861.pdf",
+        "uploadedAt": "2026-06-29T20:34:23.889Z",
+        "_id": "6a42d6cff166bedcff20c043"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 6-27-25.pdf",
+        "path": "uploads/file-1782765280936.pdf",
+        "uploadedAt": "2026-06-29T20:34:40.965Z",
+        "_id": "6a42d6e0f166bedcff20c052"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 7-28-25.pdf",
+        "path": "uploads/file-1782765292684.pdf",
+        "uploadedAt": "2026-06-29T20:34:52.714Z",
+        "_id": "6a42d6ecf166bedcff20c063"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 8-28-25.pdf",
+        "path": "uploads/file-1782765335366.pdf",
+        "uploadedAt": "2026-06-29T20:35:35.396Z",
+        "_id": "6a42d717f166bedcff20c09c"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 9-26-25.pdf",
+        "path": "uploads/file-1782765343541.pdf",
+        "uploadedAt": "2026-06-29T20:35:43.571Z",
+        "_id": "6a42d71ff166bedcff20c0b0"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 10-28-25.pdf",
+        "path": "uploads/file-1782765347773.pdf",
+        "uploadedAt": "2026-06-29T20:35:47.800Z",
+        "_id": "6a42d723f166bedcff20c0c6"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 11-25-25.pdf",
+        "path": "uploads/file-1782765353744.pdf",
+        "uploadedAt": "2026-06-29T20:35:53.773Z",
+        "_id": "6a42d729f166bedcff20c0df"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Wagoner Public Works Authority 12-26-25.pdf",
+        "path": "uploads/file-1782765359461.pdf",
+        "uploadedAt": "2026-06-29T20:35:59.491Z",
+        "_id": "6a42d72ff166bedcff20c0fa"
+      },
+      {
+        "name": "Confidentiality Statement",
+        "originalName": "Confidentiality Statement.pdf",
+        "path": "uploads/file-1782765393635.pdf",
+        "uploadedAt": "2026-06-29T20:36:33.666Z",
+        "_id": "6a42d751f166bedcff20c118"
+      },
+      {
+        "name": "Media Release Form",
+        "originalName": "Media Release Statement.pdf",
+        "path": "uploads/file-1782765413551.pdf",
+        "uploadedAt": "2026-06-29T20:36:53.581Z",
+        "_id": "6a42d765f166bedcff20c138"
+      },
+      {
+        "name": "Energy Assessment Application",
+        "originalName": "Energy Assessment Application 2024-2025 - Rev B.pdf",
+        "path": "uploads/file-1782765424255.pdf",
+        "uploadedAt": "2026-06-29T20:37:04.285Z",
+        "_id": "6a42d770f166bedcff20c159"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 01-14-26.pdf",
+        "path": "uploads/file-1782765442423.pdf",
+        "uploadedAt": "2026-06-29T20:37:22.451Z",
+        "_id": "6a42d782f166bedcff20c17d"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 02-13-26.pdf",
+        "path": "uploads/file-1782765448033.pdf",
+        "uploadedAt": "2026-06-29T20:37:28.060Z",
+        "_id": "6a42d788f166bedcff20c1a1"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 03-13-26.pdf",
+        "path": "uploads/file-1782765453831.pdf",
+        "uploadedAt": "2026-06-29T20:37:33.858Z",
+        "_id": "6a42d78df166bedcff20c1c7"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 04-14-26.pdf",
+        "path": "uploads/file-1782765458996.pdf",
+        "uploadedAt": "2026-06-29T20:37:39.022Z",
+        "_id": "6a42d793f166bedcff20c1f0"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 05-14-26.pdf",
+        "path": "uploads/file-1782765465407.pdf",
+        "uploadedAt": "2026-06-29T20:37:45.435Z",
+        "_id": "6a42d799f166bedcff20c21a"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 06-15-26.pdf",
+        "path": "uploads/file-1782765470234.pdf",
+        "uploadedAt": "2026-06-29T20:37:50.261Z",
+        "_id": "6a42d79ef166bedcff20c247"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 07-14-25.pdf",
+        "path": "uploads/file-1782765476385.pdf",
+        "uploadedAt": "2026-06-29T20:37:56.412Z",
+        "_id": "6a42d7a4f166bedcff20c275"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 08-14-25.pdf",
+        "path": "uploads/file-1782765527474.pdf",
+        "uploadedAt": "2026-06-29T20:38:47.500Z",
+        "_id": "6a42d7d7f166bedcff20c3a5"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 09-15-25.pdf",
+        "path": "uploads/file-1782765532283.pdf",
+        "uploadedAt": "2026-06-29T20:38:52.313Z",
+        "_id": "6a42d7dcf166bedcff20c3da"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 10-14-25.pdf",
+        "path": "uploads/file-1782765539907.pdf",
+        "uploadedAt": "2026-06-29T20:38:59.936Z",
+        "_id": "6a42d7e3f166bedcff20c411"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 11-14-25.pdf",
+        "path": "uploads/file-1782765545416.pdf",
+        "uploadedAt": "2026-06-29T20:39:05.442Z",
+        "_id": "6a42d7e9f166bedcff20c44a"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Oklahoma Natural Gas 12-15-25.pdf",
+        "path": "uploads/file-1782765577984.pdf",
+        "uploadedAt": "2026-06-29T20:39:38.047Z",
+        "_id": "6a42d80af166bedcff20c4bb"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "BlueMark Energy 03-31-25.pdf",
+        "path": "uploads/file-1782841738283.pdf",
+        "uploadedAt": "2026-06-30T17:48:58.311Z",
+        "_id": "6a44018af166bedcff20d878"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "BlueMark Energy 04-30-25.pdf",
+        "path": "uploads/file-1782841746313.pdf",
+        "uploadedAt": "2026-06-30T17:49:06.342Z",
+        "_id": "6a440192f166bedcff20d8b5"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "BlueMark Energy 07-31-25.pdf",
+        "path": "uploads/file-1782841753062.pdf",
+        "uploadedAt": "2026-06-30T17:49:13.089Z",
+        "_id": "6a440199f166bedcff20d8f4"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "BlueMark Energy 11-30-25.pdf",
+        "path": "uploads/file-1782841757422.pdf",
+        "uploadedAt": "2026-06-30T17:49:17.448Z",
+        "_id": "6a44019df166bedcff20d935"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "BlueMark Energy 12-31-25.pdf",
+        "path": "uploads/file-1782841761309.pdf",
+        "uploadedAt": "2026-06-30T17:49:21.336Z",
+        "_id": "6a4401a1f166bedcff20d977"
+      }
+    ],
+    "electricityProvider": "City of Wagoner",
+    "energyConsumption": "$120,000",
+    "grossSales": "$125,000,000",
+    "isArchived": true,
+    "isAuditConfirmed": true,
+    "isGrossSalesLessThan250M": "yes",
+    "naics": "xxxxxxx",
+    "naturalGasProvider": "ONG??",
+    "naturalGasTransporter": "ONG",
+    "proposedAuditDates": [
+      "2026-07-24"
+    ],
+    "referredBy": "Christine Allison, TCC",
+    "serviceType": "Industrial TAC",
+    "state": "OK",
+    "status": "Report writing",
+    "statusUpdatedAt": "2026-08-04T23:12:08.271Z",
+    "streetAddress": "300 SE 15th St",
+    "updatedAt": "2026-08-04T23:15:29.849Z",
+    "utilityExpenses": "120,000",
+    "zipCode": "74467"
+  },
+  {
+    "_id": "6a5a6387e4c19cb0e49852d1",
+    "user": "6a5a6183bc1f55613d08f2eb",
+    "__v": 0,
+    "auditNotes": "",
+    "buildingSize": "144000",
+    "businessDescription": "Architectural Flat Glass Fabrication ",
+    "city": "Catoosa",
+    "companyName": "Tristar Glass Inc",
+    "confirmedAuditDate": "",
+    "contactEmail": "robertncarlson@gmail.com",
+    "contactName": "Robert Carlson",
+    "contactPhone": "9189060886",
+    "createdAt": "2026-07-17T17:16:55.280Z",
+    "description": "We conducted a similar study in 2021 ",
+    "documents": [],
+    "electricityProvider": "PSO",
+    "energyConsumption": "",
+    "grossSales": "85000000",
+    "isArchived": true,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "yes",
+    "naics": "327215",
+    "naturalGasProvider": "Constellation",
+    "naturalGasTransporter": "",
+    "proposedAuditDates": [],
+    "referredBy": "OSU ITAC",
+    "serviceType": "Industrial TAC",
+    "state": "OK",
+    "status": "Approved",
+    "statusUpdatedAt": "2026-07-23T17:40:08.818Z",
+    "streetAddress": "1120 W Main Pkwy",
+    "updatedAt": "2026-08-17T21:13:33.444Z",
+    "utilityExpenses": "55000",
+    "zipCode": "74015"
+  },
+  {
+    "_id": "6a6a2f8c9e1eb048cfd7cd0e",
+    "user": "6a6a08a9bc1f55613d094b6c",
+    "__v": 0,
+    "auditNotes": "",
+    "buildingSize": "255,600 sq ft total ",
+    "businessDescription": "Manufacturing and Construction of Cooling Towers",
+    "city": "Chickasha",
+    "companyName": "Midwest Cooling Towers Inc.",
+    "confirmedAuditDate": "",
+    "contactEmail": "alan.williams@mwcooling.com",
+    "contactName": "Alan Williams",
+    "contactPhone": "+1 405 219 6047",
+    "createdAt": "2026-07-29T16:51:24.881Z",
+    "description": "",
+    "documents": [],
+    "electricityProvider": "American Electric & Power",
+    "energyConsumption": "",
+    "grossSales": "43,241.368 million",
+    "isArchived": true,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "no",
+    "naics": "333415",
+    "naturalGasProvider": "Summit",
+    "naturalGasTransporter": "summit",
+    "proposedAuditDates": [],
+    "referredBy": "Rajesh Krishnamurthy",
+    "serviceType": "Industrial TAC",
+    "state": "OK",
+    "status": "Approved",
+    "statusUpdatedAt": "2026-08-03T16:31:55.947Z",
+    "streetAddress": "1156 east highway 19",
+    "updatedAt": "2026-08-17T21:13:25.935Z",
+    "utilityExpenses": "$152,075.26",
+    "zipCode": "73018"
+  },
+  {
+    "_id": "6a8dcb5221aa26bd966aad68",
+    "user": "6a8dbffdbc1f55613d09b67f",
+    "__v": 4,
+    "auditNotes": "",
+    "buildingSize": "15400.",
+    "businessDescription": "Honda Dealership - New & Used Dealer",
+    "city": "Ponca City",
+    "companyName": "HEATHER CANNON HONDA",
+    "confirmedAuditDate": "",
+    "contactEmail": "heather.cannon@cannonhonda.com",
+    "contactName": "Heather Cannon",
+    "contactPhone": "5807626636",
+    "createdAt": "2026-08-25T17:05:22.249Z",
+    "description": "",
+    "documents": [
+      {
+        "name": "Confidentiality Statement",
+        "originalName": "[Untitled]_2026090114344711.pdf",
+        "path": "uploads/file-1788287666692.pdf",
+        "uploadedAt": "2026-09-01T18:34:26.724Z",
+        "_id": "6a971ab2bc1f55613d0be842"
+      },
+      {
+        "name": "Media Release Form",
+        "originalName": "[Untitled]_2026090114350030.pdf",
+        "path": "uploads/file-1788287674187.pdf",
+        "uploadedAt": "2026-09-01T18:34:34.216Z",
+        "_id": "6a971ababc1f55613d0be849"
+      },
+      {
+        "name": "Energy Assessment Application",
+        "originalName": "[Untitled]_2026090114351723.pdf",
+        "path": "uploads/file-1788287685121.pdf",
+        "uploadedAt": "2026-09-01T18:34:45.152Z",
+        "_id": "6a971ac5bc1f55613d0be851"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "[Untitled]_2026090114381201.pdf",
+        "path": "uploads/file-1788287833582.pdf",
+        "uploadedAt": "2026-09-01T18:37:13.615Z",
+        "_id": "6a971b59bc1f55613d0be90d"
+      }
+    ],
+    "electricityProvider": "Ponca City Utility Authority",
+    "energyConsumption": "",
+    "grossSales": "1832570.00",
+    "isArchived": false,
+    "isAuditConfirmed": true,
+    "isGrossSalesLessThan250M": "no",
+    "naics": "44110",
+    "naturalGasProvider": "Oklahoma Natural Gas",
+    "naturalGasTransporter": "",
+    "proposedAuditDates": [
+      "2026-10-01",
+      "2026-10-06",
+      "2026-10-13"
+    ],
+    "referredBy": "",
+    "serviceType": "Commercial ITAC",
+    "state": "OK",
+    "status": "Audit Scheduled",
+    "statusUpdatedAt": "2026-09-15T15:33:08.320Z",
+    "streetAddress": "3415 N 14th St",
+    "updatedAt": "2026-09-15T15:35:08.971Z",
+    "utilityExpenses": "42649.33",
+    "zipCode": "74601"
+  },
+  {
+    "_id": "6aaa971469d8c00be5270da4",
+    "user": "6a861709bc1f55613d09a560",
+    "__v": 43,
+    "auditNotes": "",
+    "buildingSize": "200000",
+    "businessDescription": "Lopez Dorada",
+    "city": "Oklahoma City",
+    "companyName": "Lopez Dorada",
+    "confirmedAuditDate": "",
+    "contactEmail": "alex.floyd@lopezdorada.com",
+    "contactName": "Alex Floyd",
+    "contactPhone": "4794097497",
+    "createdAt": "2026-09-16T13:18:12.381Z",
+    "description": "",
+    "documents": [
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_01_20_25.pdf",
+        "path": "uploads/file-1789564778904.pdf",
+        "uploadedAt": "2026-09-16T13:19:38.935Z",
+        "_id": "6aaa976abc1f55613d0e64f6"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_02_19_25.pdf",
+        "path": "uploads/file-1789564786476.pdf",
+        "uploadedAt": "2026-09-16T13:19:46.504Z",
+        "_id": "6aaa9772bc1f55613d0e6504"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_03_18_25.pdf",
+        "path": "uploads/file-1789564796426.pdf",
+        "uploadedAt": "2026-09-16T13:19:56.453Z",
+        "_id": "6aaa977cbc1f55613d0e650f"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_04_18_25.pdf",
+        "path": "uploads/file-1789564801785.pdf",
+        "uploadedAt": "2026-09-16T13:20:01.812Z",
+        "_id": "6aaa9781bc1f55613d0e651b"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_05_19_25.pdf",
+        "path": "uploads/file-1789564809860.pdf",
+        "uploadedAt": "2026-09-16T13:20:09.888Z",
+        "_id": "6aaa9789bc1f55613d0e652a"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_06_18_25.pdf",
+        "path": "uploads/file-1789564829582.pdf",
+        "uploadedAt": "2026-09-16T13:20:29.609Z",
+        "_id": "6aaa979dbc1f55613d0e653b"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_07_21_25.pdf",
+        "path": "uploads/file-1789564836827.pdf",
+        "uploadedAt": "2026-09-16T13:20:36.854Z",
+        "_id": "6aaa97a4bc1f55613d0e654e"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_08_19_25.pdf",
+        "path": "uploads/file-1789564845859.pdf",
+        "uploadedAt": "2026-09-16T13:20:45.888Z",
+        "_id": "6aaa97adbc1f55613d0e6562"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_09_18_25.pdf",
+        "path": "uploads/file-1789564849889.pdf",
+        "uploadedAt": "2026-09-16T13:20:49.917Z",
+        "_id": "6aaa97b1bc1f55613d0e6579"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_10_20_25.pdf",
+        "path": "uploads/file-1789564854797.pdf",
+        "uploadedAt": "2026-09-16T13:20:54.826Z",
+        "_id": "6aaa97b6bc1f55613d0e6591"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_11_18_25.pdf",
+        "path": "uploads/file-1789564861512.pdf",
+        "uploadedAt": "2026-09-16T13:21:01.540Z",
+        "_id": "6aaa97bdbc1f55613d0e65ab"
+      },
+      {
+        "name": "Electricity Bills",
+        "originalName": "Atrius_OkGAndE_12_17_25.pdf",
+        "path": "uploads/file-1789564868688.pdf",
+        "uploadedAt": "2026-09-16T13:21:08.716Z",
+        "_id": "6aaa97c4bc1f55613d0e65c8"
+      },
+      {
+        "name": "Confidentiality Statement",
+        "originalName": "Lopez Foods - OSU ITAC - NDA- 2026 0824.pdf",
+        "path": "uploads/file-1789565372836.pdf",
+        "uploadedAt": "2026-09-16T13:29:32.864Z",
+        "_id": "6aaa99bcbc1f55613d0e66af"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_668918_14423.pdf",
+        "path": "uploads/file-1789565411268.pdf",
+        "uploadedAt": "2026-09-16T13:30:11.296Z",
+        "_id": "6aaa99e3bc1f55613d0e66d6"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_670906_14423.pdf",
+        "path": "uploads/file-1789565426104.pdf",
+        "uploadedAt": "2026-09-16T13:30:26.133Z",
+        "_id": "6aaa99f2bc1f55613d0e675a"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_672821_14423.pdf",
+        "path": "uploads/file-1789565429219.pdf",
+        "uploadedAt": "2026-09-16T13:30:29.247Z",
+        "_id": "6aaa99f5bc1f55613d0e677c"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_674964_14423.pdf",
+        "path": "uploads/file-1789565432841.pdf",
+        "uploadedAt": "2026-09-16T13:30:32.871Z",
+        "_id": "6aaa99f8bc1f55613d0e67a0"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_676914_14423.pdf",
+        "path": "uploads/file-1789565437925.pdf",
+        "uploadedAt": "2026-09-16T13:30:37.954Z",
+        "_id": "6aaa99fdbc1f55613d0e67c7"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_678580_14423.pdf",
+        "path": "uploads/file-1789565442260.pdf",
+        "uploadedAt": "2026-09-16T13:30:42.289Z",
+        "_id": "6aaa9a02bc1f55613d0e67ef"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_680884_14423.pdf",
+        "path": "uploads/file-1789565446457.pdf",
+        "uploadedAt": "2026-09-16T13:30:46.486Z",
+        "_id": "6aaa9a06bc1f55613d0e6819"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_683442_14423.pdf",
+        "path": "uploads/file-1789565451483.pdf",
+        "uploadedAt": "2026-09-16T13:30:51.583Z",
+        "_id": "6aaa9a0bbc1f55613d0e6846"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_685281_14423.pdf",
+        "path": "uploads/file-1789565455492.pdf",
+        "uploadedAt": "2026-09-16T13:30:55.521Z",
+        "_id": "6aaa9a0fbc1f55613d0e6874"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_687026_14423.pdf",
+        "path": "uploads/file-1789565467273.pdf",
+        "uploadedAt": "2026-09-16T13:31:07.302Z",
+        "_id": "6aaa9a1bbc1f55613d0e68a5"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "01_clearwater_02512.pdf",
+        "path": "uploads/file-1789565471338.pdf",
+        "uploadedAt": "2026-09-16T13:31:11.367Z",
+        "_id": "6aaa9a1fbc1f55613d0e68d7"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Clearwater.pdf",
+        "path": "uploads/file-1789565477820.pdf",
+        "uploadedAt": "2026-09-16T13:31:17.849Z",
+        "_id": "6aaa9a25bc1f55613d0e690b"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_01_31_25.pdf",
+        "path": "uploads/file-1789565488248.pdf",
+        "uploadedAt": "2026-09-16T13:31:28.277Z",
+        "_id": "6aaa9a30bc1f55613d0e6942"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_02_28_25.pdf",
+        "path": "uploads/file-1789565494495.pdf",
+        "uploadedAt": "2026-09-16T13:31:34.525Z",
+        "_id": "6aaa9a36bc1f55613d0e697b"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_03_31_25.pdf",
+        "path": "uploads/file-1789565498929.pdf",
+        "uploadedAt": "2026-09-16T13:31:38.958Z",
+        "_id": "6aaa9a3abc1f55613d0e69b5"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_04_30_25.pdf",
+        "path": "uploads/file-1789565728139.pdf",
+        "uploadedAt": "2026-09-16T13:35:28.169Z",
+        "_id": "6aaa9b20bc1f55613d0e69f9"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_05_31_25.pdf",
+        "path": "uploads/file-1789565732597.pdf",
+        "uploadedAt": "2026-09-16T13:35:32.626Z",
+        "_id": "6aaa9b24bc1f55613d0e6a37"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_06_30_25.pdf",
+        "path": "uploads/file-1789565737198.pdf",
+        "uploadedAt": "2026-09-16T13:35:37.227Z",
+        "_id": "6aaa9b29bc1f55613d0e6a78"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_07_31_25.pdf",
+        "path": "uploads/file-1789565742181.pdf",
+        "uploadedAt": "2026-09-16T13:35:42.212Z",
+        "_id": "6aaa9b2ebc1f55613d0e6aba"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_08_31_25.pdf",
+        "path": "uploads/file-1789565746894.pdf",
+        "uploadedAt": "2026-09-16T13:35:46.923Z",
+        "_id": "6aaa9b32bc1f55613d0e6afe"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_09_30_25.pdf",
+        "path": "uploads/file-1789565751256.pdf",
+        "uploadedAt": "2026-09-16T13:35:51.286Z",
+        "_id": "6aaa9b37bc1f55613d0e6b45"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_10_31_25.pdf",
+        "path": "uploads/file-1789565756312.pdf",
+        "uploadedAt": "2026-09-16T13:35:56.342Z",
+        "_id": "6aaa9b3cbc1f55613d0e6b8d"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_11_30_25.pdf",
+        "path": "uploads/file-1789565761100.pdf",
+        "uploadedAt": "2026-09-16T13:36:01.131Z",
+        "_id": "6aaa9b41bc1f55613d0e6bd7"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Atrius_OkNatGSvc_12_31_25.pdf",
+        "path": "uploads/file-1789565765292.pdf",
+        "uploadedAt": "2026-09-16T13:36:05.376Z",
+        "_id": "6aaa9b45bc1f55613d0e6c24"
+      },
+      {
+        "name": "Media Release Form",
+        "originalName": "Media Release Form 2026.pdf",
+        "path": "uploads/file-1789568385330.pdf",
+        "uploadedAt": "2026-09-16T14:19:45.366Z",
+        "_id": "6aaaa581bc1f55613d0e6d1a"
+      },
+      {
+        "name": "Other Documents",
+        "originalName": "Equipment - OKC.xlsx",
+        "path": "uploads/file-1790096413114.xlsx",
+        "uploadedAt": "2026-09-22T17:00:13.144Z",
+        "_id": "6ab2b41dbc1f55613d0e9952"
+      }
+    ],
+    "electricityProvider": "OG&E",
+    "energyConsumption": "",
+    "grossSales": "",
+    "isArchived": false,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "yes",
+    "naics": "311612",
+    "naturalGasProvider": "Clearwater",
+    "naturalGasTransporter": "ONG",
+    "proposedAuditDates": [],
+    "referredBy": "Better Plants TAM- Wei Guo",
+    "serviceType": "",
+    "state": "OK",
+    "status": "Documents Submitted",
+    "statusUpdatedAt": "2026-09-16T13:36:12.031Z",
+    "streetAddress": "3817 Northwest Expy",
+    "updatedAt": "2026-09-22T17:00:13.148Z",
+    "utilityExpenses": "3401467",
+    "zipCode": "73112-1489"
+  },
+  {
+    "_id": "6ac6a730fd558086d90d0830",
+    "user": "6ac6a6c4eede4c5c8e4f68a2",
+    "__v": 0,
+    "auditFiles": [],
+    "auditNotes": "",
+    "buildingSize": "1000",
+    "businessDescription": "sgdsdg",
+    "city": "Tulsa",
+    "companyName": "Test company",
+    "confirmedAuditDate": "",
+    "contactEmail": "testconf@gamil.com",
+    "contactName": "Test User",
+    "contactPhone": "19999999999",
+    "createdAt": "2026-10-07T20:10:24.594Z",
+    "description": "",
+    "documents": [],
+    "electricityProvider": "",
+    "energyConsumption": "",
+    "grossSales": "",
+    "isArchived": true,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "no",
+    "naics": "5757547",
+    "naturalGasProvider": "",
+    "naturalGasTransporter": "",
+    "proposedAuditDates": [],
+    "referredBy": "",
+    "secondaryEmail": "",
+    "serviceType": "Industrial TAC",
+    "state": "CA",
+    "status": "Ready for audit",
+    "statusUpdatedAt": "2026-10-07T20:20:38.265Z",
+    "streetAddress": "46 C St",
+    "updatedAt": "2026-10-07T20:21:42.900Z",
+    "utilityExpenses": "2000",
+    "zipCode": "522616"
+  },
+  {
+    "_id": "6acd428eeede4c5c8e4f8ba3",
+    "user": "6acd428eeede4c5c8e4f8ba1",
+    "companyName": "Test",
+    "contactName": "tester",
+    "contactEmail": "testingaddclient@gmail.com",
+    "status": "Awaiting Documents",
+    "serviceType": "",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [],
+    "auditNotes": "",
+    "confirmedAuditDate": "",
+    "isAuditConfirmed": false,
+    "statusUpdatedAt": "2026-10-16T18:41:57.839Z",
+    "documents": [],
+    "auditFiles": [],
+    "createdAt": "2026-10-12T20:26:54.240Z",
+    "updatedAt": "2026-10-16T18:41:57.840Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ad2705a6a7c3041e15efb12",
+    "user": "6ad270229cdc6ae61a519f77",
+    "__v": 3,
+    "auditFiles": [],
+    "auditNotes": "",
+    "buildingSize": "1000",
+    "businessDescription": "Oklahoma State University",
+    "city": "Tracy",
+    "companyName": "Testing file upload",
+    "confirmedAuditDate": "",
+    "contactEmail": "testingfile@gmail.com",
+    "contactName": "testingfile",
+    "contactPhone": "9252000930",
+    "createdAt": "2026-10-16T18:43:38.535Z",
+    "description": "",
+    "documents": [
+      {
+        "name": "Electricity Bills",
+        "originalName": "Dallas to Mumbai.pdf",
+        "path": "uploads/file-1792176255267.pdf",
+        "uploadedAt": "2026-10-16T18:44:15.300Z",
+        "_id": "6ad2707f9cdc6ae61a51a528"
+      },
+      {
+        "name": "Confidentiality Statement",
+        "originalName": "confidentiality_statement (1).pdf",
+        "path": "uploads/file-1792178616806.pdf",
+        "uploadedAt": "2026-10-16T19:23:36.834Z",
+        "_id": "6ad279b89cdc6ae61a51abba"
+      },
+      {
+        "name": "Media Release Form",
+        "originalName": "media_release.pdf",
+        "path": "uploads/file-1792178845269.pdf",
+        "uploadedAt": "2026-10-16T19:27:25.297Z",
+        "_id": "6ad27a9d9cdc6ae61a51abc9"
+      }
+    ],
+    "electricityProvider": "",
+    "energyConsumption": "",
+    "grossSales": "",
+    "isArchived": false,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "",
+    "naics": "7567745645",
+    "naturalGasProvider": "",
+    "naturalGasTransporter": "",
+    "proposedAuditDates": [],
+    "referredBy": "",
+    "secondaryEmail": "",
+    "serviceType": "Industrial TAC",
+    "state": "Oklahoma",
+    "status": "Documents Submitted",
+    "statusUpdatedAt": "2026-10-16T19:27:27.459Z",
+    "streetAddress": "140 N Duck St",
+    "updatedAt": "2026-10-16T19:27:27.459Z",
+    "utilityExpenses": "2000",
+    "zipCode": "74075"
+  },
+  {
+    "_id": "6ad6270a6a7c3041e15f2af9",
+    "user": "6ad624f09cdc6ae61a51b3f8",
+    "__v": 0,
+    "auditFiles": [],
+    "auditNotes": "",
+    "buildingSize": "900,000",
+    "businessDescription": "United State Post Office Distribution Center",
+    "city": "Oklahoma City",
+    "companyName": "USPS",
+    "confirmedAuditDate": "",
+    "contactEmail": "craig.s.daigle@usps.gov",
+    "contactName": "Craig Daigle",
+    "contactPhone": "4052065239",
+    "createdAt": "2026-10-19T14:19:54.885Z",
+    "description": "",
+    "documents": [],
+    "electricityProvider": "OGE",
+    "energyConsumption": "",
+    "grossSales": "N/A",
+    "isArchived": false,
+    "isAuditConfirmed": false,
+    "isGrossSalesLessThan250M": "no",
+    "naics": "491110",
+    "naturalGasProvider": "ONG",
+    "naturalGasTransporter": "ONG",
+    "proposedAuditDates": [],
+    "referredBy": "Kyle Robison",
+    "secondaryEmail": "",
+    "serviceType": "Commercial ITAC",
+    "state": "OK",
+    "status": "Awaiting Documents",
+    "statusUpdatedAt": "2026-10-19T21:30:48.377Z",
+    "streetAddress": "4025 W Reno Ave",
+    "updatedAt": "2026-10-19T21:30:48.377Z",
+    "utilityExpenses": "647468.07",
+    "zipCode": "73125"
+  },
+  {
+    "_id": "6ad662a6c5c0bef20dcd9533",
+    "user": "6ad66278c5c0bef20dcd952a",
+    "companyName": "site 1",
+    "contactName": "Testing Multiple sites",
+    "contactEmail": "multisite@gmail.com",
+    "contactPhone": "19999999999",
+    "streetAddress": "140 N Duck St",
+    "city": "Stillwater",
+    "state": "OK",
+    "zipCode": "74075",
+    "status": "Audit Scheduled",
+    "serviceType": "Industrial TAC",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [
+      "2026-10-27",
+      "2026-10-28",
+      "2026-10-29"
+    ],
+    "auditNotes": "",
+    "confirmedAuditDate": "2026-10-28",
+    "isAuditConfirmed": true,
+    "statusUpdatedAt": "2026-10-19T21:56:28.405Z",
+    "documents": [
+      {
+        "name": "Electricity Bills",
+        "originalName": "Revised Article Review.docx",
+        "path": "uploads/file-1792444984613.docx",
+        "uploadedAt": "2026-10-19T21:23:04.670Z",
+        "_id": "6ad68a38daa3922340ac6805"
+      },
+      {
+        "name": "Natural Gas Bills",
+        "originalName": "Certificate of Insurance (SEL) 2.pdf",
+        "path": "uploads/file-1792444989163.pdf",
+        "uploadedAt": "2026-10-19T21:23:09.230Z",
+        "_id": "6ad68a3ddaa3922340ac680c"
+      }
+    ],
+    "auditFiles": [],
+    "createdAt": "2026-10-19T18:34:14.853Z",
+    "updatedAt": "2026-10-19T21:56:53.019Z",
+    "__v": 2,
+    "buildingSize": "54545",
+    "businessDescription": "fdgvdbv",
+    "electricityProvider": "252345",
+    "naturalGasProvider": "325325",
+    "naturalGasTransporter": "235325",
+    "description": "",
+    "energyConsumption": "1000000",
+    "grossSales": "5657656",
+    "isGrossSalesLessThan250M": "yes",
+    "naics": "7567745645",
+    "secondaryEmail": "",
+    "utilityExpenses": "2000"
+  },
+  {
+    "_id": "6ad66cd2c5c0bef20dcd9b9c",
+    "user": "6ad66cabc5c0bef20dcd9b93",
+    "companyName": "site 12",
+    "contactName": "multisites2",
+    "contactEmail": "multisites@gmail.com",
+    "contactPhone": "4893958565",
+    "streetAddress": "140 N Duck St",
+    "city": "Sitllwater",
+    "state": "OK",
+    "zipCode": "74075",
+    "buildingSize": "4325345",
+    "businessDescription": "43sdvdwfv",
+    "status": "Awaiting Documents",
+    "serviceType": "Industrial TAC",
+    "naturalGasProvider": "sdvdvf",
+    "electricityProvider": "sdvdfv",
+    "naturalGasTransporter": "savsv",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [],
+    "auditNotes": "",
+    "confirmedAuditDate": "",
+    "isAuditConfirmed": false,
+    "statusUpdatedAt": "2026-10-19T21:31:42.188Z",
+    "documents": [],
+    "auditFiles": [],
+    "createdAt": "2026-10-19T19:17:38.763Z",
+    "updatedAt": "2026-10-19T21:31:42.189Z",
+    "__v": 0,
+    "description": "",
+    "secondaryEmail": "",
+    "energyConsumption": "1000000",
+    "grossSales": "100000",
+    "isGrossSalesLessThan250M": "no",
+    "naics": "5757547",
+    "utilityExpenses": "2000"
+  },
+  {
+    "_id": "6ad687afdaa3922340ac6129",
+    "user": "6ad66cabc5c0bef20dcd9b93",
+    "companyName": "site 22",
+    "contactName": "multisites2",
+    "contactEmail": "multisites@gmail.com",
+    "secondaryEmail": "",
+    "contactPhone": "9252000930",
+    "streetAddress": "46 C St",
+    "city": "Tulsa",
+    "state": "CA",
+    "zipCode": "74075",
+    "buildingSize": "1000",
+    "utilityExpenses": "2000",
+    "energyConsumption": "1000000",
+    "isGrossSalesLessThan250M": "yes",
+    "grossSales": "5657656",
+    "businessDescription": "ryerery",
+    "naics": "5757547",
+    "description": "",
+    "status": "Report writing",
+    "serviceType": "Industrial TAC",
+    "naturalGasProvider": "325325",
+    "electricityProvider": "252345",
+    "naturalGasTransporter": "235325",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [],
+    "auditNotes": "",
+    "confirmedAuditDate": "",
+    "isAuditConfirmed": false,
+    "statusUpdatedAt": "2026-11-09T17:20:46.476Z",
+    "documents": [],
+    "auditFiles": [],
+    "createdAt": "2026-10-19T21:12:15.663Z",
+    "updatedAt": "2026-11-17T22:52:10.797Z",
+    "__v": 0,
+    "assignedLeadStudent": "6ac53be68e3b17364e7b5952",
+    "reportProgressStatus": "Assigned to Lead"
+  },
+  {
+    "_id": "6afb5fc1111d7289208c0dc2",
+    "user": "6afb5f80111d7289208c0dc1",
+    "companyName": "test",
+    "contactName": "Testing New Client Architecture",
+    "contactEmail": "newclientarch@gmail.com",
+    "secondaryEmail": "",
+    "contactPhone": "8349237432",
+    "streetAddress": "140 N Duck St",
+    "city": "Stillwater",
+    "state": "Ok",
+    "zipCode": "74075",
+    "buildingSize": "100",
+    "utilityExpenses": "100000",
+    "energyConsumption": "34455",
+    "isGrossSalesLessThan250M": "yes",
+    "grossSales": "10000",
+    "businessDescription": "iwhdohqw",
+    "naics": "4234",
+    "description": "",
+    "status": "New Inquiry",
+    "serviceType": "",
+    "naturalGasProvider": "",
+    "electricityProvider": "",
+    "naturalGasTransporter": "",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [],
+    "auditNotes": "",
+    "confirmedAuditDate": "",
+    "isAuditConfirmed": false,
+    "statusUpdatedAt": "2026-11-16T19:55:45.863Z",
+    "documents": [],
+    "auditFiles": [],
+    "createdAt": "2026-11-16T19:55:45.864Z",
+    "updatedAt": "2026-11-16T19:56:08.359Z",
+    "__v": 0
+  },
+  {
+    "_id": "6afb6025111d7289208c0dc3",
+    "user": "6afb5f80111d7289208c0dc1",
+    "companyName": "test 2",
+    "contactName": "Testing New Client Architecture",
+    "contactEmail": "newclientarch@gmail.com",
+    "secondaryEmail": "",
+    "contactPhone": "8349237432",
+    "streetAddress": "140 N Duck St",
+    "city": "Stillwater",
+    "state": "Ok",
+    "zipCode": "74075",
+    "buildingSize": "100",
+    "utilityExpenses": "100000",
+    "energyConsumption": "34455",
+    "isGrossSalesLessThan250M": "yes",
+    "grossSales": "10000",
+    "businessDescription": "iwhdohqw",
+    "naics": "4234",
+    "description": "",
+    "status": "New Inquiry",
+    "serviceType": "",
+    "naturalGasProvider": "",
+    "electricityProvider": "",
+    "naturalGasTransporter": "",
+    "referredBy": "",
+    "isArchived": false,
+    "proposedAuditDates": [],
+    "auditNotes": "",
+    "confirmedAuditDate": "",
+    "isAuditConfirmed": false,
+    "statusUpdatedAt": "2026-11-16T19:57:25.086Z",
+    "documents": [],
+    "auditFiles": [],
+    "createdAt": "2026-11-16T19:57:25.088Z",
+    "updatedAt": "2026-11-16T19:57:25.088Z",
+    "__v": 0
+  }
+]
